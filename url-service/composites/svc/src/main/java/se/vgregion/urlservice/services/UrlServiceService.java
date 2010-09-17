@@ -25,8 +25,10 @@ import se.vgregion.urlservice.types.ShortLink;
 
 public interface UrlServiceService {
 
-    ShortLink shorten(String urlString) throws URISyntaxException;
+    ShortLink shorten(String url) throws URISyntaxException;
 
     ShortLink expand(String shortUrlOrHash) throws URISyntaxException;
+
+    ShortLink lookup(String url) throws URISyntaxException;
 
 }

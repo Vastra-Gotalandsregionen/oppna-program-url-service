@@ -189,6 +189,69 @@ public class UrlServiceController {
         }
     }
 
+    @RequestMapping("/lookup")
+    public void lookup(@RequestParam(value = "url") List<String> urls,
+            @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
+            throws IOException {
+
+        try {
+            List<ShortLink> links = new ArrayList<ShortLink>();
+            if(urls != null) {
+                for (String shortUrl : urls) {
+                    links.add(urlServiceService.expand(shortUrl));
+                }
+            }
+    
+            if (links.isEmpty()) {
+                // nothing to expand
+                response.sendError(500, "MISSING_ARG_URL");
+            } else {
+
+                PrintWriter writer = response.getWriter();
+
+                if ("json".equals(format)) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode root = mapper.createObjectNode();
+                    root.put("status_code", 200);
+                    root.put("status_txt", "OK");
+                    ObjectNode data = root.putObject("data");
+                    ArrayNode array = data.putArray("lookup");
+
+                    for (ShortLink link : links) {
+                        ObjectNode node = mapper.createObjectNode();
+                        node.put("short_url", createFullShortUrl(link));
+                        node.put("global_hash", link.getHash());
+                        node.put("long_url", link.getUrl());
+                        array.add(node);
+                    }
+
+                    mapper.writeValue(writer, root);
+                } else if ("xml".equals(format)) {
+                    Element root = new Element("response");
+                    root.appendChild(createElement("status_code", "200"));
+                    root.appendChild(createElement("status_txt", "OK"));
+                    Element data = new Element("data");
+                    for (ShortLink link : links) {
+                        Element entry = new Element("lookup");
+                        entry.appendChild(createElement("short_url", createFullShortUrl(link)));
+                        entry.appendChild(createElement("global_hash", link.getHash()));
+                        entry.appendChild(createElement("long_url", link.getUrl()));
+
+                        data.appendChild(entry);
+                    }
+
+                    root.appendChild(data);
+
+                    writer.write(root.toXML());
+                } else {
+                    sendUnknownFormatError(response);
+                }
+            }
+        } catch (URISyntaxException e) {
+            sendInvalidUriError(response);
+        }
+    }
+
 
     private String createFullShortUrl(ShortLink link) {
         return urlPrefix + link.getHash();

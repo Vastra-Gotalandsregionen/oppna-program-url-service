@@ -101,6 +101,11 @@ public class DefaultUrlServiceService implements UrlServiceService {
         return shortLinkRepository.findByHash(hash);
     }
 
+    @Override
+    public ShortLink lookup(String url) throws URISyntaxException {
+        return shortLinkRepository.findByUrl(url);
+    }
+
     public ShortLinkRepository getShortLinkRepository() {
         return shortLinkRepository;
     }
@@ -109,6 +114,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public void setShortLinkRepository(ShortLinkRepository shortLinkRepository) {
         this.shortLinkRepository = shortLinkRepository;
     }
+
 
 
 }

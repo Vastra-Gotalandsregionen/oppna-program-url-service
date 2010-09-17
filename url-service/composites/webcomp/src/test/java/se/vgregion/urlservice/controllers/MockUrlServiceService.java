@@ -65,4 +65,13 @@ public class MockUrlServiceService implements UrlServiceService {
         
         return link;
     }
+
+    @Override
+    public ShortLink lookup(String url) throws URISyntaxException {
+        ShortLink link = new ShortLink();
+        link.setHash("foo");
+        link.setUrl(url);
+        
+        return link;
+    }
 }
