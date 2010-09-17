@@ -1,72 +1,120 @@
 <?xml version="1.0"?>
-<!--
-This is the Web-app Maven POM.
-
-
-Template version: 1.4
-Generation time : 2010-09-14 14:37:13 CEST
--->
+	<!--
+		This is the Web-app Maven POM. Template version: 1.4 Generation time :
+		2010-09-14 14:37:13 CEST
+	-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>se.vgregion.url-service</groupId>
-    <artifactId>url-service-url-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
-  <groupId>se.vgregion.url-service</groupId>
-  <artifactId>url-service-url-service-module-web</artifactId>
-  <packaging>war</packaging>
-  <name>${project.artifactId}</name>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>se.vgregion.url-service</groupId>
+		<artifactId>url-service-url-service</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>se.vgregion.url-service</groupId>
+	<artifactId>url-service-url-service-module-web</artifactId>
+	<packaging>war</packaging>
+	<name>${project.artifactId}</name>
 
-  <build>
-    <finalName>${project.artifactId}</finalName>
-    <plugins>
-      <plugin>
-        <!-- Configure eclipse plug-in to generate a context root that does not have the version number on it -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <wtpContextName>${project.artifactId}</wtpContextName>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<!--
+					Configure eclipse plug-in to generate a context root that does not
+					have the version number on it
+				-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<wtpContextName>${project.artifactId}</wtpContextName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.8</version>
+				<configuration>
+					<contextPath>/</contextPath>
+					<scanIntervalSeconds>5</scanIntervalSeconds>
+				</configuration>
+			</plugin>
 
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>url-service-url-service-composite-webcomp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>se.vgregion.javg</groupId>
-      <artifactId>javg-rt-support</artifactId>
-      <version>${javg.version}</version>
-    </dependency>
-    <dependency>
-      <!-- Use the resource-loading servlet from Spring-JS -->
-      <groupId>org.springframework.webflow</groupId>
-      <artifactId>org.springframework.js</artifactId>
-      <version>2.0.5.RELEASE</version>
-    </dependency>
-    <dependency>
-      <!-- required by the Spring-JS resource-loading servlet -->
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-    </dependency>
-    <!--
-      We use a Servlet Filter from spring-web to control UTF-8 encodings.
-      Facelets doesn't do this for us.
-    -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-  </dependencies>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>url-service-url-service-composite-webcomp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>se.vgregion.javg</groupId>
+			<artifactId>javg-rt-support</artifactId>
+			<version>${javg.version}</version>
+		</dependency>
+		<dependency>
+			<!-- Use the resource-loading servlet from Spring-JS -->
+			<groupId>org.springframework.webflow</groupId>
+			<artifactId>org.springframework.js</artifactId>
+			<version>2.0.5.RELEASE</version>
+		</dependency>
+		<dependency>
+			<!-- required by the Spring-JS resource-loading servlet -->
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+		<!--
+			We use a Servlet Filter from spring-web to control UTF-8 encodings.
+			Facelets doesn't do this for us.
+		-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>3.4.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.9.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.10</version>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
 </project>

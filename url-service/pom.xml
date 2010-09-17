@@ -13,6 +13,38 @@
   <version>1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
 
+  <pluginRepositories>
+      <pluginRepository>
+        <id>jrebel</id>
+        <name>JRebel</name>
+        <url>http://repos.zeroturnaround.com/maven2</url>
+        <layout>default</layout>
+  		<releases>
+  	        <enabled>true</enabled>
+  	    </releases>
+      </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.zeroturnaround</groupId>
+  			<artifactId>jrebel-maven-plugin</artifactId>
+  			<version>1.0.7</version>
+
+  			<executions>
+  				<execution>
+  					<id>generate-rebel-xml</id>
+  					<phase>process-resources</phase>
+  					<goals>
+  						<goal>generate</goal>
+  					</goals>
+  				</execution>
+  			</executions>
+  		</plugin>
+  	</plugins>
+    </build>
+
   <modules>
     <module>composites/types</module>
     <module>composites/svc</module>
