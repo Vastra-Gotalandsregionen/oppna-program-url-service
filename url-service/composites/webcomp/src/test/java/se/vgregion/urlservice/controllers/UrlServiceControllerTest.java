@@ -44,14 +44,38 @@ public class UrlServiceControllerTest {
         controller.shorten("http://example.com", "json", response);
         
         Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals("{\"status_code\": 200,\"data\": " +
-        		"{\"url\": \"http://example.com/foo\"," +
-        		"\"hash\": \"foo\", " +
-        		"\"global_hash\": \"foo\", " +
-        		"\"long_url\": \"http://example.com\"," +
-        		"\"new_hash\": 0}, " +
-        		"\"status_txt\": \"OK\"}", response.getContentAsString());
+        Assert.assertEquals(
+                        "{\"status_code\":200," +
+                        "\"status_txt\":\"OK\"," +
+        		"\"data\":{" +
+        		"\"url\":\"http://s.vgregion.se/foo\"," +
+        		"\"hash\":\"foo\"," +
+        		"\"global_hash\":\"foo\"," +
+        		"\"long_url\":\"http://example.com\"," +
+        		"\"new_hash\":0}" +
+        		"}", response.getContentAsString());
     }
+
+    @Test
+    public void xmlResponse() throws IOException {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
+        controller.shorten("http://example.com", "xml", response);
+        
+        Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals(
+                        "<response>" +
+                        "<status_code>200</status_code>" +
+                        "<status_txt>OK</status_txt>" +
+                        "<data>" +
+                        "<url>http://s.vgregion.se/foo</url>" +
+                        "<hash>foo</hash>" +
+                        "<global_hash>foo</global_hash>" +
+                        "<long_url>http://example.com</long_url>" +
+                        "<new_hash>0</new_hash>" +
+                        "</data></response>", response.getContentAsString());
+    }
+
     
     @Test
     public void txtResponse() throws IOException {
