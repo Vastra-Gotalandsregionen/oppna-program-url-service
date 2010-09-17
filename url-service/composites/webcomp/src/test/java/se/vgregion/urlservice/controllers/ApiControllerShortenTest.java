@@ -27,9 +27,9 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
-public class UrlServiceControllerShortenTest {
+public class ApiControllerShortenTest {
 
-    UrlServiceController controller = new UrlServiceController();
+    private ApiController controller = new ApiController();
     
     @Before
     public void setup() {

@@ -43,16 +43,17 @@ import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
 
 @Controller
-public class UrlServiceController {
+@RequestMapping("/api/v3")
+public class ApiController {
 
-    private final Logger log = LoggerFactory.getLogger(UrlServiceController.class);
+    private final Logger log = LoggerFactory.getLogger(ApiController.class);
 
     private String urlPrefix = "http://s.vgregion.se/";
 
     private UrlServiceService urlServiceService;
 
-    public UrlServiceController() {
-        log.info("Created {}", UrlServiceController.class.getName());
+    public ApiController() {
+        log.info("Created {}", ApiController.class.getName());
     }
 
     public UrlServiceService getUrlServiceService() {

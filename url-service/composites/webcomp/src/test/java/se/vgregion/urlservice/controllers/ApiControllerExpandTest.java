@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
-public class UrlServiceControllerLookupTest {
+public class ApiControllerExpandTest {
 
-    UrlServiceController controller = new UrlServiceController();
+    private ApiController controller = new ApiController();
     private MockHttpServletResponse response = new MockHttpServletResponse();
     
     @Before
@@ -41,53 +41,58 @@ public class UrlServiceControllerLookupTest {
 
     @Test
     public void jsonResponse() throws IOException {
-        controller.lookup(Arrays.asList("http://s.vgregion.se/foo"), "json", response);
+        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "json", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
                         "{\"status_code\":200," +
                         "\"status_txt\":\"OK\"," +
                         "\"data\":{" +
-                        "\"lookup\":[{" +
+                        "\"expand\":[{" +
+                        "\"hash\":\"foo\"," +
                         "\"short_url\":\"http://s.vgregion.se/foo\"," +
                         "\"global_hash\":\"foo\"," +
-                        "\"long_url\":\"http://example.com\"" +
+                        "\"long_url\":\"http://example.com\"," +
+                        "\"user_hash\":\"foo\"" +
                         "}]}}", response.getContentAsString());
     }
 
     @Test
     public void xmlResponse() throws IOException {
-        controller.lookup(Arrays.asList("http://example.com"), "xml", response);
+        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "xml", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
                 "<response><status_code>200</status_code>" +
                 "<status_txt>OK</status_txt>" +
-                "<data><lookup>" +
+                "<data><entry>" +
+                "<hash>foo</hash>" +
                 "<short_url>http://s.vgregion.se/foo</short_url>" +
                 "<global_hash>foo</global_hash>" +
                 "<long_url>http://example.com</long_url>" +
-                "</lookup></data></response>", response.getContentAsString());
+                "<user_hash>foo</user_hash>" +
+                "</entry></data></response>", response.getContentAsString());
     }
 
     
     @Test
-    public void txtResponseNotAllowed() throws IOException {
-        controller.lookup(Arrays.asList("http://s.vgregion.se/foo"), "txt", response);
+    public void txtResponse() throws IOException {
+        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "txt", response);
         
-        Assert.assertEquals(500, response.getStatus());
+        Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals("http://example.com", response.getContentAsString());
     }
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        controller.lookup(Arrays.asList("http://example.com"), "unknown", response);
+        controller.expand(Arrays.asList("http://example.com"), null, "unknown", response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void noUrlMustBeRefused() throws IOException {
-        controller.lookup(null, "txt", response);
+    public void noShortLinkNorHashMustBeRefused() throws IOException {
+        controller.expand(null, null, "txt", response);
         
         Assert.assertEquals(500, response.getStatus());
     }

@@ -59,11 +59,15 @@ public class MockUrlServiceService implements UrlServiceService {
     }
     
     public ShortLink expand(String hashOrShortUrl) {
-        ShortLink link = new ShortLink();
-        link.setHash("foo");
-        link.setUrl("http://example.com");
-        
-        return link;
+        if(hashOrShortUrl.equals("foo") ||
+                hashOrShortUrl.equals("http://s.vgregion.se/foo")) {
+            ShortLink link = new ShortLink();
+            link.setHash("foo");
+            link.setUrl("http://example.com");
+            return link;
+        } else {
+            return null;
+        }
     }
 
     @Override
