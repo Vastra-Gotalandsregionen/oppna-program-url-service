@@ -44,16 +44,16 @@ import se.vgregion.urlservice.types.ShortLink;
 
 @Controller
 @RequestMapping("/api/v3")
-public class ApiController {
+public class BitlyApiController {
 
-    private final Logger log = LoggerFactory.getLogger(ApiController.class);
+    private final Logger log = LoggerFactory.getLogger(BitlyApiController.class);
 
     private String urlPrefix = "http://s.vgregion.se/";
 
     private UrlServiceService urlServiceService;
 
-    public ApiController() {
-        log.info("Created {}", ApiController.class.getName());
+    public BitlyApiController() {
+        log.info("Created {}", BitlyApiController.class.getName());
     }
 
     public UrlServiceService getUrlServiceService() {

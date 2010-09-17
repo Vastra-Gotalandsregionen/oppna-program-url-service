@@ -66,7 +66,7 @@ public class RedirectController {
                 
                 PrintWriter writer = response.getWriter();
                 
-                
+                // HTML5 goodness
                 writer.write("<!DOCTYPE html>");
                 writer.write("<html>");
                 writer.write("<head>");

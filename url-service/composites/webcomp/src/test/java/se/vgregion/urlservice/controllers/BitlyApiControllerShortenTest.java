@@ -27,9 +27,9 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
-public class ApiControllerShortenTest {
+public class BitlyApiControllerShortenTest {
 
-    private ApiController controller = new ApiController();
+    private BitlyApiController controller = new BitlyApiController();
     
     @Before
     public void setup() {
