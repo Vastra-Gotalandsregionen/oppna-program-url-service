@@ -20,17 +20,18 @@
 package se.vgregion.urlservice.dao.jpa;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.urlservice.dao.ShortLinkDao;
+import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 @Repository("shortLinkDao")
 @Transactional(readOnly = true)
-public class JpaShortLinkDao implements ShortLinkDao {
+public class JpaShortLinkRepository implements ShortLinkRepository {
     
     @PersistenceContext
     private EntityManager em;
@@ -46,8 +47,13 @@ public class JpaShortLinkDao implements ShortLinkDao {
      * Find link by hash.
      */
     public ShortLink findByHash(String hash) {
-        return (ShortLink)em.createNamedQuery("findByHash")
+        try {
+            return (ShortLink)em.createQuery("select l from ShortLink l where l.hash = :hash")
                 .setParameter("hash", hash).getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
+
     }
 
     
@@ -65,5 +71,15 @@ public class JpaShortLinkDao implements ShortLinkDao {
     @Transactional(readOnly = false)
     public void delete(ShortLink link) {
         em.remove(em.merge(link));
+    }
+
+    @Override
+    public ShortLink findByUrl(String url) {
+        try {
+            return (ShortLink)em.createQuery("select l from ShortLink l where l.url = :url")
+            .setParameter("url", url).getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
     }   
 }

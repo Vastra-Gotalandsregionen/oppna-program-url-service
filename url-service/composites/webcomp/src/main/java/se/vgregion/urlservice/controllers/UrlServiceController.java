@@ -110,7 +110,7 @@ public class UrlServiceController {
         }
     }
 
-    @RequestMapping("/shorten")
+    @RequestMapping("/expand")
     public void expand(@RequestParam(value = "shortUrl", required = false) List<String> shortUrls,
             @RequestParam(value = "hash", required = false) List<String> hashes,
             @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)

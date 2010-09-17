@@ -23,13 +23,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQueries(
-    @NamedQuery(name="findByHash", query="select l from ShortLink l where l.hash = :hash")    
-    )
 public class ShortLink {
 
     @Id
@@ -41,6 +36,14 @@ public class ShortLink {
     
     @Column(nullable=false)
     private String url;
+
+    public ShortLink() {
+    }
+
+    public ShortLink(String hash, String url) {
+        this.hash = hash;
+        this.url = url;
+    }
     
     public long getId() {
         return id;

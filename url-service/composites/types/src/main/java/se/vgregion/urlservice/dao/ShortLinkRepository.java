@@ -21,7 +21,7 @@ package se.vgregion.urlservice.dao;
 
 import se.vgregion.urlservice.types.ShortLink;
     
-public interface ShortLinkDao {
+public interface ShortLinkRepository {
 
     /**
      * Find link by id.
@@ -33,6 +33,12 @@ public interface ShortLinkDao {
      */
     ShortLink findByHash(String hash);
 
+    /**
+     * Find link by URL.
+     */
+    ShortLink findByUrl(String url);
+
+    
     /**
      * Saves link.
      */

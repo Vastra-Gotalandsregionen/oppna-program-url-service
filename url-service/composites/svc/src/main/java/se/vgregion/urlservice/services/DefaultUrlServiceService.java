@@ -24,10 +24,14 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
 
 @Service
@@ -36,6 +40,10 @@ public class DefaultUrlServiceService implements UrlServiceService {
     private final Logger log = LoggerFactory.getLogger(DefaultUrlServiceService.class);
     
     private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
+
+    private static final int INITIAL_HASH_LENGTH = 6;
+    
+    private ShortLinkRepository shortLinkRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -48,10 +56,35 @@ public class DefaultUrlServiceService implements UrlServiceService {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            ShortLink link = new ShortLink();
-            link.setHash("def");
-            link.setUrl(urlString);
-            return link;
+            ShortLink link = shortLinkRepository.findByUrl(urlString);
+            
+            if(link != null) {
+                return link;
+            } else {
+                String md5 = DigestUtils.md5Hex(urlString);
+                
+                int length = INITIAL_HASH_LENGTH;
+                String hash = md5.substring(0, length);
+                
+                // check that the hash does not already exist
+                while(shortLinkRepository.findByHash(hash) != null) {
+                    length++;
+                    
+                    if(length > md5.length()) {
+                        // should never happen...
+                        throw new RuntimeException("Failed to generate hash");
+                    }
+                    
+                    hash = md5.substring(0, length);
+                }
+                
+                ShortLink newLink = new ShortLink();
+                newLink.setHash(hash);
+                newLink.setUrl(urlString);
+                
+                newLink = shortLinkRepository.save(newLink);
+                return newLink;
+            }
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
@@ -59,7 +92,23 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     @Override
     public ShortLink expand(String shortUrlOrHash) throws URISyntaxException {
-        // TODO Auto-generated method stub
-        return null;
+        String hash;
+        if(shortUrlOrHash.startsWith("http://")) {
+            hash = shortUrlOrHash.substring(shortUrlOrHash.lastIndexOf('/') + 1);
+        } else {
+            hash = shortUrlOrHash;
+        }
+        return shortLinkRepository.findByHash(hash);
     }
+
+    public ShortLinkRepository getShortLinkRepository() {
+        return shortLinkRepository;
+    }
+
+    @Resource
+    public void setShortLinkRepository(ShortLinkRepository shortLinkRepository) {
+        this.shortLinkRepository = shortLinkRepository;
+    }
+
+
 }
