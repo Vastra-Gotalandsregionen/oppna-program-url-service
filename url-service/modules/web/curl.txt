@@ -1,0 +1,12 @@
+# shorten a few link
+curl "http://localhost:8080/url-service-url-service-module-web/shorten?longUrl=http://example.com"
+curl "http://localhost:8080/url-service-url-service-module-web/shorten?longUrl=http://example.com/1"
+
+# now expand them
+curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0"
+curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&hash=9be0f2"
+
+curl "http://localhost:8080/url-service-url-service-module-web/expand?shortUrl=http://s.vgregion.se/a9b9f0&hash=9be0f2"
+
+curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&format=xml"
+curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&format=txt"
