@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
-public class UrlServiceControllerTest {
+public class UrlServiceControllerShortenTest {
 
     UrlServiceController controller = new UrlServiceController();
     
@@ -93,7 +93,7 @@ public class UrlServiceControllerTest {
         
         controller.shorten("http://example.com", "unknown", response);
         
-        Assert.assertEquals(404, response.getStatus());
+        Assert.assertEquals(500, response.getStatus());
     }
 
     @Test

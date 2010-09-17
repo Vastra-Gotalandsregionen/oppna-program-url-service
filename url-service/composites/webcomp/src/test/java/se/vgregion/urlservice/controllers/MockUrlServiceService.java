@@ -57,4 +57,12 @@ public class MockUrlServiceService implements UrlServiceService {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
     }
+    
+    public ShortLink expand(String hashOrShortUrl) {
+        ShortLink link = new ShortLink();
+        link.setHash("foo");
+        link.setUrl("http://example.com");
+        
+        return link;
+    }
 }

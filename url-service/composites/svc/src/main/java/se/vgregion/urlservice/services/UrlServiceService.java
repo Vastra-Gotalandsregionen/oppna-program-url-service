@@ -27,4 +27,6 @@ public interface UrlServiceService {
 
     ShortLink shorten(String urlString) throws URISyntaxException;
 
+    ShortLink expand(String shortUrlOrHash) throws URISyntaxException;
+
 }

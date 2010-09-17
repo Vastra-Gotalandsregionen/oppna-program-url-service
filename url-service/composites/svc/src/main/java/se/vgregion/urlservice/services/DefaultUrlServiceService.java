@@ -56,4 +56,10 @@ public class DefaultUrlServiceService implements UrlServiceService {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
     }
+
+    @Override
+    public ShortLink expand(String shortUrlOrHash) throws URISyntaxException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
