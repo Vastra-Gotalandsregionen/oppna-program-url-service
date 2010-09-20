@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.repository;
+package se.vgregion.urlservice.repository.jpa;
 
 import javax.persistence.PersistenceException;
 
