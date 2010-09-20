@@ -35,6 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
 
+/**
+ * Controller for handling redirects, e.g. a user doing a HTTP GET for http://s.vgregion.se/a4f6Bd 
+ * this controller will redirect the user to the long URL for this short link.
+ *
+ */
 @Controller
 public class RedirectController {
 

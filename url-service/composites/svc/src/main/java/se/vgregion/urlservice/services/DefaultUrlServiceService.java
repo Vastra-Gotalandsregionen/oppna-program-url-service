@@ -50,8 +50,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
     }
 
-    /* (non-Javadoc)
-     * @see se.vgregion.urlservice.services.UrlServiceService#shorten(java.lang.String)
+    /** 
+     * {@inheritDoc}
      */
     @Transactional(readOnly = false)
     public ShortLink shorten(String urlString) throws URISyntaxException {
@@ -92,6 +92,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
         }
     }
 
+    /** 
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public ShortLink expand(String shortUrlOrHash) throws URISyntaxException {
@@ -104,6 +107,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
         return shortLinkRepository.findByHash(hash);
     }
 
+    /** 
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public ShortLink lookup(String url) throws URISyntaxException {

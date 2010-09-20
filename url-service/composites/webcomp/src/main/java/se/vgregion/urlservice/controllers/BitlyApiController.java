@@ -42,6 +42,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
 
+/**
+ * Controller implementing the bit.ly version 3 API (http://code.google.com/p/bitly-api/wiki/ApiDocumentation)
+ *
+ */
 @Controller
 @RequestMapping("/api/v3")
 public class BitlyApiController {
