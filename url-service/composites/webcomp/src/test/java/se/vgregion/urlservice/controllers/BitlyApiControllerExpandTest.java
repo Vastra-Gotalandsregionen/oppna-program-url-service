@@ -23,26 +23,19 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
 public class BitlyApiControllerExpandTest {
 
-    private BitlyApiController controller = new BitlyApiController();
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
     private MockHttpServletResponse response = new MockHttpServletResponse();
-    
-    @Before
-    public void setup() {
-        controller.setUrlServiceService(new MockUrlServiceService());
-    }
-
 
     @Test
     public void jsonResponse() throws IOException {
         controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "json", response);
-        
+
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
                         "{\"status_code\":200," +

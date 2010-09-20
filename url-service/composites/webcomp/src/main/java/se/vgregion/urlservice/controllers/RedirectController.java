@@ -40,21 +40,21 @@ public class RedirectController {
 
     private final Logger log = LoggerFactory.getLogger(RedirectController.class);
 
+    @Resource
     private UrlServiceService urlServiceService;
 
     public RedirectController() {
         log.info("Created {}", RedirectController.class.getName());
     }
 
-    public UrlServiceService getUrlServiceService() {
-        return urlServiceService;
-    }
-
-    @Resource
-    public void setUrlServiceService(UrlServiceService urlServiceService) {
+    public RedirectController(UrlServiceService urlServiceService) {
+        this();
         this.urlServiceService = urlServiceService;
     }
 
+    /**
+     * Handle redirects for a shortlink
+     */
     @RequestMapping("/{hash}")
     public void redirect(@PathVariable("hash") String hash, HttpServletResponse response) throws IOException {
         try {

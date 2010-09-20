@@ -17,32 +17,28 @@
  *
  */
 
-package se.vgregion.urlservice.dao.jpa;
+package se.vgregion.urlservice.repository.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
 import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
-@Repository("shortLinkDao")
-@Transactional(readOnly = true)
-public class JpaShortLinkRepository implements ShortLinkRepository {
+@Repository
+public class JpaShortLinkRepository extends JpaRepository<ShortLink, Long> implements ShortLinkRepository {
     
     @PersistenceContext
     private EntityManager em;
 
-    /**
-     * Find link.
-     */
-    public ShortLink find(long id) {
-        return em.find(ShortLink.class, id);
+    public JpaShortLinkRepository() {
+        super(ShortLink.class);
     }
-
+    
     /**
      * Find link by hash.
      */
@@ -54,23 +50,6 @@ public class JpaShortLinkRepository implements ShortLinkRepository {
             return null;
         }
 
-    }
-
-    
-    /**
-     * Saves link.
-     */
-    @Transactional(readOnly = false)
-    public ShortLink save(ShortLink link) {
-        return em.merge(link);
-    }
-
-    /**
-     * Deletes link.
-     */
-    @Transactional(readOnly = false)
-    public void delete(ShortLink link) {
-        em.remove(em.merge(link));
     }
 
     @Override

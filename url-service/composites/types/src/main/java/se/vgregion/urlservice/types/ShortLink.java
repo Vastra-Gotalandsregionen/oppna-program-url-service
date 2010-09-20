@@ -24,8 +24,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
+
 @Entity
-public class ShortLink {
+public class ShortLink extends AbstractEntity<ShortLink, Long> {
 
     @Id
     @GeneratedValue
@@ -45,9 +47,10 @@ public class ShortLink {
         this.url = url;
     }
     
-    public long getId() {
+    public Long getId() {
         return id;
     }
+    
     public String getHash() {
         return hash;
     }

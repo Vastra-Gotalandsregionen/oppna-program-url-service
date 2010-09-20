@@ -22,22 +22,15 @@ package se.vgregion.urlservice.controllers;
 import java.io.IOException;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
 public class RedirectTest {
 
-    private RedirectController controller = new RedirectController();
+    private RedirectController controller = new RedirectController(new MockUrlServiceService());
     private MockHttpServletResponse response = new MockHttpServletResponse();
     
-    @Before
-    public void setup() {
-        controller.setUrlServiceService(new MockUrlServiceService());
-    }
-
-
     @Test
     public void redirectWithExistingHash() throws IOException {
         controller.redirect("foo", response);

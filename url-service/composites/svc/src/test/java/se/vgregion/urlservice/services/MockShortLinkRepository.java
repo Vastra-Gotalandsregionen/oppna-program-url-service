@@ -19,18 +19,14 @@
 
 package se.vgregion.urlservice.services;
 
+import java.util.List;
+import java.util.Map;
+
 import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 public class MockShortLinkRepository implements ShortLinkRepository {
     
-    /**
-     * Find link.
-     */
-    public ShortLink find(long id) {
-        return null;
-    }
-
     /**
      * Find link by hash.
      */
@@ -38,22 +34,80 @@ public class MockShortLinkRepository implements ShortLinkRepository {
         return null;
     }
 
-    
-    /**
-     * Saves link.
-     */
-    public ShortLink save(ShortLink link) {
-        return link;
-    }
-
-    /**
-     * Deletes link.
-     */
-    public void delete(ShortLink link) {
+    @Override
+    public ShortLink findByUrl(String url) {
+        return null;
     }
 
     @Override
-    public ShortLink findByUrl(String url) {
+    public void clear() {
+    }
+
+    @Override
+    public boolean contains(ShortLink entity) {
+        return false;
+    }
+
+    @Override
+    public void deleteByPk(Long pk) {
+        
+    }
+
+    @Override
+    public List<ShortLink> findAll() {
+        return null;
+    }
+
+    @Override
+    public List<ShortLink> findByNamedQuery(String queryName, Map<String, ? extends Object> args) {
+        return null;
+    }
+
+    @Override
+    public List<ShortLink> findByNamedQuery(String queryName, Object[] args) {
+        return null;
+    }
+
+    @Override
+    public ShortLink findByPk(Long pk) {
+        return null;
+    }
+
+    @Override
+    public ShortLink findInstanceByNamedQuery(String queryName, Object[] args) {
+        return null;
+    }
+
+    @Override
+    public ShortLink findInstanceByNamedQuery(String queryName, Map<String, ? extends Object> args) {
+        return null;
+    }
+
+    @Override
+    public void flush() {
+        
+    }
+
+    @Override
+    public ShortLink merge(ShortLink object) {
+        return null;
+    }
+
+    @Override
+    public ShortLink persist(ShortLink object) {
+        return object;
+    }
+
+    @Override
+    public void refresh(ShortLink object) {
+    }
+
+    @Override
+    public void removeEntity(ShortLink object) {
+    }
+
+    @Override
+    public ShortLink store(ShortLink entity) {
         return null;
     }   
 }

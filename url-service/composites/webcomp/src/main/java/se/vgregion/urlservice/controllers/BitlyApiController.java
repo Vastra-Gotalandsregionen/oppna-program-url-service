@@ -50,18 +50,15 @@ public class BitlyApiController {
 
     private String urlPrefix = "http://s.vgregion.se/";
 
+    @Resource
     private UrlServiceService urlServiceService;
 
     public BitlyApiController() {
         log.info("Created {}", BitlyApiController.class.getName());
     }
 
-    public UrlServiceService getUrlServiceService() {
-        return urlServiceService;
-    }
-
-    @Resource
-    public void setUrlServiceService(UrlServiceService urlServiceService) {
+    public BitlyApiController(UrlServiceService urlServiceService) {
+        this();
         this.urlServiceService = urlServiceService;
     }
 

@@ -19,14 +19,10 @@
 
 package se.vgregion.urlservice.dao;
 
+import se.vgregion.portal.core.domain.patterns.repository.Repository;
 import se.vgregion.urlservice.types.ShortLink;
     
-public interface ShortLinkRepository {
-
-    /**
-     * Find link by id.
-     */
-    ShortLink find(long id);
+public interface ShortLinkRepository extends Repository<ShortLink, Long> {
 
     /**
      * Find link by hash.
@@ -37,15 +33,4 @@ public interface ShortLinkRepository {
      * Find link by URL.
      */
     ShortLink findByUrl(String url);
-
-    
-    /**
-     * Saves link.
-     */
-    ShortLink save(ShortLink link);
-    
-    /**
-     * Deletes link.
-     */
-    void delete(ShortLink link);
 }

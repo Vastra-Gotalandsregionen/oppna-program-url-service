@@ -30,6 +30,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
@@ -52,6 +53,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     /* (non-Javadoc)
      * @see se.vgregion.urlservice.services.UrlServiceService#shorten(java.lang.String)
      */
+    @Transactional(readOnly = false)
     public ShortLink shorten(String urlString) throws URISyntaxException {
         URI url = new URI(urlString);
         
@@ -82,7 +84,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 newLink.setHash(hash);
                 newLink.setUrl(urlString);
                 
-                newLink = shortLinkRepository.save(newLink);
+                newLink = shortLinkRepository.persist(newLink);
                 return newLink;
             }
         } else {
@@ -91,6 +93,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ShortLink expand(String shortUrlOrHash) throws URISyntaxException {
         String hash;
         if(shortUrlOrHash.startsWith("http://")) {
@@ -102,6 +105,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ShortLink lookup(String url) throws URISyntaxException {
         return shortLinkRepository.findByUrl(url);
     }

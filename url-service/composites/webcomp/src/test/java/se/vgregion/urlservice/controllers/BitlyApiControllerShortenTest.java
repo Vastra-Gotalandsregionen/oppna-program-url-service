@@ -29,14 +29,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BitlyApiControllerShortenTest {
 
-    private BitlyApiController controller = new BitlyApiController();
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
     
-    @Before
-    public void setup() {
-        controller.setUrlServiceService(new MockUrlServiceService());
-    }
-
-
     @Test
     public void jsonResponse() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();

@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.dao;
+package se.vgregion.urlservice.repository;
 
 import javax.persistence.PersistenceException;
 
@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import se.vgregion.urlservice.dao.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
 
 
@@ -39,12 +40,12 @@ public class JpaShortLinkRepositoryTest {
     
     @Before
     public void setup() {
-        link1 = dao.save(new ShortLink("foo1", "http://example.com/1"));
+        link1 = dao.persist(new ShortLink("foo1", "http://example.com/1"));
     }
     
     @Test
-    public void findById() {
-        ShortLink loaded = dao.find(link1.getId());
+    public void findByPk() {
+        ShortLink loaded = dao.findByPk(link1.getId());
         
         Assert.assertEquals(link1.getHash(), loaded.getHash());
         Assert.assertEquals(link1.getUrl(), loaded.getUrl());
@@ -78,7 +79,7 @@ public class JpaShortLinkRepositoryTest {
 
     @Test(expected=PersistenceException.class)
     public void duplicateHashNotAllowed() {
-        dao.save(new ShortLink(link1.getHash(), "http://dummy"));
+        dao.persist(new ShortLink(link1.getHash(), "http://dummy"));
     }
 
 }
