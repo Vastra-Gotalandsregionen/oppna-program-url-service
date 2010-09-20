@@ -22,7 +22,7 @@ package se.vgregion.urlservice.services;
 import java.util.List;
 import java.util.Map;
 
-import se.vgregion.urlservice.dao.ShortLinkRepository;
+import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 public class MockShortLinkRepository implements ShortLinkRepository {

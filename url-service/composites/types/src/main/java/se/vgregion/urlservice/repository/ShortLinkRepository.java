@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.dao;
+package se.vgregion.urlservice.repository;
 
 import se.vgregion.portal.core.domain.patterns.repository.Repository;
 import se.vgregion.urlservice.types.ShortLink;

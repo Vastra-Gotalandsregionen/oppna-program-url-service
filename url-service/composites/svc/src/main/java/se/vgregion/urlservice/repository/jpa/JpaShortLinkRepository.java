@@ -26,7 +26,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
-import se.vgregion.urlservice.dao.ShortLinkRepository;
+import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 @Repository
