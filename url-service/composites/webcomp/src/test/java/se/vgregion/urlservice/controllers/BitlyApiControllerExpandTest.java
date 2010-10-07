@@ -29,7 +29,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BitlyApiControllerExpandTest {
 
-    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), "http://s.vgregion.se/");
     private MockHttpServletResponse response = new MockHttpServletResponse();
 
     @Test

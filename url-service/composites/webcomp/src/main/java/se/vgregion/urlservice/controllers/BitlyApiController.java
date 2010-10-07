@@ -52,7 +52,8 @@ public class BitlyApiController {
 
     private final Logger log = LoggerFactory.getLogger(BitlyApiController.class);
 
-    private String urlPrefix = "http://s.vgregion.se/";
+    @Resource(name="urlPrefix")
+    private String urlPrefix;
 
     @Resource
     private UrlServiceService urlServiceService;
@@ -61,9 +62,10 @@ public class BitlyApiController {
         log.info("Created {}", BitlyApiController.class.getName());
     }
 
-    public BitlyApiController(UrlServiceService urlServiceService) {
+    public BitlyApiController(UrlServiceService urlServiceService, String urlPrefix) {
         this();
         this.urlServiceService = urlServiceService;
+        this.urlPrefix = urlPrefix;
     }
 
     @RequestMapping("/shorten")
