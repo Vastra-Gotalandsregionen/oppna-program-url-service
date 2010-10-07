@@ -28,18 +28,19 @@ import se.vgregion.urlservice.types.ShortLink;
 
 public class UrlServiceServiceTest {
 
+    private static final String SHORT_URL = "http://short";
     private static final String HASH = "foo";
-    private static final String URL = "http://example.com";
+    private static final String LOGN_URL = "http://example.com";
     private DefaultUrlServiceService urlService = new DefaultUrlServiceService();
 
     @Test
     public void shortenNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository());
 
-        ShortLink link = urlService.shorten(URL);
+        ShortLink link = urlService.shorten(LOGN_URL);
 
         Assert.assertEquals("a9b9f0", link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
     @Test
@@ -50,18 +51,18 @@ public class UrlServiceServiceTest {
             public ShortLink findByHash(String hash) {
                 // make sure the first hash collides
                 if("a9b9f0".equals(hash)) {
-                    return new ShortLink("a9b9f0", "http://someurl");
+                    return new ShortLink("a9b9f0", "http://someurl", SHORT_URL);
                 } else {
                     return null;
                 }
             }
         });
 
-        ShortLink link = urlService.shorten(URL);
+        ShortLink link = urlService.shorten(LOGN_URL);
 
         // since the hash collides, we should get a longer hash
         Assert.assertEquals("a9b9f04", link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
     
@@ -69,16 +70,16 @@ public class UrlServiceServiceTest {
     public void shortenExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
-            public ShortLink findByUrl(String url) {
-                return new ShortLink(HASH, url);
+            public ShortLink findByLongUrl(String url) {
+                return new ShortLink(HASH, url, SHORT_URL);
             }
             
         });
 
-        ShortLink link = urlService.shorten(URL);
+        ShortLink link = urlService.shorten(LOGN_URL);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
     @Test(expected=URISyntaxException.class)
@@ -93,14 +94,14 @@ public class UrlServiceServiceTest {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
             public ShortLink findByHash(String hash) {
-                return new ShortLink(hash, URL);
+                return new ShortLink(hash, LOGN_URL, SHORT_URL);
             }
         });
 
         ShortLink link = urlService.expand(HASH);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
     @Test
@@ -108,14 +109,14 @@ public class UrlServiceServiceTest {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
             public ShortLink findByHash(String hash) {
-                return new ShortLink(hash, URL);
+                return new ShortLink(hash, LOGN_URL, SHORT_URL);
             }
         });
 
         ShortLink link = urlService.expand("http://s.vgregion.se/foo");
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
     
@@ -131,15 +132,15 @@ public class UrlServiceServiceTest {
     public void lookupExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
-            public ShortLink findByUrl(String url) {
-                return new ShortLink(HASH, url);
+            public ShortLink findByLongUrl(String url) {
+                return new ShortLink(HASH, url, SHORT_URL);
             }
         });
 
-        ShortLink link = urlService.lookup(URL);
+        ShortLink link = urlService.lookup(LOGN_URL);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(URL, link.getUrl());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
     }
 
 
@@ -147,7 +148,7 @@ public class UrlServiceServiceTest {
     public void lookupNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository());
 
-        Assert.assertNull(urlService.lookup(URL));
+        Assert.assertNull(urlService.lookup(LOGN_URL));
     }
 
 }

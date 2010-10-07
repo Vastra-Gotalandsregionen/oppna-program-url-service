@@ -67,7 +67,7 @@ public class RedirectController {
 
             if (link != null) {
                 response.setStatus(301);
-                response.setHeader("Location", link.getUrl());
+                response.setHeader("Location", link.getLongUrl());
                 
                 PrintWriter writer = response.getWriter();
                 
@@ -78,7 +78,7 @@ public class RedirectController {
                 writer.write("<title>Moved</title>");
                 writer.write("</head>");
                 writer.write("<body>");
-                writer.write("<a href=\"" + link.getUrl() + "\">The requested URL has moved here.</a>");
+                writer.write("<a href=\"" + link.getLongUrl() + "\">The requested URL has moved here.</a>");
                 writer.write("</body>");
                 writer.write("</html>");
             } else {

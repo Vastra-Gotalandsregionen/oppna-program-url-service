@@ -35,7 +35,7 @@ import se.vgregion.urlservice.types.ShortLink;
 public class MockUrlServiceService implements UrlServiceService {
 
     private final Logger log = LoggerFactory.getLogger(MockUrlServiceService.class);
-    
+    private static final String URL_PREFIX = "http://s.vgregion.se/";
     private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
     
     public MockUrlServiceService() {
@@ -51,7 +51,8 @@ public class MockUrlServiceService implements UrlServiceService {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             ShortLink link = new ShortLink();
             link.setHash("foo");
-            link.setUrl(urlString);
+            link.setLongUrl(urlString);
+            link.setShortUrl(URL_PREFIX + "foo");
             return link;
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
@@ -63,7 +64,8 @@ public class MockUrlServiceService implements UrlServiceService {
                 hashOrShortUrl.equals("http://s.vgregion.se/foo")) {
             ShortLink link = new ShortLink();
             link.setHash("foo");
-            link.setUrl("http://example.com");
+            link.setLongUrl("http://example.com");
+            link.setShortUrl(URL_PREFIX + "foo");
             return link;
         } else {
             return null;
@@ -74,7 +76,8 @@ public class MockUrlServiceService implements UrlServiceService {
     public ShortLink lookup(String url) throws URISyntaxException {
         ShortLink link = new ShortLink();
         link.setHash("foo");
-        link.setUrl(url);
+        link.setLongUrl(url);
+        link.setShortUrl(URL_PREFIX + "foo");
         
         return link;
     }

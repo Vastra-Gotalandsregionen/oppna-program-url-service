@@ -35,7 +35,7 @@ public class MockShortLinkRepository implements ShortLinkRepository {
     }
 
     @Override
-    public ShortLink findByUrl(String url) {
+    public ShortLink findByLongUrl(String url) {
         return null;
     }
 

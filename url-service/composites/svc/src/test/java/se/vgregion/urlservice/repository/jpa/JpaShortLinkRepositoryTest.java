@@ -40,7 +40,7 @@ public class JpaShortLinkRepositoryTest {
     
     @Before
     public void setup() {
-        link1 = dao.persist(new ShortLink("foo1", "http://example.com/1"));
+        link1 = dao.persist(new ShortLink("foo1", "http://example.com/1", "http://short"));
     }
     
     @Test
@@ -48,7 +48,7 @@ public class JpaShortLinkRepositoryTest {
         ShortLink loaded = dao.findByPk(link1.getId());
         
         Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
+        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class JpaShortLinkRepositoryTest {
         ShortLink loaded = dao.findByHash(link1.getHash());
         
         Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
+        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
     }
 
     @Test
@@ -65,21 +65,21 @@ public class JpaShortLinkRepositoryTest {
     }
 
     @Test
-    public void findNonExistingByUrl() {
-        Assert.assertNull(dao.findByUrl("dummy"));
+    public void findNonExistingByLongUrl() {
+        Assert.assertNull(dao.findByLongUrl("dummy"));
     }
     
     @Test
-    public void findByUrl() {
-        ShortLink loaded = dao.findByUrl(link1.getUrl());
+    public void findByLongUrl() {
+        ShortLink loaded = dao.findByLongUrl(link1.getLongUrl());
         
         Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
+        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
     }
 
     @Test(expected=PersistenceException.class)
     public void duplicateHashNotAllowed() {
-        dao.persist(new ShortLink(link1.getHash(), "http://dummy"));
+        dao.persist(new ShortLink(link1.getHash(), "http://dummy", "http://short"));
     }
 
 }

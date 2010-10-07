@@ -44,10 +44,6 @@ public class ShortenGuiController {
 
     private final Logger log = LoggerFactory.getLogger(ShortenGuiController.class);
 
-    // TODO move into UrlServiceService
-    @Resource(name="urlPrefix")
-    private String urlPrefix;
-    
     @Resource
     private UrlServiceService urlServiceService;
 
@@ -55,10 +51,9 @@ public class ShortenGuiController {
         log.info("Created {}", ShortenGuiController.class.getName());
     }
 
-    public ShortenGuiController(UrlServiceService urlServiceService, String urlPrefix) {
+    public ShortenGuiController(UrlServiceService urlServiceService) {
         this();
         this.urlServiceService = urlServiceService;
-        this.urlPrefix = urlPrefix;
     }
 
     @RequestMapping(value="/")
@@ -84,9 +79,8 @@ public class ShortenGuiController {
         writer.write("</form>");
         
         if(longUrl != null) {
-            String shortUrl;
             try {
-                shortUrl = urlPrefix + urlServiceService.shorten(longUrl).getHash();
+                String shortUrl = urlServiceService.shorten(longUrl).getShortUrl();
                 writer.write("<p><a href=\"" + shortUrl + "\">" + shortUrl + "</a></p>");
             } catch (URISyntaxException e) {
                 writer.write("<p>Felaktig address, måste börja med \"http://\" eller \"https://\"</p>");

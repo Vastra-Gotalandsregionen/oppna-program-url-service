@@ -53,10 +53,10 @@ public class JpaShortLinkRepository extends JpaRepository<ShortLink, Long> imple
     }
 
     @Override
-    public ShortLink findByUrl(String url) {
+    public ShortLink findByLongUrl(String longUrl) {
         try {
-            return (ShortLink)em.createQuery("select l from ShortLink l where l.url = :url")
-            .setParameter("url", url).getSingleResult();
+            return (ShortLink)em.createQuery("select l from ShortLink l where l.longUrl = :longurl")
+            .setParameter("longurl", longUrl).getSingleResult();
         } catch(NoResultException e) {
             return null;
         }

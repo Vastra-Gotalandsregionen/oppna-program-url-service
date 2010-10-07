@@ -37,14 +37,19 @@ public class ShortLink extends AbstractEntity<ShortLink, Long> {
     private String hash;
     
     @Column(nullable=false)
-    private String url;
+    private String longUrl;
 
+    @Column(nullable=false)
+    private String shortUrl;
+
+    
     public ShortLink() {
     }
 
-    public ShortLink(String hash, String url) {
+    public ShortLink(String hash, String longUrl, String shortUrl) {
         this.hash = hash;
-        this.url = url;
+        this.longUrl = longUrl;
+        this.shortUrl = shortUrl;
     }
     
     public Long getId() {
@@ -57,12 +62,18 @@ public class ShortLink extends AbstractEntity<ShortLink, Long> {
     public void setHash(String hash) {
         this.hash = hash;
     }
-    public String getUrl() {
-        return url;
+    public String getLongUrl() {
+        return longUrl;
     }
-    public void setUrl(String url) {
-        this.url = url;
+    public void setLongUrl(String url) {
+        this.longUrl = url;
     }
-    
-    
+
+    public String getShortUrl() {
+        return shortUrl;
+    }
+
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
+    }
 }

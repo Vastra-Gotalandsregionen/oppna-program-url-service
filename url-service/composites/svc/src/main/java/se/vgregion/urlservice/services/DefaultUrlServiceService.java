@@ -44,6 +44,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     private static final int INITIAL_HASH_LENGTH = 6;
     
+    private String urlPrefix;
+    
     private ShortLinkRepository shortLinkRepository;
     
     public DefaultUrlServiceService() {
@@ -58,7 +60,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            ShortLink link = shortLinkRepository.findByUrl(urlString);
+            ShortLink link = shortLinkRepository.findByLongUrl(urlString);
             
             if(link != null) {
                 return link;
@@ -82,7 +84,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 
                 ShortLink newLink = new ShortLink();
                 newLink.setHash(hash);
-                newLink.setUrl(urlString);
+                newLink.setLongUrl(urlString);
+                newLink.setShortUrl(urlPrefix + hash);
                 
                 newLink = shortLinkRepository.persist(newLink);
                 return newLink;
@@ -113,7 +116,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public ShortLink lookup(String url) throws URISyntaxException {
-        return shortLinkRepository.findByUrl(url);
+        return shortLinkRepository.findByLongUrl(url);
     }
 
     public ShortLinkRepository getShortLinkRepository() {
@@ -123,6 +126,19 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Resource
     public void setShortLinkRepository(ShortLinkRepository shortLinkRepository) {
         this.shortLinkRepository = shortLinkRepository;
+    }
+
+    public String getUrlPrefix() {
+        return urlPrefix;
+    }
+
+    @Resource(name="urlPrefix")
+    public void setUrlPrefix(String urlPrefix) {
+        if(!urlPrefix.endsWith("/")) {
+            urlPrefix = urlPrefix + "/";
+        }
+        
+        this.urlPrefix = urlPrefix;
     }
 
 

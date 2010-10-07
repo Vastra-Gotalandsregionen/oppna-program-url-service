@@ -32,5 +32,5 @@ public interface ShortLinkRepository extends Repository<ShortLink, Long> {
     /**
      * Find link by URL.
      */
-    ShortLink findByUrl(String url);
+    ShortLink findByLongUrl(String longUrl);
 }

@@ -52,9 +52,6 @@ public class BitlyApiController {
 
     private final Logger log = LoggerFactory.getLogger(BitlyApiController.class);
 
-    @Resource(name="urlPrefix")
-    private String urlPrefix;
-
     @Resource
     private UrlServiceService urlServiceService;
 
@@ -62,10 +59,9 @@ public class BitlyApiController {
         log.info("Created {}", BitlyApiController.class.getName());
     }
 
-    public BitlyApiController(UrlServiceService urlServiceService, String urlPrefix) {
+    public BitlyApiController(UrlServiceService urlServiceService) {
         this();
         this.urlServiceService = urlServiceService;
-        this.urlPrefix = urlPrefix;
     }
 
     @RequestMapping("/shorten")
@@ -83,10 +79,10 @@ public class BitlyApiController {
                 root.put("status_code", 200);
                 root.put("status_txt", "OK");
                 ObjectNode data = root.putObject("data");
-                data.put("url", createFullShortUrl(link));
+                data.put("url", link.getShortUrl());
                 data.put("hash", link.getHash());
                 data.put("global_hash", link.getHash());
-                data.put("long_url", link.getUrl());
+                data.put("long_url", link.getLongUrl());
                 data.put("new_hash", 0);
 
                 treeMapper.writeValue(writer, root);
@@ -95,10 +91,10 @@ public class BitlyApiController {
                 root.appendChild(createElement("status_code", "200"));
                 root.appendChild(createElement("status_txt", "OK"));
                 Element data = new Element("data");
-                data.appendChild(createElement("url", createFullShortUrl(link)));
+                data.appendChild(createElement("url", link.getShortUrl()));
                 data.appendChild(createElement("hash", link.getHash()));
                 data.appendChild(createElement("global_hash", link.getHash()));
-                data.appendChild(createElement("long_url", link.getUrl()));
+                data.appendChild(createElement("long_url", link.getLongUrl()));
                 data.appendChild(createElement("new_hash", "0"));
 
                 root.appendChild(data);
@@ -151,9 +147,9 @@ public class BitlyApiController {
                     for (ShortLink link : links) {
                         ObjectNode node = mapper.createObjectNode();
                         node.put("hash", link.getHash());
-                        node.put("short_url", createFullShortUrl(link));
+                        node.put("short_url", link.getShortUrl());
                         node.put("global_hash", link.getHash());
-                        node.put("long_url", link.getUrl());
+                        node.put("long_url", link.getLongUrl());
                         node.put("user_hash", link.getHash());
                         array.add(node);
                     }
@@ -167,9 +163,9 @@ public class BitlyApiController {
                     for (ShortLink link : links) {
                         Element entry = new Element("entry");
                         entry.appendChild(createElement("hash", link.getHash()));
-                        entry.appendChild(createElement("short_url", createFullShortUrl(link)));
+                        entry.appendChild(createElement("short_url", link.getShortUrl()));
                         entry.appendChild(createElement("global_hash", link.getHash()));
-                        entry.appendChild(createElement("long_url", link.getUrl()));
+                        entry.appendChild(createElement("long_url", link.getLongUrl()));
                         entry.appendChild(createElement("user_hash", link.getHash()));
 
                         data.appendChild(entry);
@@ -182,7 +178,7 @@ public class BitlyApiController {
                     if (links.size() > 1) {
                         response.sendError(500, "TOO_MANY_EXPAND_PARAMETERS");
                     } else {
-                        writer.write(links.get(0).getUrl());
+                        writer.write(links.get(0).getLongUrl());
                     }
                 } else {
                     sendUnknownFormatError(response);
@@ -223,9 +219,9 @@ public class BitlyApiController {
 
                     for (ShortLink link : links) {
                         ObjectNode node = mapper.createObjectNode();
-                        node.put("short_url", createFullShortUrl(link));
+                        node.put("short_url", link.getShortUrl());
                         node.put("global_hash", link.getHash());
-                        node.put("long_url", link.getUrl());
+                        node.put("long_url", link.getLongUrl());
                         array.add(node);
                     }
 
@@ -237,9 +233,9 @@ public class BitlyApiController {
                     Element data = new Element("data");
                     for (ShortLink link : links) {
                         Element entry = new Element("lookup");
-                        entry.appendChild(createElement("short_url", createFullShortUrl(link)));
+                        entry.appendChild(createElement("short_url", link.getShortUrl()));
                         entry.appendChild(createElement("global_hash", link.getHash()));
-                        entry.appendChild(createElement("long_url", link.getUrl()));
+                        entry.appendChild(createElement("long_url", link.getLongUrl()));
 
                         data.appendChild(entry);
                     }
@@ -254,11 +250,6 @@ public class BitlyApiController {
         } catch (URISyntaxException e) {
             sendInvalidUriError(response);
         }
-    }
-
-
-    private String createFullShortUrl(ShortLink link) {
-        return urlPrefix + link.getHash();
     }
 
     private Element createElement(String name, String text) {
