@@ -103,11 +103,20 @@ public class MockShortLinkRepository implements ShortLinkRepository {
     }
 
     @Override
-    public void removeEntity(ShortLink object) {
+    public ShortLink store(ShortLink entity) {
+        return null;
     }
 
     @Override
-    public ShortLink store(ShortLink entity) {
+    public ShortLink find(Long id) {
         return null;
+    }
+
+    @Override
+    public void remove(ShortLink object) {
+    }
+
+    @Override
+    public void remove(Long id) {
     }   
 }

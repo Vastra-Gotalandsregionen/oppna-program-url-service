@@ -25,18 +25,18 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
+import se.vgregion.portal.core.infrastructure.persistence.jpa.DefaultJpaRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 @Repository
-public class JpaShortLinkRepository extends JpaRepository<ShortLink, Long> implements ShortLinkRepository {
+public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> implements ShortLinkRepository {
     
     @PersistenceContext
     private EntityManager em;
 
     public JpaShortLinkRepository() {
-        super(ShortLink.class);
+        setType(ShortLink.class);
     }
     
     /**

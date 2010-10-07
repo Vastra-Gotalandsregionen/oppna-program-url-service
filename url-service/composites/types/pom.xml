@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>se.vgregion.commons-util</groupId>
 			<artifactId>commons-util-core-bc-composite-types-jpa</artifactId>
-			<version>2.1</version>
+			<version>3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
