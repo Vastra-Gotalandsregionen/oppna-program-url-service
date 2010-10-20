@@ -39,6 +39,17 @@ public interface UrlServiceService {
     ShortLink shorten(String url) throws URISyntaxException;
 
     /**
+     * Shorten a long URL to a short link. If the long URL already exists, 
+     * the already existing short link will be returned.
+     * @param url The long URL, required.
+     * @param hash The desired hash
+     * @return The {@link ShortLink} representing the long URL
+     * @throws URISyntaxException
+     */
+    ShortLink shorten(String url, String hash) throws URISyntaxException;
+
+    
+    /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) or hash (e.g. "abc") 
      * to the matching long URL. 
      * @param shortUrlOrHash The short URL or the hash, required

@@ -20,17 +20,16 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 
@@ -57,40 +56,19 @@ public class ShortenGuiController {
     }
 
     @RequestMapping(value="/")
-    public void index(@RequestParam(value="longurl", required=false) String longUrl, HttpServletResponse response) throws IOException {
-        PrintWriter writer = response.getWriter();
-        
-        // HTML5 goodness
-        writer.write("<!DOCTYPE html>");
-        writer.write("<html>");
-        writer.write("<head>");
-        writer.write("<title>Förkorta länk</title>");
-        writer.write("</head>");
-        writer.write("<body>");
-        writer.write("<form action=''>");
-        
+    public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug) throws IOException {
+        ModelAndView mav = new ModelAndView("shorten");
         if(longUrl != null) {
-            writer.write("<input name='longurl' value='" + longUrl + "'>");
-        } else {
-            writer.write("<input name='longurl' value=''>");
-        }
-        
-        writer.write("<input type='submit' value='Förkorta länk'>");
-        writer.write("</form>");
-        
-        if(longUrl != null) {
+            mav.addObject("longUrl", longUrl);
             try {
-                String shortUrl = urlServiceService.shorten(longUrl).getShortUrl();
-                writer.write("<p><a href=\"" + shortUrl + "\">" + shortUrl + "</a></p>");
+                String shortUrl = urlServiceService.shorten(longUrl, slug).getShortUrl();
+                mav.addObject("shortUrl", shortUrl);
+                mav.addObject("slug", slug);
             } catch (URISyntaxException e) {
-                writer.write("<p>Felaktig address, måste börja med \"http://\" eller \"https://\"</p>");
+                mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");
             }
         }
         
-        writer.write("<p><a href=\"javascript:location.href='http://localhost:8080/url-service-url-service-module-web/?longurl='+encodeURIComponent(location.href)\">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</p>");
-        
-        writer.write("</body>");
-        writer.write("</html>");
-        
+        return mav;
     }
 }

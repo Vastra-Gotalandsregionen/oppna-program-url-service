@@ -45,7 +45,7 @@ public class JpaShortLinkRepositoryTest {
     
     @Test
     public void findByPk() {
-        ShortLink loaded = dao.findByPk(link1.getId());
+        ShortLink loaded = dao.findByPrimaryKey(link1.getId());
         
         Assert.assertEquals(link1.getHash(), loaded.getHash());
         Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());

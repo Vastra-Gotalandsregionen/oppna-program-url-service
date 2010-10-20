@@ -49,11 +49,6 @@ public class MockShortLinkRepository implements ShortLinkRepository {
     }
 
     @Override
-    public void deleteByPk(Long pk) {
-        
-    }
-
-    @Override
     public List<ShortLink> findAll() {
         return null;
     }
@@ -65,11 +60,6 @@ public class MockShortLinkRepository implements ShortLinkRepository {
 
     @Override
     public List<ShortLink> findByNamedQuery(String queryName, Object[] args) {
-        return null;
-    }
-
-    @Override
-    public ShortLink findByPk(Long pk) {
         return null;
     }
 
@@ -118,5 +108,15 @@ public class MockShortLinkRepository implements ShortLinkRepository {
 
     @Override
     public void remove(Long id) {
+    }
+
+    @Override
+    public ShortLink findByPrimaryKey(Long pk) {
+        return null;
+    }
+
+    @Override
+    public void removeByPrimaryKey(Long pk) {
+        
     }   
 }

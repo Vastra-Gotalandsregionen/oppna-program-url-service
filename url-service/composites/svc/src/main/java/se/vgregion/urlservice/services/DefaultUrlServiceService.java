@@ -52,11 +52,19 @@ public class DefaultUrlServiceService implements UrlServiceService {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
     }
 
+    
     /** 
      * {@inheritDoc}
      */
     @Transactional(readOnly = false)
     public ShortLink shorten(String urlString) throws URISyntaxException {
+        return shorten(urlString, null);
+    }
+    /** 
+     * {@inheritDoc}
+     */
+    @Transactional(readOnly = false)
+    public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
@@ -68,7 +76,10 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 String md5 = DigestUtils.md5Hex(urlString);
                 
                 int length = INITIAL_HASH_LENGTH;
-                String hash = md5.substring(0, length);
+                
+                if(hash == null) {
+                    hash = md5.substring(0, length);
+                }
                 
                 // check that the hash does not already exist
                 while(shortLinkRepository.findByHash(hash) != null) {
@@ -79,7 +90,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                         throw new RuntimeException("Failed to generate hash");
                     }
                     
-                    hash = md5.substring(0, length);
+                    hash += md5.substring(length-1, length);
                 }
                 
                 ShortLink newLink = new ShortLink();

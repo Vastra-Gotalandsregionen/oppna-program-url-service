@@ -18,19 +18,19 @@
 ====
 
 # shorten a few link
-curl "http://localhost:8080/url-service-url-service-module-web/api/v3/shorten?longUrl=http://example.com"
-curl "http://localhost:8080/url-service-url-service-module-web/shorten?longUrl=http://example.com/1"
+curl "http://localhost:8080/api/v3/shorten?longUrl=http://example.com"
+curl "http://localhost:8080/api/v3/shorten?longUrl=http://example.com/1"
 
 # now expand them
-curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0"
-curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&hash=9be0f2"
+curl "http://localhost:8080/api/v3/expand?hash=a9b9f0"
+curl "http://localhost:8080/api/v3/expand?hash=a9b9f0&hash=9be0f2"
 
-curl "http://localhost:8080/url-service-url-service-module-web/expand?shortUrl=http://s.vgregion.se/a9b9f0&hash=9be0f2"
+curl "http://localhost:8080/api/v3/expand?shortUrl=http://s.vgregion.se/a9b9f0&hash=9be0f2"
 
-curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&format=xml"
-curl "http://localhost:8080/url-service-url-service-module-web/expand?hash=a9b9f0&format=txt"
+curl "http://localhost:8080/api/v3/expand?hash=a9b9f0&format=xml"
+curl "http://localhost:8080/api/v3/expand?hash=a9b9f0&format=txt"
 
 
 
 # now redirect
-curl -v "http://localhost:8080/url-service-url-service-module-web/a9b9f0"
+curl -v "http://localhost:8080/a9b9f0"

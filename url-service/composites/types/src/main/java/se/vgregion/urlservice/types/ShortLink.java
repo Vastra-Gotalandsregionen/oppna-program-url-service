@@ -24,7 +24,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
+import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 public class ShortLink extends AbstractEntity<ShortLink, Long> {

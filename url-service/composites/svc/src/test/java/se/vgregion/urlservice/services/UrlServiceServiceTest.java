@@ -44,6 +44,39 @@ public class UrlServiceServiceTest {
     }
 
     @Test
+    public void shortenWithSlug() throws URISyntaxException {
+        urlService.setShortLinkRepository(new MockShortLinkRepository());
+
+        ShortLink link = urlService.shorten(LOGN_URL, "my_slug");
+
+        Assert.assertEquals("my_slug", link.getHash());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+    }
+
+    @Test
+    public void shortenWithSlugCollision() throws URISyntaxException {
+        urlService.setShortLinkRepository(new MockShortLinkRepository() {
+
+            @Override
+            public ShortLink findByHash(String hash) {
+                // make sure the first hash collides
+                if("my_slug".equals(hash)) {
+                    return new ShortLink("my_slug", "http://someurl", SHORT_URL);
+                } else {
+                    return null;
+                }
+            }
+        });
+
+
+        ShortLink link = urlService.shorten(LOGN_URL, "my_slug");
+
+        Assert.assertEquals("my_slug4", link.getHash());
+        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+    }
+
+    
+    @Test
     public void shortenWithHashCollision() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
 

@@ -46,17 +46,7 @@ public class MockUrlServiceService implements UrlServiceService {
      * @see se.vgregion.urlservice.services.UrlServiceService#shorten(java.lang.String)
      */
     public ShortLink shorten(String urlString) throws URISyntaxException {
-        URI url = new URI(urlString);
-        
-        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            ShortLink link = new ShortLink();
-            link.setHash("foo");
-            link.setLongUrl(urlString);
-            link.setShortUrl(URL_PREFIX + "foo");
-            return link;
-        } else {
-            throw new URISyntaxException(urlString, "Scheme not allowed");
-        }
+        return shorten(urlString, null);
     }
     
     public ShortLink expand(String hashOrShortUrl) {
@@ -80,5 +70,23 @@ public class MockUrlServiceService implements UrlServiceService {
         link.setShortUrl(URL_PREFIX + "foo");
         
         return link;
+    }
+
+    @Override
+    public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
+        URI url = new URI(urlString);
+        
+        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
+            hash = (hash != null) ? hash : "foo"; 
+            
+            ShortLink link = new ShortLink();
+            link.setHash(hash);
+            link.setLongUrl(urlString);
+            link.setShortUrl(URL_PREFIX + hash);
+            return link;
+        } else {
+            throw new URISyntaxException(urlString, "Scheme not allowed");
+        }
+
     }
 }

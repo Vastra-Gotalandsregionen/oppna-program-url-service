@@ -63,7 +63,7 @@
 		<url-pattern>/resources/*</url-pattern>
 	</servlet-mapping>
 
-	<servlet>
+ 	<servlet>
 		<servlet-name>url</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
@@ -71,8 +71,6 @@
 
 	<servlet-mapping>
 		<servlet-name>url</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-
-
 </web-app>

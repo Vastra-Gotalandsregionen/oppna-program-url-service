@@ -30,7 +30,7 @@
 
 	<bean id="urlPrefix" class="java.lang.String">
 		<!-- TODO URL used for testing purposes, later to be replaced with configurable URL -->
-		<constructor-arg value="http://localhost:8080/url-service-url-service-module-web/" />
+		<constructor-arg value="http://localhost:8080/" />
 	</bean>
 
 

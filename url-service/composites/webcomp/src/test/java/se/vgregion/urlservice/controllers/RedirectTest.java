@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.servlet.ModelAndView;
 
 
 public class RedirectTest {
@@ -33,17 +34,19 @@ public class RedirectTest {
     
     @Test
     public void redirectWithExistingHash() throws IOException {
-        controller.redirect("foo", response);
+        ModelAndView mav = controller.redirect("foo", response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
+        Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
     }
 
     @Test
     public void redirectWithNonExistingHash() throws IOException {
-        controller.redirect("dummy", response);
+        ModelAndView mav = controller.redirect("dummy", response);
         
         Assert.assertEquals(404, response.getStatus());
+        Assert.assertNull(mav);
     }
 
 }

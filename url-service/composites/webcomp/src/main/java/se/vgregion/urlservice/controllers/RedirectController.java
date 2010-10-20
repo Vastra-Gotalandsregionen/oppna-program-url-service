@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
@@ -61,7 +62,7 @@ public class RedirectController {
      * Handle redirects for a shortlink
      */
     @RequestMapping("/{hash}")
-    public void redirect(@PathVariable("hash") String hash, HttpServletResponse response) throws IOException {
+    public ModelAndView redirect(@PathVariable("hash") String hash, HttpServletResponse response) throws IOException {
         try {
             ShortLink link = urlServiceService.expand(hash);
 
@@ -69,23 +70,17 @@ public class RedirectController {
                 response.setStatus(301);
                 response.setHeader("Location", link.getLongUrl());
                 
-                PrintWriter writer = response.getWriter();
-                
-                // HTML5 goodness
-                writer.write("<!DOCTYPE html>");
-                writer.write("<html>");
-                writer.write("<head>");
-                writer.write("<title>Moved</title>");
-                writer.write("</head>");
-                writer.write("<body>");
-                writer.write("<a href=\"" + link.getLongUrl() + "\">The requested URL has moved here.</a>");
-                writer.write("</body>");
-                writer.write("</html>");
+                ModelAndView mav = new ModelAndView("redirect");
+                mav.addObject("longUrl", link.getLongUrl());
+
+                return mav;
             } else {
                 response.sendError(404);
+                return null;
             }
         } catch (URISyntaxException e) {
             response.sendError(500);
+            return null;
         }
     }
 }

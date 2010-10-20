@@ -19,9 +19,9 @@
 			<version>1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>se.vgregion.commons-util</groupId>
-			<artifactId>commons-util-core-bc-composite-types-jpa</artifactId>
-			<version>3.1</version>
+			<groupId>se.vgregion.daoframework</groupId>
+			<artifactId>dao-framework-jpa</artifactId>
+			<version>3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
