@@ -49,4 +49,14 @@ public class RedirectTest {
         Assert.assertNull(mav);
     }
 
+    
+    @Test
+    public void redirectWithRedirectRule() throws IOException {
+        ModelAndView mav = controller.redirect("bar", response);
+        
+        Assert.assertEquals(301, response.getStatus());
+        Assert.assertEquals("http://google.com", response.getHeader("Location"));
+        Assert.assertEquals("http://google.com", mav.getModel().get("longUrl"));
+    }
+
 }

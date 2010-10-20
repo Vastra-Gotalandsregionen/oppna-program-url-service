@@ -22,7 +22,6 @@ package se.vgregion.urlservice.controllers;
 import java.io.IOException;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 

@@ -19,38 +19,42 @@
 
 package se.vgregion.urlservice.services;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
 
-public class UrlServiceServiceTest {
+public class DefaultUrlServiceServiceTest {
 
     private static final String SHORT_URL = "http://short";
     private static final String HASH = "foo";
-    private static final String LOGN_URL = "http://example.com";
+    private static final String LONG_URL = "http://example.com";
     private DefaultUrlServiceService urlService = new DefaultUrlServiceService();
 
     @Test
     public void shortenNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository());
 
-        ShortLink link = urlService.shorten(LOGN_URL);
+        ShortLink link = urlService.shorten(LONG_URL);
 
         Assert.assertEquals("a9b9f0", link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     @Test
     public void shortenWithSlug() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository());
 
-        ShortLink link = urlService.shorten(LOGN_URL, "my_slug");
+        ShortLink link = urlService.shorten(LONG_URL, "my_slug");
 
         Assert.assertEquals("my_slug", link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     @Test
@@ -69,10 +73,10 @@ public class UrlServiceServiceTest {
         });
 
 
-        ShortLink link = urlService.shorten(LOGN_URL, "my_slug");
+        ShortLink link = urlService.shorten(LONG_URL, "my_slug");
 
         Assert.assertEquals("my_slug4", link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     
@@ -91,11 +95,11 @@ public class UrlServiceServiceTest {
             }
         });
 
-        ShortLink link = urlService.shorten(LOGN_URL);
+        ShortLink link = urlService.shorten(LONG_URL);
 
         // since the hash collides, we should get a longer hash
         Assert.assertEquals("a9b9f04", link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     
@@ -109,10 +113,10 @@ public class UrlServiceServiceTest {
             
         });
 
-        ShortLink link = urlService.shorten(LOGN_URL);
+        ShortLink link = urlService.shorten(LONG_URL);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     @Test(expected=URISyntaxException.class)
@@ -127,14 +131,14 @@ public class UrlServiceServiceTest {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
             public ShortLink findByHash(String hash) {
-                return new ShortLink(hash, LOGN_URL, SHORT_URL);
+                return new ShortLink(hash, LONG_URL, SHORT_URL);
             }
         });
 
         ShortLink link = urlService.expand(HASH);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     @Test
@@ -142,14 +146,14 @@ public class UrlServiceServiceTest {
         urlService.setShortLinkRepository(new MockShortLinkRepository() {
             @Override
             public ShortLink findByHash(String hash) {
-                return new ShortLink(hash, LOGN_URL, SHORT_URL);
+                return new ShortLink(hash, LONG_URL, SHORT_URL);
             }
         });
 
         ShortLink link = urlService.expand("http://s.vgregion.se/foo");
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
     
@@ -170,10 +174,10 @@ public class UrlServiceServiceTest {
             }
         });
 
-        ShortLink link = urlService.lookup(LOGN_URL);
+        ShortLink link = urlService.lookup(LONG_URL);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LOGN_URL, link.getLongUrl());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
 
@@ -181,7 +185,31 @@ public class UrlServiceServiceTest {
     public void lookupNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(new MockShortLinkRepository());
 
-        Assert.assertNull(urlService.lookup(LOGN_URL));
+        Assert.assertNull(urlService.lookup(LONG_URL));
     }
 
+    @Test
+    public void redirect() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(new MockRedirectRuleRepository() {
+            @Override
+            public Collection<RedirectRule> findAll() {
+                return Arrays.asList(new RedirectRule("foo", LONG_URL));
+            }
+            
+        });
+
+        URI uri = urlService.redirect("foo");
+
+        Assert.assertEquals(LONG_URL, uri.toString());
+    }
+
+    @Test
+    public void redirectNoneMatching() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(new MockRedirectRuleRepository());
+
+        URI uri = urlService.redirect("foo");
+
+        Assert.assertNull(uri);
+    }
+    
 }

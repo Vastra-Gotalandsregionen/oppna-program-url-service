@@ -20,7 +20,7 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.annotation.Resource;
@@ -75,8 +75,20 @@ public class RedirectController {
 
                 return mav;
             } else {
-                response.sendError(404);
-                return null;
+                URI uri = urlServiceService.redirect(hash);
+                
+                if(uri != null) {
+                    response.setStatus(301);
+                    response.setHeader("Location", uri.toString());
+                    
+                    ModelAndView mav = new ModelAndView("redirect");
+                    mav.addObject("longUrl", uri.toString());
+
+                    return mav;
+                } else {
+                    response.sendError(404);
+                    return null;
+                }
             }
         } catch (URISyntaxException e) {
             response.sendError(500);

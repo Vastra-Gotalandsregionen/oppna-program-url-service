@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.services;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import se.vgregion.urlservice.types.ShortLink;
@@ -68,4 +69,5 @@ public interface UrlServiceService {
      */
     ShortLink lookup(String url) throws URISyntaxException;
 
+    URI redirect(String path);
 }
