@@ -89,6 +89,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 }
                 
                 // check that the hash does not already exist
+                System.out.println(hash);
+                System.out.println(shortLinkRepository.findByHash(hash));
                 while(shortLinkRepository.findByHash(hash) != null) {
                     length++;
                     
@@ -105,7 +107,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 newLink.setLongUrl(urlString);
                 newLink.setShortUrl(urlPrefix + hash);
                 
-                newLink = shortLinkRepository.persist(newLink);
+                shortLinkRepository.persist(newLink);
                 return newLink;
             }
         } else {
