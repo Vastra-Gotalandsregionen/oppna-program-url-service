@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,7 +35,9 @@ public class RedirectTest {
     
     @Test
     public void redirectWithExistingHash() throws IOException {
-        ModelAndView mav = controller.redirect("foo", response);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/foo");
+        request.setPathInfo("/foo");
+        ModelAndView mav = controller.redirect(request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
@@ -43,7 +46,9 @@ public class RedirectTest {
 
     @Test
     public void redirectWithNonExistingHash() throws IOException {
-        ModelAndView mav = controller.redirect("dummy", response);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/dummy");
+        request.setPathInfo("/dummy");
+        ModelAndView mav = controller.redirect(request, response);
         
         Assert.assertEquals(404, response.getStatus());
         Assert.assertNull(mav);
@@ -52,7 +57,9 @@ public class RedirectTest {
     
     @Test
     public void redirectWithRedirectRule() throws IOException {
-        ModelAndView mav = controller.redirect("bar", response);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/bar");
+        request.setPathInfo("/bar");
+        ModelAndView mav = controller.redirect(request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://google.com", response.getHeader("Location"));

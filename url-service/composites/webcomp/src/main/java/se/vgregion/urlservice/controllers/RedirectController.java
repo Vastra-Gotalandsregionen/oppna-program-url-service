@@ -21,9 +21,9 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
-import se.vgregion.urlservice.types.ShortLink;
 
 /**
  * Controller for handling redirects, e.g. a user doing a HTTP GET for http://s.vgregion.se/a4f6Bd 
@@ -59,10 +58,13 @@ public class RedirectController {
     }
 
     /**
-     * Handle redirects for a shortlink
+     * Handle redirects
      */
-    @RequestMapping("/{path}")
-    public ModelAndView redirect(@PathVariable("path") String path, HttpServletResponse response) throws IOException {
+    @RequestMapping("/**")
+    public ModelAndView redirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("Redirecting");
+        System.out.println("############ " + request.getPathInfo());
+        String path = request.getPathInfo().substring(1);
         URI uri = urlServiceService.redirect(path);
                 
         if(uri != null) {

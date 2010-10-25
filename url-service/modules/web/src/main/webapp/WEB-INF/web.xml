@@ -39,6 +39,21 @@
 		</init-param>
 	</filter>
 
+	<filter>
+		<!-- Needed for redirect not to conflict with JSP view rendering -->
+		<!-- Uses configuration in /WEB-INF/urlrewrite.xml -->
+		<filter-name>UrlRewriteFilter</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+		<init-param>
+            <param-name>logLevel</param-name>
+            <param-value>WARN</param-value>
+        </init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>UrlRewriteFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!--
 		Bootstraps the root Spring Web Application Context, responsible for
 		deploying managed beans defined in the configuration files above.
@@ -63,7 +78,7 @@
 		<url-pattern>/resources/*</url-pattern>
 	</servlet-mapping>
 
- 	<servlet>
+	<servlet>
 		<servlet-name>url</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
@@ -71,6 +86,6 @@
 
 	<servlet-mapping>
 		<servlet-name>url</servlet-name>
-		<url-pattern>/</url-pattern>
+		<url-pattern>/app/*</url-pattern>
 	</servlet-mapping>
 </web-app>

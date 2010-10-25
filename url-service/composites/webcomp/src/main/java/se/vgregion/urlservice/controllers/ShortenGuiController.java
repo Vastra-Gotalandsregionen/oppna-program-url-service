@@ -54,7 +54,7 @@ public class ShortenGuiController {
         this.urlServiceService = urlServiceService;
     }
 
-    @RequestMapping(value="/")
+    @RequestMapping(value="/shorten")
     public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug) throws IOException {
         ModelAndView mav = new ModelAndView("shorten");
         if(longUrl != null) {
