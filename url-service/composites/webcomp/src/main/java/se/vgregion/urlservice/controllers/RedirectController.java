@@ -63,7 +63,6 @@ public class RedirectController {
     @RequestMapping("/**")
     public ModelAndView redirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("Redirecting");
-        System.out.println("############ " + request.getPathInfo());
         String path = request.getPathInfo().substring(1);
         URI uri = urlServiceService.redirect(path);
                 
