@@ -147,6 +147,14 @@ public class AdminGuiController {
     public void setRedirectRuleRepository(RedirectRuleRepository redirectRuleRepository) {
         this.redirectRuleRepository = redirectRuleRepository;
     }
+
+    public StaticRedirectRepository getStaticRedirectRepository() {
+        return staticRedirectRepository;
+    }
+
+    public void setStaticRedirectRepository(StaticRedirectRepository staticRedirectRepository) {
+        this.staticRedirectRepository = staticRedirectRepository;
+    }
     
     
 }

@@ -33,7 +33,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
+import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.RedirectRule;
+import se.vgregion.urlservice.types.StaticRedirect;
 
 
 public class AdminGuiControllerTest {
@@ -45,14 +47,20 @@ public class AdminGuiControllerTest {
     @Test
     public void index() throws IOException {
         List<RedirectRule> rules = Arrays.asList(new RedirectRule(PATTERN, URL));
-        
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
         when(redirectRuleRepository.findAll()).thenReturn(rules);
         controller.setRedirectRuleRepository(redirectRuleRepository);
+
+        List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(PATTERN, URL));
+        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
+        when(staticRedirectRepository.findAll()).thenReturn(statics);
+        controller.setStaticRedirectRepository(staticRedirectRepository);
+
         
         ModelAndView mav = controller.index();
         
         Assert.assertEquals(rules, mav.getModel().get("redirectRules"));
+        Assert.assertEquals(statics, mav.getModel().get("staticRedirects"));
     }
     
     @Test
@@ -65,7 +73,7 @@ public class AdminGuiControllerTest {
         request.addParameter("pattern", PATTERN);
         request.addParameter("url", URL);
         
-        controller.update(request);
+        controller.updateRedirectRules(request);
 
         verify(redirectRuleRepository).persist(new RedirectRule(PATTERN, URL));
     }
@@ -78,9 +86,37 @@ public class AdminGuiControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("delete-1", "any value");
         
-        controller.update(request);
+        controller.updateRedirectRules(request);
 
         verify(redirectRuleRepository).removeByPrimaryKey(1L);
+    }
+
+    @Test
+    public void addStaticRedirect() throws IOException {
+        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
+        controller.setStaticRedirectRepository(staticRedirectRepository);
+        
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("add", "any value");
+        request.addParameter("path", PATTERN);
+        request.addParameter("url", URL);
+        
+        controller.updateStaticRedirects(request);
+
+        verify(staticRedirectRepository).persist(new StaticRedirect(PATTERN, URL));
+    }
+
+    @Test
+    public void deleteStaticRedirect() throws IOException {
+        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
+        controller.setStaticRedirectRepository(staticRedirectRepository);
+        
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("delete-1", "any value");
+        
+        controller.updateStaticRedirects(request);
+
+        verify(staticRedirectRepository).removeByPrimaryKey(1L);
     }
 
 }
