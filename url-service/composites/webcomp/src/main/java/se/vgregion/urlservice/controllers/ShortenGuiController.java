@@ -35,7 +35,6 @@ import se.vgregion.urlservice.services.UrlServiceService;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
- * TODO does not currently use a view framework 
  *
  */
 @Controller

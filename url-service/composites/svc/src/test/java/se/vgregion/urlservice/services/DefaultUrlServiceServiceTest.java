@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.StaticRedirect;
 
 public class DefaultUrlServiceServiceTest {
 
@@ -189,23 +190,58 @@ public class DefaultUrlServiceServiceTest {
     }
 
     @Test
-    public void redirect() throws URISyntaxException {
+    public void redirectOnRedirectRule() throws URISyntaxException {
         urlService.setRedirectRuleRepository(new MockRedirectRuleRepository() {
             @Override
             public Collection<RedirectRule> findAll() {
                 return Arrays.asList(new RedirectRule("foo", LONG_URL));
             }
-            
         });
-
+        urlService.setShortLinkRepository(new MockShortLinkRepository());
+        urlService.setStaticRedirectRepository(new MockStaticRedirectRepository());
+        
+        
         URI uri = urlService.redirect("foo");
 
         Assert.assertEquals(LONG_URL, uri.toString());
     }
 
     @Test
+    public void redirectOnShortLink() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(new MockRedirectRuleRepository());
+        urlService.setShortLinkRepository(new MockShortLinkRepository(){
+            @Override
+            public ShortLink findByHash(String hash) {
+                return new ShortLink(hash, LONG_URL, SHORT_URL);
+            }});
+        urlService.setStaticRedirectRepository(new MockStaticRedirectRepository());
+        
+        URI uri = urlService.redirect("foo");
+
+        Assert.assertEquals(LONG_URL, uri.toString());
+    }
+
+    @Test
+    public void redirectOnStaticRedirect() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(new MockRedirectRuleRepository());
+        urlService.setShortLinkRepository(new MockShortLinkRepository());
+        urlService.setStaticRedirectRepository(new MockStaticRedirectRepository(){
+            @Override
+            public StaticRedirect findByPath(String path) {
+                return new StaticRedirect(path, LONG_URL);
+            }});
+        
+        URI uri = urlService.redirect("foo");
+
+        Assert.assertEquals(LONG_URL, uri.toString());
+    }
+
+    
+    @Test
     public void redirectNoneMatching() throws URISyntaxException {
         urlService.setRedirectRuleRepository(new MockRedirectRuleRepository());
+        urlService.setShortLinkRepository(new MockShortLinkRepository());
+        urlService.setStaticRedirectRepository(new MockStaticRedirectRepository());
 
         URI uri = urlService.redirect("foo");
 

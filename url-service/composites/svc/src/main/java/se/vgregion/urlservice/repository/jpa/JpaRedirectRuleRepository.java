@@ -17,11 +17,16 @@
  *
  */
 
-package se.vgregion.urlservice.repository;
+package se.vgregion.urlservice.repository.jpa;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
+import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.types.RedirectRule;
     
-public interface RedirectRuleRepository extends JpaRepository<RedirectRule, Long, Long> {
-
+@Repository
+public class JpaRedirectRuleRepository extends DefaultJpaRepository<RedirectRule> implements RedirectRuleRepository {
+    
+   
 }

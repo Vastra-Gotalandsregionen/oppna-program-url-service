@@ -92,7 +92,9 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public URI redirect(String path) {
-        if(path.equals("bar")) {
+        if(expand(path) != null) {
+            return URI.create(expand(path).getLongUrl()); 
+        } else if(path.equals("bar")) {
             return URI.create("http://google.com");
         } else {
             return null;

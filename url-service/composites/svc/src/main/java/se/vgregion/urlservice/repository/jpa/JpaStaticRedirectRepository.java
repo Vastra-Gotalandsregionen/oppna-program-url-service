@@ -26,38 +26,27 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.types.StaticRedirect;
     
 @Repository
-public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> implements ShortLinkRepository {
+public class JpaStaticRedirectRepository extends DefaultJpaRepository<StaticRedirect> implements StaticRedirectRepository {
     
-    public JpaShortLinkRepository() {
-        setType(ShortLink.class);
+    public JpaStaticRedirectRepository() {
+        setType(StaticRedirect.class);
     }
     
     /**
      * Find link by hash.
      */
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
-    public ShortLink findByHash(String hash) {
+    public StaticRedirect findByPath(String path) {
         try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.hash = :hash")
-                .setParameter("hash", hash).getSingleResult();
+            return (StaticRedirect)entityManager.createQuery("select l from StaticRedirect l where l.path = :path")
+                .setParameter("path", path).getSingleResult();
         } catch(NoResultException e) {
             return null;
         }
 
     }
-
-    @Override
-    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
-    public ShortLink findByLongUrl(String longUrl) {
-        try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.longUrl = :longurl")
-            .setParameter("longurl", longUrl).getSingleResult();
-        } catch(NoResultException e) {
-            return null;
-        }
-    }   
 }

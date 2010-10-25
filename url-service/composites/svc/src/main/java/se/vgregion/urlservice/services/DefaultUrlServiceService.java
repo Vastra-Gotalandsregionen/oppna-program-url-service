@@ -35,8 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
+import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.StaticRedirect;
 
 @Service
 public class DefaultUrlServiceService implements UrlServiceService {
@@ -51,6 +53,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     
     private ShortLinkRepository shortLinkRepository;
     private RedirectRuleRepository redirectRuleRepository;
+    private StaticRedirectRepository staticRedirectRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -115,7 +118,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ShortLink expand(String shortUrlOrHash) throws URISyntaxException {
+    public ShortLink expand(String shortUrlOrHash) {
         String hash;
         if(shortUrlOrHash.startsWith("http://")) {
             hash = shortUrlOrHash.substring(shortUrlOrHash.lastIndexOf('/') + 1);
@@ -131,16 +134,30 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public URI redirect(String path) {
-        Collection<RedirectRule> rules = redirectRuleRepository.findAll();
+        ShortLink shortLink = expand(path);
         
-        
-        for(RedirectRule rule : rules) {
-            if(rule.matches(path)) {
-                return URI.create(rule.getUrl());
+        // first try short links
+        if(shortLink != null) {
+            return URI.create(shortLink.getLongUrl());
+        } else {
+            // next, try static redirects
+            StaticRedirect redirect = staticRedirectRepository.findByPath(path);
+            
+            if(redirect != null) {
+                return URI.create(redirect.getUrl());
+            } else {
+                // finally, check redirect rules
+                Collection<RedirectRule> rules = redirectRuleRepository.findAll();
+                
+                for(RedirectRule rule : rules) {
+                    if(rule.matches(path)) {
+                        return URI.create(rule.getUrl());
+                    }
+                }
+                
+                return null;
             }
         }
-        
-        return null;
     }
 
     
@@ -169,6 +186,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Resource
     public void setRedirectRuleRepository(RedirectRuleRepository redirectRuleRepository) {
         this.redirectRuleRepository = redirectRuleRepository;
+    }
+
+    public StaticRedirectRepository getStaticRedirectRepository() {
+        return staticRedirectRepository;
+    }
+
+    @Resource
+    public void setStaticRedirectRepository(StaticRedirectRepository staticRedirectRepository) {
+        this.staticRedirectRepository = staticRedirectRepository;
     }
 
 

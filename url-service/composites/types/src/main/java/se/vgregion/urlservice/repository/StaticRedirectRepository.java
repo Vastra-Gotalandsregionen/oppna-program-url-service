@@ -20,8 +20,13 @@
 package se.vgregion.urlservice.repository;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
-import se.vgregion.urlservice.types.RedirectRule;
+import se.vgregion.urlservice.types.StaticRedirect;
     
-public interface RedirectRuleRepository extends JpaRepository<RedirectRule, Long, Long> {
+public interface StaticRedirectRepository extends JpaRepository<StaticRedirect, Long, Long> {
+
+    /**
+     * Find link by path.
+     */
+    StaticRedirect findByPath(String path);
 
 }

@@ -61,37 +61,20 @@ public class RedirectController {
     /**
      * Handle redirects for a shortlink
      */
-    @RequestMapping("/{hash}")
-    public ModelAndView redirect(@PathVariable("hash") String hash, HttpServletResponse response) throws IOException {
-        try {
-            ShortLink link = urlServiceService.expand(hash);
-
-            if (link != null) {
-                response.setStatus(301);
-                response.setHeader("Location", link.getLongUrl());
+    @RequestMapping("/{path}")
+    public ModelAndView redirect(@PathVariable("path") String path, HttpServletResponse response) throws IOException {
+        URI uri = urlServiceService.redirect(path);
                 
-                ModelAndView mav = new ModelAndView("redirect");
-                mav.addObject("longUrl", link.getLongUrl());
+        if(uri != null) {
+            ModelAndView mav = new ModelAndView("redirect");
+            response.setStatus(301);
+            response.setHeader("Location", uri.toString());
+            
+            mav.addObject("longUrl", uri.toString());
 
-                return mav;
-            } else {
-                URI uri = urlServiceService.redirect(hash);
-                
-                if(uri != null) {
-                    response.setStatus(301);
-                    response.setHeader("Location", uri.toString());
-                    
-                    ModelAndView mav = new ModelAndView("redirect");
-                    mav.addObject("longUrl", uri.toString());
-
-                    return mav;
-                } else {
-                    response.sendError(404);
-                    return null;
-                }
-            }
-        } catch (URISyntaxException e) {
-            response.sendError(500);
+            return mav;
+        } else {
+            response.sendError(404);
             return null;
         }
     }

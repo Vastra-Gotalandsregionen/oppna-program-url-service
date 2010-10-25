@@ -69,5 +69,11 @@ public interface UrlServiceService {
      */
     ShortLink lookup(String url) throws URISyntaxException;
 
+    /**
+     * Given a path, will return the URI to where the user should be redirected. 
+     * Handles all types of redirects.
+     * @param path The path part of the request URL
+     * @return The URI to where the user should be redirected.
+     */
     URI redirect(String path);
 }

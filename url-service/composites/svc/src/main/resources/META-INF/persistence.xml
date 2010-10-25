@@ -25,5 +25,7 @@
              version="1.0">
     <persistence-unit name="URLService">
         <class>se.vgregion.urlservice.types.ShortLink</class>
+        <class>se.vgregion.urlservice.types.RedirectRule</class>
+        <class>se.vgregion.urlservice.types.StaticRedirect</class>
     </persistence-unit>
 </persistence>
