@@ -35,7 +35,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
+import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.RedirectRule;
+import se.vgregion.urlservice.types.StaticRedirect;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
@@ -49,6 +51,10 @@ public class AdminGuiController {
     @Resource
     private RedirectRuleRepository redirectRuleRepository;
 
+    @Resource
+    private StaticRedirectRepository staticRedirectRepository;
+
+    
     public AdminGuiController() {
         log.info("Created {}", AdminGuiController.class.getName());
     }
@@ -58,13 +64,14 @@ public class AdminGuiController {
         ModelAndView mav = new ModelAndView("admin/index");
         
         mav.addObject("redirectRules", redirectRuleRepository.findAll());
+        mav.addObject("staticRedirects", staticRedirectRepository.findAll());
         
         return mav;
     }
 
     @Transactional
     @RequestMapping(value="/admin/redirectrules", method=RequestMethod.POST)
-    public ModelAndView update(HttpServletRequest request) throws IOException {
+    public ModelAndView updateRedirectRules(HttpServletRequest request) throws IOException {
         ModelAndView mav = new ModelAndView("redirect:../admin");
         
         if(request.getParameter("add") != null) {
@@ -91,6 +98,36 @@ public class AdminGuiController {
         return mav;
     }
 
+    @Transactional
+    @RequestMapping(value="/admin/staticredirects", method=RequestMethod.POST)
+    public ModelAndView updateStaticRedirects(HttpServletRequest request) throws IOException {
+        ModelAndView mav = new ModelAndView("redirect:../admin");
+        
+        if(request.getParameter("add") != null) {
+            // adding a new rule
+            String path = request.getParameter("path");
+            String url = request.getParameter("url");
+            
+            if(StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(url)) {
+                log.debug("Adding static redirect with path \"{}\" and URL \"{}\"", path, url);
+                try { 
+                    staticRedirectRepository.persist(new StaticRedirect(path, url));
+                } catch(RuntimeException e) {
+                    // TODO do not ignore
+                }
+            }
+        } else {
+            Long deletedId = findDeletedId(request);
+            if(deletedId != null) {
+                log.debug("Deleting static redirect {}", deletedId);
+                staticRedirectRepository.removeByPrimaryKey(deletedId);
+            }
+        }
+        
+        return mav;
+    }
+
+    
     private Long findDeletedId(HttpServletRequest request) {
         Enumeration names = request.getParameterNames();
         while(names.hasMoreElements()) {

@@ -33,10 +33,12 @@
 		
 		<h2>Redirect regler</h2>
 		
-		${error}
-		
 		<form action="admin/redirectrules" method="post">
-			<input type="hidden" name="type" value="redirectRule">
+			<div style="height:0px; width:0px; position:absolute; overflow:hidden">
+				<!-- Hack, make sure the add action happens on user pressing Enter -->
+    			<input type="submit" name="add" />
+			</div>
+		
 			<table>
 				<tr>
 					<th>Mönster</th>
@@ -52,6 +54,34 @@
 				</c:forEach>
 					<tr>
 						<td><input name="pattern"></td>
+						<td><input name="url"></td>
+						<td><input type="submit" value="Lägg till" name="add">
+					</tr>
+			</table>
+		</form>		
+
+		<h2>Statiska redirects</h2>
+
+		<form action="admin/staticredirects" method="post">
+			<div style="height:0px; width:0px; position:absolute; overflow:hidden">
+				<!-- Hack, make sure the add action happens on user pressing Enter -->
+    			<input type="submit" name="add" />
+			</div>
+			<table>
+				<tr>
+					<th>Mönster</th>
+					<th>URL</th>
+					<th></th>
+				</tr>
+				<c:forEach var="redirect" items="${staticRedirects}">
+					<tr>
+						<td>${redirect.path}</td>
+						<td>${redirect.url}</td>
+						<td><input type="submit" value="Ta bort" name="delete-${redirect.id}">
+					</tr>
+				</c:forEach>
+					<tr>
+						<td><input name="path"></td>
 						<td><input name="url"></td>
 						<td><input type="submit" value="Lägg till" name="add">
 					</tr>
