@@ -22,6 +22,12 @@
 			<groupId>se.vgregion.daoframework</groupId>
 			<artifactId>dao-framework-jpa</artifactId>
 			<version>3.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -41,8 +47,7 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<!-- 1.2.15 drags down non-optional deps -->
+			<version>1.2.16</version>
 		</dependency>
 
 		<dependency>
