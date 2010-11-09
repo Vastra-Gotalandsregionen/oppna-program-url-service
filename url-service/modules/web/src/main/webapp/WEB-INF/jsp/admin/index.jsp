@@ -69,7 +69,7 @@
 			</div>
 			<table>
 				<tr>
-					<th>Mönster</th>
+					<th>Sökväg</th>
 					<th>URL</th>
 					<th></th>
 				</tr>

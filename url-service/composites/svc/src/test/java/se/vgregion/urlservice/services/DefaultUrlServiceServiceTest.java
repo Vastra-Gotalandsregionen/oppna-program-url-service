@@ -65,6 +65,27 @@ public class DefaultUrlServiceServiceTest {
     }
 
     @Test
+    public void shortenWithBlankSlug() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        ShortLink link = urlService.shorten(LONG_URL, "");
+
+        Assert.assertEquals("a9b9f0", link.getHash());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
+    }
+
+    @Test
+    public void shortenWithNullSlug() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        ShortLink link = urlService.shorten(LONG_URL, null);
+
+        Assert.assertEquals("a9b9f0", link.getHash());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
+    }
+
+    
+    @Test
     public void shortenWithSlugCollision() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
         when(shortLinkRepository.findByHash("my_slug")).thenReturn(new ShortLink("a9b9f0", "http://someurl", SHORT_URL));

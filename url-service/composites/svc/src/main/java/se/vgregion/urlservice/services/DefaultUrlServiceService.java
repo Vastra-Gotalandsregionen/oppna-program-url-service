@@ -28,6 +28,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -84,10 +85,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 
                 int length = INITIAL_HASH_LENGTH;
                 
-                if(hash == null) {
+                if(StringUtils.isBlank(hash)) {
                     hash = md5.substring(0, length);
                 }
-                
                 // check that the hash does not already exist
                 while(shortLinkRepository.findByHash(hash) != null) {
                     length++;
