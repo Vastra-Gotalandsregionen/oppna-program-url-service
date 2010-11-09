@@ -16,6 +16,18 @@
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.css</include>
+					<include>**/*.js</include>
+					<include>**/*.png</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 
 	<dependencies>
 		<dependency>

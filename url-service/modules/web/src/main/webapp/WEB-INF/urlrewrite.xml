@@ -33,6 +33,11 @@
 	</rule>
 
 	<rule match-type="wildcard">
+		<from>/resources/**</from>
+		<to last="true">/resources/$1</to>
+	</rule>
+
+	<rule match-type="wildcard">
 		<from>/**</from>
 		<to last="true">/app/$1</to>
 	</rule>

@@ -84,6 +84,16 @@ public class DefaultUrlServiceServiceTest {
         Assert.assertEquals(LONG_URL, link.getLongUrl());
     }
 
+    @Test
+    public void shortenWithTooShortSlug() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        ShortLink link = urlService.shorten(LONG_URL, "foo");
+
+        Assert.assertEquals("foo9f0", link.getHash());
+        Assert.assertEquals(LONG_URL, link.getLongUrl());
+    }
+
     
     @Test
     public void shortenWithSlugCollision() throws URISyntaxException {

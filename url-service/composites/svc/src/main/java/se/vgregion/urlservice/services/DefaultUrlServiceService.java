@@ -88,6 +88,11 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 if(StringUtils.isBlank(hash)) {
                     hash = md5.substring(0, length);
                 }
+                
+                if(hash.length() < INITIAL_HASH_LENGTH) {
+                    hash = hash + md5.substring(hash.length(), length);
+                }
+                
                 // check that the hash does not already exist
                 while(shortLinkRepository.findByHash(hash) != null) {
                     length++;
@@ -100,10 +105,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                ShortLink newLink = new ShortLink();
-                newLink.setHash(hash);
-                newLink.setLongUrl(urlString);
-                newLink.setShortUrl(urlPrefix + hash);
+                ShortLink newLink = new ShortLink(hash, urlString, urlPrefix + hash);
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;

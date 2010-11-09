@@ -26,6 +26,11 @@
 <html>
 	<head>
 		<title>Förkorta länk</title>
+		
+		<link rel="stylesheet" href="/resources/css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="/resources/css/typography.css" type="text/css" />
+		<link rel="stylesheet" href="/resources/css/forms.css" type="text/css" />
+		<link rel="stylesheet" href="/resources/css/urlservice.css" type="text/css" />
 	</head>
 	<body>
 		<form action=''>
@@ -43,6 +48,6 @@
 			<p>${error}</p>
 		</c:if>
 
-		<p><a href="javascript:location.href='http://localhost:8080/?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</p>
+		<p><a href="javascript:location.href='http://localhost:8080/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</p>
 	</body>
 </html>
