@@ -33,7 +33,7 @@
 		<link rel="stylesheet" href="/resources/css/urlservice.css" type="text/css" />
 	</head>
 	<body>
-		<form action=''>
+		<form action='' method="post">
 			<p><label for="longurl">Länk</label><input id="longurl" name='longurl' value='${longUrl}'> <input type='submit' value='Förkorta länk'></p>
 			<p><label for="slug">Nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
 
