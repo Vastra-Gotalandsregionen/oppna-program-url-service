@@ -35,6 +35,9 @@ import se.vgregion.urlservice.types.ShortLink;
 @ContextConfiguration("classpath:services-test.xml")
 public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
+    private static final String DOMAIN = "foo.vgregion.se";
+
+    
     private ShortLinkRepository dao;
     
     private ShortLink link1;
@@ -42,7 +45,7 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Before
     public void setup() {
         dao = applicationContext.getBean(ShortLinkRepository.class);
-        link1 = dao.persist(new ShortLink("foo1", "http://example.com/1", "http://short"));
+        link1 = dao.persist(new ShortLink(DOMAIN, "foo1", "http://example.com/1", "http://short"));
     }
     
     @Test
@@ -59,7 +62,7 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Transactional
     @Rollback
     public void findByHash() {
-        ShortLink loaded = dao.findByHash(link1.getPattern());
+        ShortLink loaded = dao.findByHash(DOMAIN, link1.getPattern());
         
         Assert.assertEquals(link1.getPattern(), loaded.getPattern());
         Assert.assertEquals(link1.getUrl(), loaded.getUrl());
@@ -68,8 +71,26 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     @Transactional
     @Rollback
+    public void findByHashWithNullDomain() {
+        ShortLink loaded = dao.findByHash(null, link1.getPattern());
+        
+        Assert.assertEquals(link1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
+    }
+
+    
+    @Test
+    @Transactional
+    @Rollback
+    public void findByHashDomainNotMatching() {
+        Assert.assertNull(dao.findByHash("dummy", link1.getPattern()));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void findNonExistingByHash() {
-        Assert.assertNull(dao.findByHash("dummy"));
+        Assert.assertNull(dao.findByHash(DOMAIN, "dummy"));
     }
 
     @Test
@@ -93,7 +114,7 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        dao.persist(new ShortLink(link1.getPattern(), "http://dummy", "http://short"));
+        dao.persist(new ShortLink(DOMAIN, link1.getPattern(), "http://dummy", "http://short"));
     }
 
 }

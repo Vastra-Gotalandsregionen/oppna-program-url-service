@@ -47,6 +47,6 @@ public class DemoDataPopulator {
     
     @PostConstruct
     public void createData() {
-        redirectRuleRepository.persist(new RedirectRule("foo/.*", "http://google.com"));
+        redirectRuleRepository.persist(new RedirectRule("http://vgregion.se", "foo/.*", "http://google.com"));
     }
 }

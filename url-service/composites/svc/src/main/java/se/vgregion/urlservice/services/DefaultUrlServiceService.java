@@ -50,7 +50,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     private static final int INITIAL_HASH_LENGTH = 6;
     
-    private String urlPrefix;
+    private String domain;
     
     private ShortLinkRepository shortLinkRepository;
     private RedirectRuleRepository redirectRuleRepository;
@@ -94,7 +94,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 }
                 
                 // check that the hash does not already exist
-                while(shortLinkRepository.findByHash(hash) != null) {
+                while(shortLinkRepository.findByHash(domain, hash) != null) {
                     length++;
                     
                     if(length > md5.length()) {
@@ -105,7 +105,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                ShortLink newLink = new ShortLink(hash, urlString, urlPrefix + hash);
+                ShortLink newLink = new ShortLink(domain, hash, urlString, domain + hash);
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;
@@ -120,14 +120,26 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ShortLink expand(String shortUrlOrHash) {
-        String hash;
-        if(shortUrlOrHash.startsWith("http://")) {
-            hash = shortUrlOrHash.substring(shortUrlOrHash.lastIndexOf('/') + 1);
-        } else {
-            hash = shortUrlOrHash;
+    public ShortLink expand(String domain, String hash) {
+        return shortLinkRepository.findByHash(domain, hash);
+    }
+    
+    @Override
+    public ShortLink expand(String shortUrl) throws URISyntaxException {
+        URI url = URI.create(shortUrl);
+        String domain = url.getHost();
+        if(url.getPort() > 0) {
+            domain += ":" + url.getPort();
         }
-        return shortLinkRepository.findByHash(hash);
+        
+        int lastSlash = url.getPath().lastIndexOf('/');
+        String hash;
+        if(lastSlash == -1) {
+            hash = url.getPath();
+        } else {
+            hash = url.getPath().substring(lastSlash);
+        }
+        return expand(domain, hash);
     }
 
     /** 
@@ -135,16 +147,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public URI redirect(String path) {
-        ShortLink shortLink = expand(path);
-        
+    public URI redirect(String domain, String path) {
+        ShortLink shortLink = expand(domain, path);
         // first try short links
         if(shortLink != null) {
             return URI.create(shortLink.getUrl());
         } else {
             // next, try static redirects
-            StaticRedirect redirect = staticRedirectRepository.findByPath(path);
-            
+            StaticRedirect redirect = staticRedirectRepository.findByPath(domain, path);
+
             if(redirect != null) {
                 return URI.create(redirect.getUrl());
             } else {
@@ -152,7 +163,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 Collection<RedirectRule> rules = redirectRuleRepository.findAll();
                 
                 for(RedirectRule rule : rules) {
-                    if(rule.matches(path)) {
+                    if(rule.matches(domain, path)) {
                         return URI.create(rule.getUrl());
                     }
                 }
@@ -200,17 +211,13 @@ public class DefaultUrlServiceService implements UrlServiceService {
     }
 
 
-    public String getUrlPrefix() {
-        return urlPrefix;
+    public String getDomain() {
+        return domain;
     }
 
-    @Resource(name="urlPrefix")
-    public void setUrlPrefix(String urlPrefix) {
-        if(!urlPrefix.endsWith("/")) {
-            urlPrefix = urlPrefix + "/";
-        }
-        
-        this.urlPrefix = urlPrefix;
+    @Resource(name="domain")
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
 

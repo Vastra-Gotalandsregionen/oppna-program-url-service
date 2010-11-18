@@ -26,6 +26,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang.StringUtils;
+
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @MappedSuperclass
@@ -35,8 +37,11 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     @Id
     @GeneratedValue
     protected Long id;
+
+    @Column
+    private String domain;
     
-    @Column(unique=true, nullable=false)
+    @Column(nullable=false)
     private String pattern;
     
     @Column(nullable=false)
@@ -45,7 +50,15 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     public AbstractRedirect() {
     }
 
-    public AbstractRedirect(String pattern, String url) {
+    public AbstractRedirect(String domain, String pattern, String url) {
+        if(StringUtils.isEmpty(pattern)) {
+            throw new IllegalArgumentException("Patter can not be empty");
+        }
+        if(StringUtils.isEmpty(url)) {
+            throw new IllegalArgumentException("URL can not be empty");
+        }
+        
+        this.domain = domain;
         this.pattern = pattern;
         this.url = url;
     }
@@ -54,6 +67,9 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         return id;
     }
     
+    public String getDomain() {
+        return domain;
+    }
     public String getPattern() {
         return pattern;
     }
@@ -61,5 +77,15 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         return url;
     }
     
-    public abstract boolean matches(String path);
+    protected boolean domainMatches(String otherDomain) {
+        if (domain == null && otherDomain == null) {
+            return true;
+        } else if(domain != null) {
+            return domain.equals(otherDomain);
+        } else {
+            return false;
+        }
+    }
+    
+    public abstract boolean matches(String domain, String path);
 }

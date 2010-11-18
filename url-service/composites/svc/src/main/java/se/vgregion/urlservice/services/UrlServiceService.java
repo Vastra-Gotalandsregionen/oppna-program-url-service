@@ -51,14 +51,24 @@ public interface UrlServiceService {
 
     
     /**
-     * Expand a short link (e.g. http://s.vgregion.se/abc) or hash (e.g. "abc") 
+     * Expand a short link (e.g. http://s.vgregion.se/abc) 
      * to the matching long URL. 
-     * @param shortUrlOrHash The short URL or the hash, required
+     * @param shortUrlOrHash The short URL, required
      * @return The {@link ShortLink} containing the long URL. Null if the
      *   short URL/hash is unknown.
      * @throws URISyntaxException
      */
-    ShortLink expand(String shortUrlOrHash) throws URISyntaxException;
+    ShortLink expand(String shortUrl) throws URISyntaxException;
+
+    /**
+     * Expand a hash (e.g. "abc") 
+     * to the matching long URL. 
+     * @param shortUrlOrHash The hash, required
+     * @return The {@link ShortLink} containing the long URL. Null if the
+     *   short URL/hash is unknown.
+     * @throws URISyntaxException
+     */
+    ShortLink expand(String domain, String hash) throws URISyntaxException;
 
     /**
      * Find the matching hash for a long URL.  
@@ -75,5 +85,5 @@ public interface UrlServiceService {
      * @param path The path part of the request URL
      * @return The URI to where the user should be redirected.
      */
-    URI redirect(String path);
+    URI redirect(String domain, String path);
 }

@@ -21,8 +21,16 @@ package se.vgregion.urlservice.types;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.apache.commons.lang.StringUtils;
 
 @Entity
+@Table(uniqueConstraints=
+    @UniqueConstraint(columnNames={"domain", "pattern"})
+    )
+
 public class ShortLink extends AbstractRedirect<ShortLink> {
 
     @Column(nullable=false)
@@ -32,8 +40,13 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
     public ShortLink() {
     }
 
-    public ShortLink(String hash, String longUrl, String shortUrl) {
-        super(hash, longUrl);
+    public ShortLink(String domain, String hash, String longUrl, String shortUrl) {
+        super(domain, hash, longUrl);
+        
+        if(StringUtils.isEmpty(domain)) {
+            throw new IllegalArgumentException("Domain can not be empty");
+        }
+        
         this.shortUrl = shortUrl;
     }
     
@@ -42,7 +55,9 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
     }
 
     @Override
-    public boolean matches(String path) {
+    public boolean matches(String domain, String path) {
+        if(!domainMatches(domain)) return false;
+        
         return getPattern().equals(path);
     }
 }

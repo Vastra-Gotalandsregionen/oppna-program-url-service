@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.services;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
@@ -39,11 +41,17 @@ import se.vgregion.urlservice.types.StaticRedirect;
 
 public class DefaultUrlServiceServiceTest {
 
+    private static final String DOMAIN = "foo.vgregion.se";
     private static final String SHORT_URL = "http://short";
     private static final String HASH = "foo";
     private static final String LONG_URL = "http://example.com";
     private DefaultUrlServiceService urlService = new DefaultUrlServiceService();
 
+    @Before
+    public void before() {
+        urlService.setDomain(DOMAIN);
+    }
+    
     @Test
     public void shortenNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
@@ -98,8 +106,8 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void shortenWithSlugCollision() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByHash("my_slug")).thenReturn(new ShortLink("a9b9f0", "http://someurl", SHORT_URL));
-        when(shortLinkRepository.findByHash("my_slug4")).thenReturn(null);
+        when(shortLinkRepository.findByHash(eq(DOMAIN), eq("my_slug"))).thenReturn(new ShortLink(DOMAIN, "a9b9f0", "http://someurl", SHORT_URL));
+        when(shortLinkRepository.findByHash(eq(DOMAIN), eq("my_slug4"))).thenReturn(null);
         urlService.setShortLinkRepository(shortLinkRepository);
 
         ShortLink link = urlService.shorten(LONG_URL, "my_slug");
@@ -112,8 +120,8 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void shortenWithHashCollision() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByHash("a9b9f0")).thenReturn(new ShortLink("a9b9f0", "http://someurl", SHORT_URL));
-        when(shortLinkRepository.findByHash("a9b9f04")).thenReturn(null);
+        when(shortLinkRepository.findByHash(DOMAIN, "a9b9f0")).thenReturn(new ShortLink(DOMAIN, "a9b9f0", "http://someurl", SHORT_URL));
+        when(shortLinkRepository.findByHash(DOMAIN, "a9b9f04")).thenReturn(null);
         urlService.setShortLinkRepository(shortLinkRepository);
         
         ShortLink link = urlService.shorten(LONG_URL);
@@ -127,7 +135,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void shortenExistingUrl() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByLongUrl(anyString())).thenReturn(new ShortLink(HASH, LONG_URL, SHORT_URL));
+        when(shortLinkRepository.findByLongUrl(anyString())).thenReturn(new ShortLink(DOMAIN, HASH, LONG_URL, SHORT_URL));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         ShortLink link = urlService.shorten(LONG_URL);
@@ -146,11 +154,11 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void expandExistingHash() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByHash(anyString())).thenReturn(new ShortLink(HASH, LONG_URL, SHORT_URL));
+        when(shortLinkRepository.findByHash(eq(DOMAIN), anyString())).thenReturn(new ShortLink(DOMAIN, HASH, LONG_URL, SHORT_URL));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         
-        ShortLink link = urlService.expand(HASH);
+        ShortLink link = urlService.expand(DOMAIN, HASH);
 
         Assert.assertEquals(HASH, link.getPattern());
         Assert.assertEquals(LONG_URL, link.getUrl());
@@ -159,11 +167,11 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void expandExistingShortUrl() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByHash(anyString())).thenReturn(new ShortLink(HASH, LONG_URL, SHORT_URL));
+        when(shortLinkRepository.findByHash(eq(DOMAIN), anyString())).thenReturn(new ShortLink(DOMAIN, HASH, LONG_URL, SHORT_URL));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         
-        ShortLink link = urlService.expand("http://s.vgregion.se/foo");
+        ShortLink link = urlService.expand("http://" + DOMAIN + "/" + HASH);
 
         Assert.assertEquals(HASH, link.getPattern());
         Assert.assertEquals(LONG_URL, link.getUrl());
@@ -181,7 +189,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void lookupExistingUrl() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByLongUrl(anyString())).thenReturn(new ShortLink(HASH, LONG_URL, SHORT_URL));
+        when(shortLinkRepository.findByLongUrl(anyString())).thenReturn(new ShortLink(DOMAIN, HASH, LONG_URL, SHORT_URL));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         ShortLink link = urlService.lookup(LONG_URL);
@@ -201,45 +209,100 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnRedirectRule() throws URISyntaxException {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule("foo", LONG_URL)));
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "foo", LONG_URL)));
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
         urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
         
-        URI uri = urlService.redirect("foo");
+        URI uri = urlService.redirect(DOMAIN, "foo");
 
         Assert.assertEquals(LONG_URL, uri.toString());
     }
 
     @Test
+    public void redirectOnRedirectRuleNullDomain() throws URISyntaxException {
+        RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(null, "foo", LONG_URL)));
+        urlService.setRedirectRuleRepository(redirectRuleRepository);
+        
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
+        
+        
+        URI uri = urlService.redirect(null, "foo");
+        
+        Assert.assertEquals(LONG_URL, uri.toString());
+    }
+
+    @Test
+    public void redirectOnRedirectRuleDomainNotMatching() throws URISyntaxException {
+        RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "foo", LONG_URL)));
+        urlService.setRedirectRuleRepository(redirectRuleRepository);
+        
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
+        
+        
+        Assert.assertNull(urlService.redirect("dummy", "foo"));
+    }
+
+    
+    @Test
     public void redirectOnShortLink() throws URISyntaxException {
         urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
         
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
-        when(shortLinkRepository.findByHash(anyString())).thenReturn(new ShortLink("foo", LONG_URL, SHORT_URL));
+        when(shortLinkRepository.findByHash(eq(DOMAIN), anyString())).thenReturn(new ShortLink(DOMAIN, "foo", LONG_URL, SHORT_URL));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
-        URI uri = urlService.redirect("foo");
+        URI uri = urlService.redirect(DOMAIN, "foo");
 
         Assert.assertEquals(LONG_URL, uri.toString());
     }
+    
+    @Test
+    public void redirectOnShortLinkDomainNoMatching() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
+        
+        ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
+        when(shortLinkRepository.findByHash(eq(DOMAIN), anyString())).thenReturn(new ShortLink(DOMAIN, "foo", LONG_URL, SHORT_URL));
+        urlService.setShortLinkRepository(shortLinkRepository);
 
+        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
+        
+        Assert.assertNull(urlService.redirect("dummy", "foo"));
+    }
+
+    
     @Test
     public void redirectOnStaticRedirect() throws URISyntaxException {
         urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
         
         StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        when(staticRedirectRepository.findByPath(anyString())).thenReturn(new StaticRedirect("foo", LONG_URL));
+        when(staticRedirectRepository.findByPath(eq(DOMAIN), anyString())).thenReturn(new StaticRedirect(DOMAIN, "foo", LONG_URL));
         urlService.setStaticRedirectRepository(staticRedirectRepository);
         
-        URI uri = urlService.redirect("foo");
+        URI uri = urlService.redirect(DOMAIN, "foo");
 
         Assert.assertEquals(LONG_URL, uri.toString());
+    }
+
+    @Test
+    public void redirectOnStaticRedirectDomainNotMatching() throws URISyntaxException {
+        urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+        
+        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
+        when(staticRedirectRepository.findByPath(eq(DOMAIN), anyString())).thenReturn(new StaticRedirect(DOMAIN, "foo", LONG_URL));
+        urlService.setStaticRedirectRepository(staticRedirectRepository);
+        
+        Assert.assertNull(urlService.redirect("dummy", "foo"));
     }
 
     
@@ -249,7 +312,7 @@ public class DefaultUrlServiceServiceTest {
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
         urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
 
-        URI uri = urlService.redirect("foo");
+        URI uri = urlService.redirect(DOMAIN, "foo");
 
         Assert.assertNull(uri);
     }

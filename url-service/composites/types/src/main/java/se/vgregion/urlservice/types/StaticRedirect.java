@@ -20,18 +20,31 @@
 package se.vgregion.urlservice.types;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.apache.commons.lang.StringUtils;
 
 @Entity
+@Table(uniqueConstraints=
+    @UniqueConstraint(columnNames={"domain", "pattern"})
+    )
 public class StaticRedirect extends AbstractRedirect<StaticRedirect> {
 
     protected StaticRedirect() {
     }
 
-    public StaticRedirect(String path, String url) {
-        super(path, url);
+    public StaticRedirect(String domain, String path, String url) {
+        super(domain, path, url);
+        
+        if(StringUtils.isEmpty(domain)) {
+            throw new IllegalArgumentException("Domain can not be empty");
+        }
     }
     
-    public boolean matches(String other) {      
+    public boolean matches(String domain, String other) {
+        if(!domainMatches(domain)) return false;
+        
         return getPattern().equals(other);
     }
 }

@@ -35,6 +35,7 @@ import se.vgregion.urlservice.types.ShortLink;
 public class MockUrlServiceService implements UrlServiceService {
 
     private final Logger log = LoggerFactory.getLogger(MockUrlServiceService.class);
+    private static final String DOMAIN = "s.vgregion.se";
     private static final String URL_PREFIX = "http://s.vgregion.se/";
     private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
     
@@ -49,10 +50,18 @@ public class MockUrlServiceService implements UrlServiceService {
         return shorten(urlString, null);
     }
     
-    public ShortLink expand(String hashOrShortUrl) {
-        if(hashOrShortUrl.equals("foo") ||
-                hashOrShortUrl.equals("http://s.vgregion.se/foo")) {
-            return new ShortLink("foo", "http://example.com", URL_PREFIX + "foo");
+    @Override
+    public ShortLink expand(String domain, String hash) {
+        if(hash.equals("foo")) {
+            return new ShortLink(DOMAIN, "foo", "http://example.com", URL_PREFIX + "foo");
+        } else {
+            return null;
+        }
+    }
+    
+    public ShortLink expand(String shortUrl) {
+        if(shortUrl.equals("http://s.vgregion.se/foo")) {
+            return new ShortLink(DOMAIN, "foo", "http://example.com", URL_PREFIX + "foo");
         } else {
             return null;
         }
@@ -60,7 +69,7 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public ShortLink lookup(String url) throws URISyntaxException {
-        return new ShortLink("foo", url, URL_PREFIX + "foo");
+        return new ShortLink(DOMAIN, "foo", url, URL_PREFIX + "foo");
     }
 
     @Override
@@ -70,7 +79,7 @@ public class MockUrlServiceService implements UrlServiceService {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             hash = (hash != null) ? hash : "foo"; 
             
-            return new ShortLink(hash, urlString, URL_PREFIX + hash);
+            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash);
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
@@ -78,13 +87,14 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public URI redirect(String path) {
-        if(expand(path) != null) {
-            return URI.create(expand(path).getUrl()); 
+    public URI redirect(String domain, String path) {
+        if(expand(domain, path) != null) {
+            return URI.create(expand(domain, path).getUrl()); 
         } else if(path.equals("bar")) {
             return URI.create("http://google.com");
         } else {
             return null;
         }
     }
+
 }

@@ -33,6 +33,8 @@ import se.vgregion.urlservice.types.RedirectRule;
 @ContextConfiguration("classpath:services-test.xml")
 public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
+    private static final String DOMAIN = "foo.vgregion.se";
+    
     private RedirectRuleRepository dao;
     
     private RedirectRule rule1;
@@ -40,7 +42,7 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
     @Before
     public void setup() {
         dao = applicationContext.getBean(RedirectRuleRepository.class);
-        rule1 = dao.persist(new RedirectRule("foo", "http://example.com/1"));
+        rule1 = dao.persist(new RedirectRule(DOMAIN, "foo", "http://example.com/1"));
     }
     
     @Test

@@ -35,6 +35,8 @@ import se.vgregion.urlservice.types.StaticRedirect;
 @ContextConfiguration("classpath:services-test.xml")
 public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
+    private static final String DOMAIN = "foo.vgregion.se";
+    
     private StaticRedirectRepository dao;
     
     private StaticRedirect redirect1;
@@ -42,7 +44,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Before
     public void setup() {
         dao = applicationContext.getBean(StaticRedirectRepository.class);
-        redirect1 = dao.persist(new StaticRedirect("foo", "http://example.com/1"));
+        redirect1 = dao.persist(new StaticRedirect(DOMAIN, "foo", "http://example.com/1"));
     }
     
     @Test
@@ -59,7 +61,17 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     @Rollback
     public void findByPath() {
-        StaticRedirect loaded = dao.findByPath(redirect1.getPattern());
+        StaticRedirect loaded = dao.findByPath(DOMAIN, redirect1.getPattern());
+        
+        Assert.assertEquals(redirect1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(redirect1.getUrl(), loaded.getUrl());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findByPathWithNullDomain() {
+        StaticRedirect loaded = dao.findByPath(null, redirect1.getPattern());
         
         Assert.assertEquals(redirect1.getPattern(), loaded.getPattern());
         Assert.assertEquals(redirect1.getUrl(), loaded.getUrl());
@@ -69,14 +81,14 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     @Rollback
     public void findNonExistingByHash() {
-        Assert.assertNull(dao.findByPath("dummy"));
+        Assert.assertNull(dao.findByPath(DOMAIN, "dummy"));
     }
 
     @Test(expected=PersistenceException.class)
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        dao.persist(new StaticRedirect(redirect1.getPattern(), "http://dummy"));
+        dao.persist(new StaticRedirect(DOMAIN, redirect1.getPattern(), "http://dummy"));
     }
 
 }

@@ -36,6 +36,7 @@ public class RedirectTest {
     @Test
     public void redirectWithExistingHash() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/foo");
+        request.setServerName("s.vgregion.se");
         request.setPathInfo("/foo");
         ModelAndView mav = controller.redirect(request, response);
         

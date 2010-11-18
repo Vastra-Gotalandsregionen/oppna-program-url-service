@@ -19,6 +19,8 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.util.List;
+
 import javax.persistence.NoResultException;
 
 import org.springframework.stereotype.Repository;
@@ -39,11 +41,27 @@ public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> impl
     /**
      * Find link by hash.
      */
+    @SuppressWarnings("unchecked")
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
-    public ShortLink findByHash(String hash) {
+    public ShortLink findByHash(String domain, String hash) {
         try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.pattern = :pattern")
-                .setParameter("pattern", hash).getSingleResult();
+            // TODO is this the desired behavior, with null domain, any matching link will be returned
+            if(domain == null) {
+                List<ShortLink> links = entityManager.createQuery("select l from ShortLink l where l.pattern = :pattern")
+                    .setParameter("pattern", hash)
+                    .getResultList();
+                if(links.isEmpty()) {
+                    return null;
+                } else {
+                    return links.get(0);
+                }
+            } else {
+                return (ShortLink) entityManager.createQuery("select l from ShortLink l where l.domain = :domain and l.pattern = :pattern")
+                    .setParameter("domain", domain)
+                    .setParameter("pattern", hash)
+                    .getSingleResult();
+            }
+            
         } catch(NoResultException e) {
             return null;
         }

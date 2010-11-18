@@ -24,28 +24,52 @@ import org.junit.Test;
 
 public class RedirectRuleTest {
 
+    private static final String DOMAIN = "foo.vgregion.se";
     private static final String URL = "http://example.com";
     
     @Test
+    public void nullDomain() {
+        new RedirectRule(null, "foo", URL);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void nullPatterNotAllowed() {
+        new RedirectRule(DOMAIN, null, URL);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void nullUrlNotAllowed() {
+        new RedirectRule(DOMAIN, "foo", null);
+    }
+    
+    @Test
     public void matchesSimple() {
-        RedirectRule rule = new RedirectRule("foo", URL);
+        RedirectRule rule = new RedirectRule(DOMAIN, "foo", URL);
         
-        Assert.assertTrue(rule.matches("foo"));
-        Assert.assertFalse(rule.matches("foox"));
-        Assert.assertFalse(rule.matches("foo/x"));
-        Assert.assertFalse(rule.matches("xfoo"));
-        Assert.assertFalse(rule.matches("bar"));
+        Assert.assertTrue(rule.matches(DOMAIN, "foo"));
+        Assert.assertFalse(rule.matches(DOMAIN, "foox"));
+        Assert.assertFalse(rule.matches(DOMAIN, "foo/x"));
+        Assert.assertFalse(rule.matches(DOMAIN, "xfoo"));
+        Assert.assertFalse(rule.matches(DOMAIN, "bar"));
     }
 
     @Test
     public void matchesWildcard() {
-        RedirectRule rule = new RedirectRule("foo.*", URL);
+        RedirectRule rule = new RedirectRule(DOMAIN, "foo.*", URL);
         
-        Assert.assertTrue(rule.matches("foo"));
-        Assert.assertTrue(rule.matches("foox"));
-        Assert.assertTrue(rule.matches("foo/x"));
-        Assert.assertFalse(rule.matches("xfoo"));
-        Assert.assertFalse(rule.matches("bar"));
+        Assert.assertTrue(rule.matches(DOMAIN, "foo"));
+        Assert.assertTrue(rule.matches(DOMAIN, "foox"));
+        Assert.assertTrue(rule.matches(DOMAIN, "foo/x"));
+        Assert.assertFalse(rule.matches(DOMAIN, "xfoo"));
+        Assert.assertFalse(rule.matches(DOMAIN, "bar"));
+    }
+
+    @Test
+    public void doNotMatchIncorrectDomain() {
+        RedirectRule rule = new RedirectRule(DOMAIN, "foo.*", URL);
+        
+        Assert.assertFalse(rule.matches("dummy", "foo"));
+        Assert.assertFalse(rule.matches(null, "foox"));
     }
 
 

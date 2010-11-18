@@ -27,7 +27,7 @@ public interface ShortLinkRepository extends JpaRepository<ShortLink, Long, Long
     /**
      * Find link by hash.
      */
-    ShortLink findByHash(String hash);
+    ShortLink findByHash(String domain, String hash);
 
     /**
      * Find link by URL.

@@ -22,19 +22,27 @@ package se.vgregion.urlservice.types;
 import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(uniqueConstraints=
+    @UniqueConstraint(columnNames={"domain", "pattern"})
+    )
+
 public class RedirectRule extends AbstractRedirect<RedirectRule> {
 
     /* Make JPA happy */
     protected RedirectRule() {
     }
 
-    public RedirectRule(String pattern, String url) {
-        super(pattern, url);
+    public RedirectRule(String domain, String pattern, String url) {
+        super(domain, pattern, url);
     }
     
-    public boolean matches(String path) {
+    public boolean matches(String domain, String path) {
+        if(!domainMatches(domain)) return false;
+        
         Pattern regex = Pattern.compile(getPattern());
         
         return regex.matcher(path).matches();

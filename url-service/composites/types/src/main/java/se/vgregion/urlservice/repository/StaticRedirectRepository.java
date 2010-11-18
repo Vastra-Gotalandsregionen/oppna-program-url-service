@@ -27,6 +27,6 @@ public interface StaticRedirectRepository extends JpaRepository<StaticRedirect, 
     /**
      * Find link by path.
      */
-    StaticRedirect findByPath(String path);
+    StaticRedirect findByPath(String domain, String path);
 
 }

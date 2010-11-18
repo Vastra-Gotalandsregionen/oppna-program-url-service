@@ -76,13 +76,17 @@ public class AdminGuiController {
         
         if(request.getParameter("add") != null) {
             // adding a new rule
+            String domain = request.getParameter("domain");
+            if(StringUtils.isEmpty(domain)) {
+                domain = null;
+            }
             String pattern = request.getParameter("pattern");
             String url = request.getParameter("url");
             
             if(StringUtils.isNotEmpty(pattern) && StringUtils.isNotEmpty(url)) {
                 log.debug("Adding redirect rule with pattern \"{}\" and URL \"{}\"", pattern, url);
                 try { 
-                    redirectRuleRepository.persist(new RedirectRule(pattern, url));
+                    redirectRuleRepository.persist(new RedirectRule(domain, pattern, url));
                 } catch(RuntimeException e) {
                     // TODO do not ignore
                 }
@@ -105,13 +109,14 @@ public class AdminGuiController {
         
         if(request.getParameter("add") != null) {
             // adding a new rule
-            String path = request.getParameter("path");
+            String domain = request.getParameter("domain");
+            String path = request.getParameter("pattern");
             String url = request.getParameter("url");
             
-            if(StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(url)) {
+            if(StringUtils.isNotEmpty(domain) && StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(url)) {
                 log.debug("Adding static redirect with path \"{}\" and URL \"{}\"", path, url);
                 try { 
-                    staticRedirectRepository.persist(new StaticRedirect(path, url));
+                    staticRedirectRepository.persist(new StaticRedirect(domain, path, url));
                 } catch(RuntimeException e) {
                     // TODO do not ignore
                 }

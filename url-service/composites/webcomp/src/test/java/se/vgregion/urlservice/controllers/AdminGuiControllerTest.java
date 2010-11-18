@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,17 +44,18 @@ import se.vgregion.urlservice.types.StaticRedirect;
 public class AdminGuiControllerTest {
 
     private static final String PATTERN = "foo";
+    private static final String DOMAIN = "vgregion.se";
     private static final String URL = "http://google.com";
     private AdminGuiController controller = new AdminGuiController();
     
     @Test
     public void index() throws IOException {
-        List<RedirectRule> rules = Arrays.asList(new RedirectRule(PATTERN, URL));
+        List<RedirectRule> rules = Arrays.asList(new RedirectRule(DOMAIN, PATTERN, URL));
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
         when(redirectRuleRepository.findAll()).thenReturn(rules);
         controller.setRedirectRuleRepository(redirectRuleRepository);
 
-        List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(PATTERN, URL));
+        List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(DOMAIN, PATTERN, URL));
         StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
         when(staticRedirectRepository.findAll()).thenReturn(statics);
         controller.setStaticRedirectRepository(staticRedirectRepository);
@@ -80,8 +80,6 @@ public class AdminGuiControllerTest {
         controller.updateRedirectRules(request);
 
         verify(redirectRuleRepository).persist(Mockito.argThat(new TypeSafeMatcher<RedirectRule>() {
-
-
             @Override
             public boolean matchesSafely(RedirectRule rule) {
                 return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
@@ -112,7 +110,8 @@ public class AdminGuiControllerTest {
         
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("add", "any value");
-        request.addParameter("path", PATTERN);
+        request.addParameter("domain", DOMAIN);
+        request.addParameter("pattern", PATTERN);
         request.addParameter("url", URL);
         
         controller.updateStaticRedirects(request);
