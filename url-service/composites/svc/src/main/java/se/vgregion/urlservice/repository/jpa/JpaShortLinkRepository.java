@@ -42,8 +42,8 @@ public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> impl
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     public ShortLink findByHash(String hash) {
         try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.hash = :hash")
-                .setParameter("hash", hash).getSingleResult();
+            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.pattern = :pattern")
+                .setParameter("pattern", hash).getSingleResult();
         } catch(NoResultException e) {
             return null;
         }
@@ -54,8 +54,8 @@ public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> impl
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     public ShortLink findByLongUrl(String longUrl) {
         try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.longUrl = :longurl")
-            .setParameter("longurl", longUrl).getSingleResult();
+            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.url = :url")
+            .setParameter("url", longUrl).getSingleResult();
         } catch(NoResultException e) {
             return null;
         }

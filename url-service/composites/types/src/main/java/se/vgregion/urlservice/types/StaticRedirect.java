@@ -19,46 +19,19 @@
 
 package se.vgregion.urlservice.types;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class StaticRedirect extends AbstractEntity<StaticRedirect, Long> {
+public class StaticRedirect extends AbstractRedirect<StaticRedirect> {
 
-    @Id
-    @GeneratedValue
-    private long id;
-    
-    @Column(unique=true, nullable=false)
-    private String path;
-    
-    @Column(nullable=false)
-    private String url;
-
-    public StaticRedirect() {
+    protected StaticRedirect() {
     }
 
     public StaticRedirect(String path, String url) {
-        this.path = path;
-        this.url = url;
-    }
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public String getPath() {
-        return path;
-    }
-    public String getUrl() {
-        return url;
+        super(path, url);
     }
     
     public boolean matches(String other) {      
-        return path.equals(other);
+        return getPattern().equals(other);
     }
 }

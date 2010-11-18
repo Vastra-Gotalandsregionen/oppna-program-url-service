@@ -51,7 +51,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     public void findByPk() {
         StaticRedirect loaded = dao.findByPrimaryKey(redirect1.getId());
         
-        Assert.assertEquals(redirect1.getPath(), loaded.getPath());
+        Assert.assertEquals(redirect1.getPattern(), loaded.getPattern());
         Assert.assertEquals(redirect1.getUrl(), loaded.getUrl());
     }
 
@@ -59,9 +59,9 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     @Rollback
     public void findByPath() {
-        StaticRedirect loaded = dao.findByPath(redirect1.getPath());
+        StaticRedirect loaded = dao.findByPath(redirect1.getPattern());
         
-        Assert.assertEquals(redirect1.getPath(), loaded.getPath());
+        Assert.assertEquals(redirect1.getPattern(), loaded.getPattern());
         Assert.assertEquals(redirect1.getUrl(), loaded.getUrl());
     }
 
@@ -76,7 +76,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        dao.persist(new StaticRedirect(redirect1.getPath(), "http://dummy"));
+        dao.persist(new StaticRedirect(redirect1.getPattern(), "http://dummy"));
     }
 
 }

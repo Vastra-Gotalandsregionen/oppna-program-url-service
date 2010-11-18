@@ -50,8 +50,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL);
 
-        Assert.assertEquals("a9b9f0", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("a9b9f0", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test
@@ -60,8 +60,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL, "my_slug");
 
-        Assert.assertEquals("my_slug", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("my_slug", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test
@@ -70,8 +70,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL, "");
 
-        Assert.assertEquals("a9b9f0", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("a9b9f0", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test
@@ -80,8 +80,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL, null);
 
-        Assert.assertEquals("a9b9f0", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("a9b9f0", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test
@@ -90,8 +90,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL, "foo");
 
-        Assert.assertEquals("foo9f0", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("foo9f0", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     
@@ -104,8 +104,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL, "my_slug");
 
-        Assert.assertEquals("my_slug4", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("my_slug4", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     
@@ -119,8 +119,8 @@ public class DefaultUrlServiceServiceTest {
         ShortLink link = urlService.shorten(LONG_URL);
 
         // since the hash collides, we should get a longer hash
-        Assert.assertEquals("a9b9f04", link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals("a9b9f04", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     
@@ -132,8 +132,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.shorten(LONG_URL);
 
-        Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals(HASH, link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test(expected=URISyntaxException.class)
@@ -152,8 +152,8 @@ public class DefaultUrlServiceServiceTest {
         
         ShortLink link = urlService.expand(HASH);
 
-        Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals(HASH, link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     @Test
@@ -165,8 +165,8 @@ public class DefaultUrlServiceServiceTest {
         
         ShortLink link = urlService.expand("http://s.vgregion.se/foo");
 
-        Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals(HASH, link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
     
@@ -186,8 +186,8 @@ public class DefaultUrlServiceServiceTest {
 
         ShortLink link = urlService.lookup(LONG_URL);
 
-        Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl());
+        Assert.assertEquals(HASH, link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
 

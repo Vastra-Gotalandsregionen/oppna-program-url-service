@@ -20,15 +20,19 @@
 package se.vgregion.urlservice.controllers;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -75,7 +79,16 @@ public class AdminGuiControllerTest {
         
         controller.updateRedirectRules(request);
 
-        verify(redirectRuleRepository).persist(new RedirectRule(PATTERN, URL));
+        verify(redirectRuleRepository).persist(Mockito.argThat(new BaseMatcher<RedirectRule>() {
+            @Override
+            public boolean matches(Object object) {
+                RedirectRule rule = (RedirectRule) object;
+                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
+            }
+
+            @Override
+            public void describeTo(Description arg0) {
+            }}));
     }
 
     @Test
@@ -103,7 +116,17 @@ public class AdminGuiControllerTest {
         
         controller.updateStaticRedirects(request);
 
-        verify(staticRedirectRepository).persist(new StaticRedirect(PATTERN, URL));
+        verify(staticRedirectRepository).persist(Mockito.argThat(new BaseMatcher<StaticRedirect>() {
+            @Override
+            public boolean matches(Object object) {
+                StaticRedirect rule = (StaticRedirect) object;
+                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
+            }
+
+            @Override
+            public void describeTo(Description arg0) {
+            }}));
+
     }
 
     @Test

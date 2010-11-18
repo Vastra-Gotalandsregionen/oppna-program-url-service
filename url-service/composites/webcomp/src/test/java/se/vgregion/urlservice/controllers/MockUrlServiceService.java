@@ -52,11 +52,7 @@ public class MockUrlServiceService implements UrlServiceService {
     public ShortLink expand(String hashOrShortUrl) {
         if(hashOrShortUrl.equals("foo") ||
                 hashOrShortUrl.equals("http://s.vgregion.se/foo")) {
-            ShortLink link = new ShortLink();
-            link.setHash("foo");
-            link.setLongUrl("http://example.com");
-            link.setShortUrl(URL_PREFIX + "foo");
-            return link;
+            return new ShortLink("foo", "http://example.com", URL_PREFIX + "foo");
         } else {
             return null;
         }
@@ -64,12 +60,7 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public ShortLink lookup(String url) throws URISyntaxException {
-        ShortLink link = new ShortLink();
-        link.setHash("foo");
-        link.setLongUrl(url);
-        link.setShortUrl(URL_PREFIX + "foo");
-        
-        return link;
+        return new ShortLink("foo", url, URL_PREFIX + "foo");
     }
 
     @Override
@@ -79,11 +70,7 @@ public class MockUrlServiceService implements UrlServiceService {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             hash = (hash != null) ? hash : "foo"; 
             
-            ShortLink link = new ShortLink();
-            link.setHash(hash);
-            link.setLongUrl(urlString);
-            link.setShortUrl(URL_PREFIX + hash);
-            return link;
+            return new ShortLink(hash, urlString, URL_PREFIX + hash);
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
@@ -93,7 +80,7 @@ public class MockUrlServiceService implements UrlServiceService {
     @Override
     public URI redirect(String path) {
         if(expand(path) != null) {
-            return URI.create(expand(path).getLongUrl()); 
+            return URI.create(expand(path).getUrl()); 
         } else if(path.equals("bar")) {
             return URI.create("http://google.com");
         } else {

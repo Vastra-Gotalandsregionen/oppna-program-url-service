@@ -51,18 +51,18 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     public void findByPk() {
         ShortLink loaded = dao.findByPrimaryKey(link1.getId());
         
-        Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
+        Assert.assertEquals(link1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
     }
 
     @Test
     @Transactional
     @Rollback
     public void findByHash() {
-        ShortLink loaded = dao.findByHash(link1.getHash());
+        ShortLink loaded = dao.findByHash(link1.getPattern());
         
-        Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
+        Assert.assertEquals(link1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
     }
 
     @Test
@@ -83,17 +83,17 @@ public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Transactional
     @Rollback
     public void findByLongUrl() {
-        ShortLink loaded = dao.findByLongUrl(link1.getLongUrl());
+        ShortLink loaded = dao.findByLongUrl(link1.getUrl());
         
-        Assert.assertEquals(link1.getHash(), loaded.getHash());
-        Assert.assertEquals(link1.getLongUrl(), loaded.getLongUrl());
+        Assert.assertEquals(link1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(link1.getUrl(), loaded.getUrl());
     }
 
     @Test(expected=PersistenceException.class)
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        dao.persist(new ShortLink(link1.getHash(), "http://dummy", "http://short"));
+        dao.persist(new ShortLink(link1.getPattern(), "http://dummy", "http://short"));
     }
 
 }

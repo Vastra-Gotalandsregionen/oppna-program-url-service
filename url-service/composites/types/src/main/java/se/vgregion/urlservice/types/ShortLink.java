@@ -21,23 +21,9 @@ package se.vgregion.urlservice.types;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class ShortLink extends AbstractEntity<ShortLink, Long> {
-
-    @Id
-    @GeneratedValue
-    private long id;
-    
-    @Column(unique=true, nullable=false)
-    private String hash;
-    
-    @Column(nullable=false)
-    private String longUrl;
+public class ShortLink extends AbstractRedirect<ShortLink> {
 
     @Column(nullable=false)
     private String shortUrl;
@@ -47,33 +33,16 @@ public class ShortLink extends AbstractEntity<ShortLink, Long> {
     }
 
     public ShortLink(String hash, String longUrl, String shortUrl) {
-        this.hash = hash;
-        this.longUrl = longUrl;
+        super(hash, longUrl);
         this.shortUrl = shortUrl;
     }
     
-    public Long getId() {
-        return id;
-    }
-    
-    public String getHash() {
-        return hash;
-    }
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-    public String getLongUrl() {
-        return longUrl;
-    }
-    public void setLongUrl(String url) {
-        this.longUrl = url;
-    }
-
     public String getShortUrl() {
         return shortUrl;
     }
 
-    public void setShortUrl(String shortUrl) {
-        this.shortUrl = shortUrl;
+    @Override
+    public boolean matches(String path) {
+        return getPattern().equals(path);
     }
 }

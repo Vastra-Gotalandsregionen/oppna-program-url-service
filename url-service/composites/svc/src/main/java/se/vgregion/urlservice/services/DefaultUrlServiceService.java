@@ -64,14 +64,14 @@ public class DefaultUrlServiceService implements UrlServiceService {
     /** 
      * {@inheritDoc}
      */
-    @Transactional(readOnly = false)
+    @Transactional
     public ShortLink shorten(String urlString) throws URISyntaxException {
         return shorten(urlString, null);
     }
     /** 
      * {@inheritDoc}
      */
-    @Transactional(readOnly = false)
+    @Transactional
     public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
         URI url = new URI(urlString);
         
@@ -140,7 +140,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
         
         // first try short links
         if(shortLink != null) {
-            return URI.create(shortLink.getLongUrl());
+            return URI.create(shortLink.getUrl());
         } else {
             // next, try static redirects
             StaticRedirect redirect = staticRedirectRepository.findByPath(path);

@@ -62,7 +62,7 @@ public class ShortenGuiController {
             try {
                 String shortUrl = urlServiceService.shorten(longUrl, slug).getShortUrl();
                 System.out.println("#####" +  shortUrl);
-                System.out.println("#####" +  urlServiceService.shorten(longUrl, slug).getHash());
+                System.out.println("#####" +  urlServiceService.shorten(longUrl, slug).getPattern());
                 mav.addObject("shortUrl", shortUrl);
                 mav.addObject("slug", slug);
             } catch (URISyntaxException e) {

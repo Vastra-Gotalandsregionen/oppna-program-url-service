@@ -80,9 +80,9 @@ public class BitlyApiController {
                 root.put("status_txt", "OK");
                 ObjectNode data = root.putObject("data");
                 data.put("url", link.getShortUrl());
-                data.put("hash", link.getHash());
-                data.put("global_hash", link.getHash());
-                data.put("long_url", link.getLongUrl());
+                data.put("hash", link.getPattern());
+                data.put("global_hash", link.getPattern());
+                data.put("long_url", link.getUrl());
                 data.put("new_hash", 0);
 
                 treeMapper.writeValue(writer, root);
@@ -92,16 +92,16 @@ public class BitlyApiController {
                 root.appendChild(createElement("status_txt", "OK"));
                 Element data = new Element("data");
                 data.appendChild(createElement("url", link.getShortUrl()));
-                data.appendChild(createElement("hash", link.getHash()));
-                data.appendChild(createElement("global_hash", link.getHash()));
-                data.appendChild(createElement("long_url", link.getLongUrl()));
+                data.appendChild(createElement("hash", link.getPattern()));
+                data.appendChild(createElement("global_hash", link.getPattern()));
+                data.appendChild(createElement("long_url", link.getUrl()));
                 data.appendChild(createElement("new_hash", "0"));
 
                 root.appendChild(data);
 
                 writer.write(root.toXML());
             } else if ("txt".equals(format)) {
-                writer.write(link.getHash());
+                writer.write(link.getPattern());
             } else {
                 sendUnknownFormatError(response);
             }
@@ -146,11 +146,11 @@ public class BitlyApiController {
 
                     for (ShortLink link : links) {
                         ObjectNode node = mapper.createObjectNode();
-                        node.put("hash", link.getHash());
+                        node.put("hash", link.getPattern());
                         node.put("short_url", link.getShortUrl());
-                        node.put("global_hash", link.getHash());
-                        node.put("long_url", link.getLongUrl());
-                        node.put("user_hash", link.getHash());
+                        node.put("global_hash", link.getPattern());
+                        node.put("long_url", link.getUrl());
+                        node.put("user_hash", link.getPattern());
                         array.add(node);
                     }
 
@@ -162,11 +162,11 @@ public class BitlyApiController {
                     Element data = new Element("data");
                     for (ShortLink link : links) {
                         Element entry = new Element("entry");
-                        entry.appendChild(createElement("hash", link.getHash()));
+                        entry.appendChild(createElement("hash", link.getPattern()));
                         entry.appendChild(createElement("short_url", link.getShortUrl()));
-                        entry.appendChild(createElement("global_hash", link.getHash()));
-                        entry.appendChild(createElement("long_url", link.getLongUrl()));
-                        entry.appendChild(createElement("user_hash", link.getHash()));
+                        entry.appendChild(createElement("global_hash", link.getPattern()));
+                        entry.appendChild(createElement("long_url", link.getUrl()));
+                        entry.appendChild(createElement("user_hash", link.getPattern()));
 
                         data.appendChild(entry);
                     }
@@ -178,7 +178,7 @@ public class BitlyApiController {
                     if (links.size() > 1) {
                         response.sendError(500, "TOO_MANY_EXPAND_PARAMETERS");
                     } else {
-                        writer.write(links.get(0).getLongUrl());
+                        writer.write(links.get(0).getUrl());
                     }
                 } else {
                     sendUnknownFormatError(response);
@@ -220,8 +220,8 @@ public class BitlyApiController {
                     for (ShortLink link : links) {
                         ObjectNode node = mapper.createObjectNode();
                         node.put("short_url", link.getShortUrl());
-                        node.put("global_hash", link.getHash());
-                        node.put("long_url", link.getLongUrl());
+                        node.put("global_hash", link.getPattern());
+                        node.put("long_url", link.getUrl());
                         array.add(node);
                     }
 
@@ -234,8 +234,8 @@ public class BitlyApiController {
                     for (ShortLink link : links) {
                         Element entry = new Element("lookup");
                         entry.appendChild(createElement("short_url", link.getShortUrl()));
-                        entry.appendChild(createElement("global_hash", link.getHash()));
-                        entry.appendChild(createElement("long_url", link.getLongUrl()));
+                        entry.appendChild(createElement("global_hash", link.getPattern()));
+                        entry.appendChild(createElement("long_url", link.getUrl()));
 
                         data.appendChild(entry);
                     }

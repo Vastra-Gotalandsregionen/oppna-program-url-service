@@ -21,47 +21,21 @@ package se.vgregion.urlservice.types;
 
 import java.util.regex.Pattern;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class RedirectRule extends AbstractEntity<RedirectRule, Long> {
+public class RedirectRule extends AbstractRedirect<RedirectRule> {
 
-    @Id
-    @GeneratedValue
-    private long id;
-    
-    @Column(unique=true, nullable=false)
-    private String pattern;
-    
-    @Column(nullable=false)
-    private String url;
-
-    public RedirectRule() {
+    /* Make JPA happy */
+    protected RedirectRule() {
     }
 
     public RedirectRule(String pattern, String url) {
-        this.pattern = pattern;
-        this.url = url;
-    }
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public String getPattern() {
-        return pattern;
-    }
-    public String getUrl() {
-        return url;
+        super(pattern, url);
     }
     
     public boolean matches(String path) {
-        Pattern regex = Pattern.compile(pattern);
+        Pattern regex = Pattern.compile(getPattern());
         
         return regex.matcher(path).matches();
     }

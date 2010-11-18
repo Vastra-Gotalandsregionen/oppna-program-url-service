@@ -42,8 +42,8 @@ public class JpaStaticRedirectRepository extends DefaultJpaRepository<StaticRedi
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     public StaticRedirect findByPath(String path) {
         try {
-            return (StaticRedirect)entityManager.createQuery("select l from StaticRedirect l where l.path = :path")
-                .setParameter("path", path).getSingleResult();
+            return (StaticRedirect)entityManager.createQuery("select l from StaticRedirect l where l.pattern = :pattern")
+                .setParameter("pattern", path).getSingleResult();
         } catch(NoResultException e) {
             return null;
         }
