@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.internal.matchers.TypeSafeMatcher;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -79,16 +79,17 @@ public class AdminGuiControllerTest {
         
         controller.updateRedirectRules(request);
 
-        verify(redirectRuleRepository).persist(Mockito.argThat(new BaseMatcher<RedirectRule>() {
+        verify(redirectRuleRepository).persist(Mockito.argThat(new TypeSafeMatcher<RedirectRule>() {
+
+
             @Override
-            public boolean matches(Object object) {
-                RedirectRule rule = (RedirectRule) object;
+            public boolean matchesSafely(RedirectRule rule) {
                 return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
             }
-
             @Override
             public void describeTo(Description arg0) {
             }}));
+
     }
 
     @Test
@@ -116,17 +117,15 @@ public class AdminGuiControllerTest {
         
         controller.updateStaticRedirects(request);
 
-        verify(staticRedirectRepository).persist(Mockito.argThat(new BaseMatcher<StaticRedirect>() {
+        verify(staticRedirectRepository).persist(Mockito.argThat(new TypeSafeMatcher<StaticRedirect>() {
             @Override
-            public boolean matches(Object object) {
-                StaticRedirect rule = (StaticRedirect) object;
+            public boolean matchesSafely(StaticRedirect rule) {
                 return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
             }
 
             @Override
             public void describeTo(Description arg0) {
             }}));
-
     }
 
     @Test
