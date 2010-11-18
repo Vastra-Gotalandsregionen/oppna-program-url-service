@@ -24,26 +24,30 @@ import javax.persistence.PersistenceException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.StaticRedirect;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class JpaStaticRedirectRepositoryTest {
-
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private StaticRedirectRepository dao = ctx.getBean(StaticRedirectRepository.class);
+    private StaticRedirectRepository dao;
     
     private StaticRedirect redirect1;
     
     @Before
     public void setup() {
+        dao = applicationContext.getBean(StaticRedirectRepository.class);
         redirect1 = dao.persist(new StaticRedirect("foo", "http://example.com/1"));
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByPk() {
         StaticRedirect loaded = dao.findByPrimaryKey(redirect1.getId());
         
@@ -52,6 +56,8 @@ public class JpaStaticRedirectRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByPath() {
         StaticRedirect loaded = dao.findByPath(redirect1.getPath());
         
@@ -60,11 +66,15 @@ public class JpaStaticRedirectRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findNonExistingByHash() {
         Assert.assertNull(dao.findByPath("dummy"));
     }
 
     @Test(expected=PersistenceException.class)
+    @Transactional
+    @Rollback
     public void duplicateHashNotAllowed() {
         dao.persist(new StaticRedirect(redirect1.getPath(), "http://dummy"));
     }

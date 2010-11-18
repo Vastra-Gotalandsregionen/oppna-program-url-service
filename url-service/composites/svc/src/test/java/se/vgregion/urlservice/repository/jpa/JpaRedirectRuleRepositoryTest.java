@@ -22,26 +22,30 @@ package se.vgregion.urlservice.repository.jpa;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.types.RedirectRule;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class JpaRedirectRuleRepositoryTest {
-
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private RedirectRuleRepository dao = ctx.getBean(RedirectRuleRepository.class);
+    private RedirectRuleRepository dao;
     
     private RedirectRule rule1;
     
     @Before
     public void setup() {
+        dao = applicationContext.getBean(RedirectRuleRepository.class);
         rule1 = dao.persist(new RedirectRule("foo", "http://example.com/1"));
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByPk() {
         RedirectRule loaded = dao.findByPrimaryKey(rule1.getId());
         

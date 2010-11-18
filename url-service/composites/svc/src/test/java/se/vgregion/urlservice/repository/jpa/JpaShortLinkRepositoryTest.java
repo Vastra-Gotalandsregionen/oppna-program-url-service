@@ -24,26 +24,30 @@ import javax.persistence.PersistenceException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class JpaShortLinkRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class JpaShortLinkRepositoryTest {
-
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private ShortLinkRepository dao = ctx.getBean(ShortLinkRepository.class);
+    private ShortLinkRepository dao;
     
     private ShortLink link1;
     
     @Before
     public void setup() {
+        dao = applicationContext.getBean(ShortLinkRepository.class);
         link1 = dao.persist(new ShortLink("foo1", "http://example.com/1", "http://short"));
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByPk() {
         ShortLink loaded = dao.findByPrimaryKey(link1.getId());
         
@@ -52,6 +56,8 @@ public class JpaShortLinkRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByHash() {
         ShortLink loaded = dao.findByHash(link1.getHash());
         
@@ -60,16 +66,22 @@ public class JpaShortLinkRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findNonExistingByHash() {
         Assert.assertNull(dao.findByHash("dummy"));
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findNonExistingByLongUrl() {
         Assert.assertNull(dao.findByLongUrl("dummy"));
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByLongUrl() {
         ShortLink loaded = dao.findByLongUrl(link1.getLongUrl());
         
@@ -78,6 +90,8 @@ public class JpaShortLinkRepositoryTest {
     }
 
     @Test(expected=PersistenceException.class)
+    @Transactional
+    @Rollback
     public void duplicateHashNotAllowed() {
         dao.persist(new ShortLink(link1.getHash(), "http://dummy", "http://short"));
     }

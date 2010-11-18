@@ -19,16 +19,16 @@
 
 package se.vgregion.urlservice.services;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Collection;
-import static org.mockito.Mockito.*;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
