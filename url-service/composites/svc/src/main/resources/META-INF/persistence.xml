@@ -27,5 +27,6 @@
         <class>se.vgregion.urlservice.types.ShortLink</class>
         <class>se.vgregion.urlservice.types.RedirectRule</class>
         <class>se.vgregion.urlservice.types.StaticRedirect</class>
+        <class>se.vgregion.urlservice.types.User</class>
     </persistence-unit>
 </persistence>
