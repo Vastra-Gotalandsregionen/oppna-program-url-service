@@ -19,12 +19,13 @@
 
 package se.vgregion.urlservice.types;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.OneToMany;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
@@ -34,6 +35,9 @@ public class User extends AbstractEntity<String> {
 
     @Id
     private String hsaid;
+    
+    @OneToMany
+    private Collection<ShortLink> shortLinks = new ArrayList<ShortLink>();
     
     protected User() {
     }
@@ -52,6 +56,12 @@ public class User extends AbstractEntity<String> {
     public String getHsaId() {
         return hsaid;
     }
+
+    public Collection<ShortLink> getShortLinks() {
+        return shortLinks;
+    }
     
-    
+    public void addShortLink(ShortLink shortLink) {
+        shortLinks.add(shortLink);
+    }
 }

@@ -21,10 +21,11 @@ package se.vgregion.urlservice.types;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.apache.commons.lang.StringUtils;
+import org.springframework.util.Assert;
 
 @Entity
 @Table(uniqueConstraints=
@@ -36,6 +37,8 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
     @Column(nullable=false)
     private String shortUrl;
 
+    @ManyToOne(optional=true)
+    private User owner;
     
     public ShortLink() {
     }
@@ -43,15 +46,30 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
     public ShortLink(String domain, String hash, String longUrl, String shortUrl) {
         super(domain, hash, longUrl);
         
-        if(StringUtils.isEmpty(domain)) {
-            throw new IllegalArgumentException("Domain can not be empty");
-        }
+        Assert.hasLength(domain, "domain can not be empty");
+        Assert.hasLength(shortUrl, "shortUrl can not be empty");
         
         this.shortUrl = shortUrl;
     }
+
+    public ShortLink(String domain, String hash, String longUrl, String shortUrl, User owner) {
+        super(domain, hash, longUrl);
+        
+        Assert.hasLength(domain, "domain can not be empty");
+        Assert.hasLength(shortUrl, "shortUrl can not be empty");
+        Assert.notNull(owner, "owner can not be null");
+        
+        this.shortUrl = shortUrl;
+        this.owner = owner;
+    }
+
     
     public String getShortUrl() {
         return shortUrl;
+    }
+
+    public User getOwner() {
+        return owner;
     }
 
     @Override
