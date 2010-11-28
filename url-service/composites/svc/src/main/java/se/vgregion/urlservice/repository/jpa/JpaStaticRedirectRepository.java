@@ -20,31 +20,43 @@
 package se.vgregion.urlservice.repository.jpa;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
+import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
-import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.StaticRedirect;
     
 @Repository
-public class JpaStaticRedirectRepository extends DefaultJpaRepository<StaticRedirect> implements StaticRedirectRepository {
+public class JpaStaticRedirectRepository extends AbstractJpaRepository<StaticRedirect, UUID, UUID> implements StaticRedirectRepository {
     
     public JpaStaticRedirectRepository() {
         setType(StaticRedirect.class);
+    }
+    
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public StaticRedirect find(UUID id) {
+        try {
+            return (StaticRedirect) entityManager.createQuery("select l from StaticRedirect l where l.id = :id")
+            .setParameter("id", id)
+            .getSingleResult();
+            
+        } catch(NoResultException e) {
+            return null;
+        }
     }
     
     /**
      * Find link by hash.
      */
     @SuppressWarnings("unchecked")
-    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public StaticRedirect findByPath(String domain, String path) {
         try {
             // TODO is this the desired behavior, with null domain, any matching link will be returned

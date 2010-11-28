@@ -19,8 +19,9 @@
 
 package se.vgregion.urlservice.types;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -32,11 +33,10 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns.entity.Entity<T, Long>> extends AbstractEntity<T, Long> {
+public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns.entity.Entity<UUID>> extends AbstractEntity<UUID> {
 
     @Id
-    @GeneratedValue
-    protected Long id;
+    protected UUID id;
 
     @Column
     private String domain;
@@ -51,6 +51,8 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     }
 
     public AbstractRedirect(String domain, String pattern, String url) {
+        this.id = UUID.randomUUID();
+        
         if(StringUtils.isEmpty(pattern)) {
             throw new IllegalArgumentException("Patter can not be empty");
         }
@@ -63,7 +65,7 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         this.url = url;
     }
     
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
     

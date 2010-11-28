@@ -19,10 +19,12 @@
 
 package se.vgregion.urlservice.repository;
 
+import java.util.UUID;
+
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
 import se.vgregion.urlservice.types.StaticRedirect;
     
-public interface StaticRedirectRepository extends JpaRepository<StaticRedirect, Long, Long> {
+public interface StaticRedirectRepository extends JpaRepository<StaticRedirect, UUID, UUID> {
 
     /**
      * Find link by path.

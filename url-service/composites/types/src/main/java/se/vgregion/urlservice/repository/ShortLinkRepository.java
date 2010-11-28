@@ -19,10 +19,12 @@
 
 package se.vgregion.urlservice.repository;
 
+import java.util.UUID;
+
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
-public interface ShortLinkRepository extends JpaRepository<ShortLink, Long, Long> {
+public interface ShortLinkRepository extends JpaRepository<ShortLink, UUID, UUID> {
 
     /**
      * Find link by hash.

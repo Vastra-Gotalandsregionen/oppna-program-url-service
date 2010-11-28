@@ -42,9 +42,11 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     private StaticRedirect redirect1;
     
     @Before
+    @Transactional
     public void setup() {
         dao = applicationContext.getBean(StaticRedirectRepository.class);
         redirect1 = dao.persist(new StaticRedirect(DOMAIN, "foo", "http://example.com/1"));
+        dao.flush();
     }
     
     @Test
@@ -89,6 +91,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Rollback
     public void duplicateHashNotAllowed() {
         dao.persist(new StaticRedirect(DOMAIN, redirect1.getPattern(), "http://dummy"));
+        dao.flush();
     }
 
 }

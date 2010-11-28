@@ -21,6 +21,7 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -92,7 +93,7 @@ public class AdminGuiController {
                 }
             }
         } else {
-            Long deletedId = findDeletedId(request);
+            UUID deletedId = findDeletedId(request);
             if(deletedId != null) {
                 log.debug("Deleting redirect rule {}", deletedId);
                 redirectRuleRepository.removeByPrimaryKey(deletedId);
@@ -122,7 +123,7 @@ public class AdminGuiController {
                 }
             }
         } else {
-            Long deletedId = findDeletedId(request);
+            UUID deletedId = findDeletedId(request);
             if(deletedId != null) {
                 log.debug("Deleting static redirect {}", deletedId);
                 staticRedirectRepository.removeByPrimaryKey(deletedId);
@@ -133,12 +134,12 @@ public class AdminGuiController {
     }
 
     
-    private Long findDeletedId(HttpServletRequest request) {
+    private UUID findDeletedId(HttpServletRequest request) {
         Enumeration names = request.getParameterNames();
         while(names.hasMoreElements()) {
             String name = (String) names.nextElement();
             if(name.startsWith("delete-")) {
-                return Long.parseLong(name.substring(7));
+                return UUID.fromString(name.substring(7));
             }
         }
         

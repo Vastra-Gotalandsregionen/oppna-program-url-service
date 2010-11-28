@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.repository.jpa;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.NoResultException;
 
@@ -27,22 +28,35 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
+import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.types.ShortLink;
     
 @Repository
-public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> implements ShortLinkRepository {
+public class JpaShortLinkRepository extends AbstractJpaRepository<ShortLink, UUID, UUID> implements ShortLinkRepository {
     
     public JpaShortLinkRepository() {
         setType(ShortLink.class);
+    }
+    
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public ShortLink find(UUID id) {
+        try {
+            return (ShortLink) entityManager.createQuery("select l from ShortLink l where l.id = :id")
+            .setParameter("id", id)
+            .getSingleResult();
+            
+        } catch(NoResultException e) {
+            return null;
+        }
     }
     
     /**
      * Find link by hash.
      */
     @SuppressWarnings("unchecked")
-    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public ShortLink findByHash(String domain, String hash) {
         try {
             // TODO is this the desired behavior, with null domain, any matching link will be returned
@@ -69,7 +83,7 @@ public class JpaShortLinkRepository extends DefaultJpaRepository<ShortLink> impl
     }
 
     @Override
-    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public ShortLink findByLongUrl(String longUrl) {
         try {
             return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.url = :url")

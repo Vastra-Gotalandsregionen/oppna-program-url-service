@@ -48,8 +48,8 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
     @Test
     @Transactional
     @Rollback
-    public void findByPk() {
-        RedirectRule loaded = dao.findByPrimaryKey(rule1.getId());
+    public void find() {
+        RedirectRule loaded = dao.find(rule1.getId());
         
         Assert.assertEquals(rule1.getPattern(), loaded.getPattern());
         Assert.assertEquals(rule1.getUrl(), loaded.getUrl());

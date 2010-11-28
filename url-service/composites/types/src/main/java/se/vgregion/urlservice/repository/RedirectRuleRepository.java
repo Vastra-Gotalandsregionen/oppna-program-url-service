@@ -19,9 +19,11 @@
 
 package se.vgregion.urlservice.repository;
 
+import java.util.UUID;
+
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
 import se.vgregion.urlservice.types.RedirectRule;
     
-public interface RedirectRuleRepository extends JpaRepository<RedirectRule, Long, Long> {
+public interface RedirectRuleRepository extends JpaRepository<RedirectRule, UUID, UUID> {
 
 }

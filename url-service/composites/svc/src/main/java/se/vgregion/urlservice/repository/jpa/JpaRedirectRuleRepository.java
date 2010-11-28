@@ -19,14 +19,32 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
-import org.springframework.stereotype.Repository;
+import java.util.UUID;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
+import javax.persistence.NoResultException;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.types.RedirectRule;
     
 @Repository
-public class JpaRedirectRuleRepository extends DefaultJpaRepository<RedirectRule> implements RedirectRuleRepository {
+public class JpaRedirectRuleRepository extends AbstractJpaRepository<RedirectRule, UUID, UUID> implements RedirectRuleRepository {
+
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public RedirectRule find(UUID id) {
+        try {
+            return (RedirectRule) entityManager.createQuery("select l from RedirectRule l where l.id = :id")
+            .setParameter("id", id)
+            .getSingleResult();
+            
+        } catch(NoResultException e) {
+            return null;
+        }
+    }
     
-   
 }

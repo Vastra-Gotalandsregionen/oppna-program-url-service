@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.hamcrest.Description;
 import org.junit.Assert;
@@ -95,12 +96,14 @@ public class AdminGuiControllerTest {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
         controller.setRedirectRuleRepository(redirectRuleRepository);
         
+        UUID id = UUID.randomUUID();
+        
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("delete-1", "any value");
+        request.addParameter("delete-" + id.toString(), "any value");
         
         controller.updateRedirectRules(request);
 
-        verify(redirectRuleRepository).removeByPrimaryKey(1L);
+        verify(redirectRuleRepository).removeByPrimaryKey(id);
     }
 
     @Test
@@ -132,12 +135,14 @@ public class AdminGuiControllerTest {
         StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
         controller.setStaticRedirectRepository(staticRedirectRepository);
         
+        UUID id = UUID.randomUUID();
+        
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("delete-1", "any value");
+        request.addParameter("delete-" + id.toString(), "any value");
         
         controller.updateStaticRedirects(request);
 
-        verify(staticRedirectRepository).removeByPrimaryKey(1L);
+        verify(staticRedirectRepository).removeByPrimaryKey(id);
     }
 
 }
