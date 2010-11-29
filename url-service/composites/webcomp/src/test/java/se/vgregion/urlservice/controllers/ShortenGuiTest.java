@@ -20,9 +20,16 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -49,6 +56,23 @@ public class ShortenGuiTest {
         Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
         Assert.assertEquals("slug", mav.getModel().get("slug"));
         Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
+        Assert.assertNull(mav.getModel().get("error"));
+    }
+
+    @Test
+    public void shortenLongUrlWithSlugAndOwner() throws IOException {
+        SecurityContextImpl ctx = new SecurityContextImpl();
+        User user = new User("roblu", "password", true, true, true, true, Arrays.asList(new GrantedAuthorityImpl("ROLE_USER")));
+        Authentication authentication = new TestingAuthenticationToken(user, "credentials");
+        ctx.setAuthentication(authentication);
+        SecurityContextHolder.setContext(ctx);
+        
+        ModelAndView mav = controller.index("http://example.com", "slug");
+        
+        Assert.assertEquals("shorten", mav.getViewName());
+        Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
+        Assert.assertEquals("slug", mav.getModel().get("slug"));
+        Assert.assertEquals("http://s.vgregion.se/roblu/slug", mav.getModel().get("shortUrl"));
         Assert.assertNull(mav.getModel().get("error"));
     }
 

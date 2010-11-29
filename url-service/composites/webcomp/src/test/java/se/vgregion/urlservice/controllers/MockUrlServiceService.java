@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.User;
 
 public class MockUrlServiceService implements UrlServiceService {
 
@@ -73,16 +74,7 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
-        URI url = new URI(urlString);
-        
-        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            hash = (hash != null) ? hash : "foo"; 
-            
-            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash);
-        } else {
-            throw new URISyntaxException(urlString, "Scheme not allowed");
-        }
-
+        return shorten(urlString, hash, null);
     }
 
     @Override
@@ -94,6 +86,27 @@ public class MockUrlServiceService implements UrlServiceService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
+        URI url = new URI(urlString);
+        
+        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
+            hash = (hash != null) ? hash : "foo"; 
+            if(owner != null) {
+                hash = owner.getVgrId() + "/" + hash;
+            }
+            
+            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, owner);
+        } else {
+            throw new URISyntaxException(urlString, "Scheme not allowed");
+        }
+    }
+
+    @Override
+    public User getUser(String vgrId) {
+        return new User(vgrId);
     }
 
 }

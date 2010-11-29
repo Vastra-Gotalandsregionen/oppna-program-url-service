@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.ShortLink;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
@@ -62,16 +64,24 @@ public class ShortenGuiController {
         ModelAndView mav = new ModelAndView("shorten");
         
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userName = null;
         if(principal instanceof User) {
-            User user = (User) principal; 
+            userName = ((User) principal).getUsername();
             mav.addObject("authenticated", true);
-            mav.addObject("userid", user.getUsername());
+            mav.addObject("userid", userName);
         }
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
-                String shortUrl = urlServiceService.shorten(longUrl, slug).getShortUrl();
-                mav.addObject("shortUrl", shortUrl);
+                ShortLink shortLink;
+                if(!StringUtils.isEmpty(slug) && userName != null) {
+                    se.vgregion.urlservice.types.User user = urlServiceService.getUser(userName);
+                    
+                    shortLink = urlServiceService.shorten(longUrl, slug, user);
+                } else {
+                    shortLink = urlServiceService.shorten(longUrl, slug);
+                }
+                mav.addObject("shortUrl", shortLink.getShortUrl());
                 mav.addObject("slug", slug);
             } catch (URISyntaxException e) {
                 mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");

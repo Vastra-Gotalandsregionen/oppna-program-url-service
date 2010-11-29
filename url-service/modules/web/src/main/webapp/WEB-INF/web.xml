@@ -62,6 +62,17 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<filter>
+        <filter-name>txFilter</filter-name>
+        <filter-class>
+            org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
+        </filter-class>
+    </filter>
+	<filter-mapping>
+		<filter-name>txFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!--
 		Bootstraps the root Spring Web Application Context, responsible for
 		deploying managed beans defined in the configuration files above.

@@ -38,6 +38,7 @@ import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.User;
 
 public class DefaultUrlServiceServiceTest {
 
@@ -73,6 +74,19 @@ public class DefaultUrlServiceServiceTest {
     }
 
     @Test
+    public void shortenWithSlugAndOwner() throws URISyntaxException {
+        User owner = new User("test");
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        ShortLink link = urlService.shorten(LONG_URL, "my_slug", owner);
+
+        Assert.assertEquals("test/my_slug", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
+        Assert.assertEquals(owner, link.getOwner());
+    }
+
+    
+    @Test
     public void shortenWithBlankSlug() throws URISyntaxException {
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
 
@@ -102,7 +116,27 @@ public class DefaultUrlServiceServiceTest {
         Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
-    
+    @Test(expected=IllegalArgumentException.class)
+    public void shortenSlugWithSlash() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        urlService.shorten(LONG_URL, "f/sdsddsoo");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shortenSlugWithPercentage() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        urlService.shorten(LONG_URL, "f%20sdsddsoo");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shortenSlugWithWhitespace() throws URISyntaxException {
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        urlService.shorten(LONG_URL, "f sdsddsoo");
+    }
+
     @Test
     public void shortenWithSlugCollision() throws URISyntaxException {
         ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);

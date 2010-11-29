@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.User;
 
 /**
  * Service for handling short link, modelled after the bit.ly version 3 API
@@ -49,6 +50,16 @@ public interface UrlServiceService {
      */
     ShortLink shorten(String url, String hash) throws URISyntaxException;
 
+    /**
+     * Shorten a long URL to a short link. If the long URL already exists, 
+     * the already existing short link will be returned.
+     * @param url The long URL, required.
+     * @param hash The desired hash
+     * @param owner The user which owns of the link
+     * @return The {@link ShortLink} representing the long URL
+     * @throws URISyntaxException
+     */
+    ShortLink shorten(String url, String hash, User owner) throws URISyntaxException;
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 
@@ -86,4 +97,6 @@ public interface UrlServiceService {
      * @return The URI to where the user should be redirected.
      */
     URI redirect(String domain, String path);
+    
+    User getUser(String vgrId);
 }

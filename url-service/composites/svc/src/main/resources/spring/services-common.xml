@@ -30,7 +30,7 @@
 
 	<bean id="domain" class="java.lang.String">
 		<!-- TODO URL used for testing purposes, later to be replaced with configurable URL -->
-		<constructor-arg value="localhost:8080" />
+		<constructor-arg value="http://localhost:8080" />
 	</bean>
 
 </beans>

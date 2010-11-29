@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -37,9 +38,11 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.User;
 
 @Service
 public class DefaultUrlServiceService implements UrlServiceService {
@@ -50,11 +53,14 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     private static final int INITIAL_HASH_LENGTH = 6;
     
+    private static final Pattern HASH_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
+    
     private String domain;
     
     private ShortLinkRepository shortLinkRepository;
     private RedirectRuleRepository redirectRuleRepository;
     private StaticRedirectRepository staticRedirectRepository;
+    private UserRepository userRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -68,11 +74,20 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public ShortLink shorten(String urlString) throws URISyntaxException {
         return shorten(urlString, null);
     }
+    
     /** 
      * {@inheritDoc}
      */
     @Transactional
     public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
+        return shorten(urlString, hash, null);
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    @Transactional
+    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
@@ -88,10 +103,18 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 
                 if(StringUtils.isBlank(hash)) {
                     hash = md5.substring(0, length);
+                } else {
+                    if(!HASH_PATTERN.matcher(hash).matches()) {
+                        throw new IllegalArgumentException("Hash contains invalid characters");
+                    }
                 }
                 
                 if(hash.length() < INITIAL_HASH_LENGTH) {
                     hash = hash + md5.substring(hash.length(), length);
+                }
+                
+                if(owner != null) {
+                    hash = owner.getVgrId() + "/" + hash;
                 }
                 
                 // check that the hash does not already exist
@@ -106,7 +129,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                ShortLink newLink = new ShortLink(domain, hash, urlString, domain + hash);
+                ShortLink newLink = new ShortLink(domain, hash, urlString, domain + hash, owner);
+                
+                
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;
@@ -211,6 +236,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
         this.staticRedirectRepository = staticRedirectRepository;
     }
 
+    public UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    @Resource
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     public String getDomain() {
         return domain;
@@ -218,7 +252,22 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     @Resource(name="domain")
     public void setDomain(String domain) {
+        if(!domain.endsWith("/")) {
+            domain += "/";
+        }
         this.domain = domain;
+    }
+
+
+    @Override
+    @Transactional
+    public User getUser(String vgrId) {
+        User user = userRepository.find(vgrId);
+        if(user == null) {
+            user = new User(vgrId);
+            userRepository.persist(user);
+        }
+        return user;
     }
 
 

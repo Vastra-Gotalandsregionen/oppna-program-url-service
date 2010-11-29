@@ -57,7 +57,6 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
         
         Assert.hasLength(domain, "domain can not be empty");
         Assert.hasLength(shortUrl, "shortUrl can not be empty");
-        Assert.notNull(owner, "owner can not be null");
         
         this.shortUrl = shortUrl;
         this.owner = owner;

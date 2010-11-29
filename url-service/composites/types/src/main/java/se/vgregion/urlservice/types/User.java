@@ -34,7 +34,7 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 public class User extends AbstractEntity<String> {
 
     @Id
-    private String hsaid;
+    private String vgrId;
     
     @OneToMany
     private Collection<ShortLink> shortLinks = new ArrayList<ShortLink>();
@@ -42,19 +42,19 @@ public class User extends AbstractEntity<String> {
     protected User() {
     }
 
-    public User(String hsaid) {
-        Assert.hasText(hsaid);
+    public User(String vgrId) {
+        Assert.hasText(vgrId);
         
-        this.hsaid = hsaid;
+        this.vgrId = vgrId;
     }
 
     @Override
     public String getId() {
-        return hsaid;
+        return vgrId;
     }
     
-    public String getHsaId() {
-        return hsaid;
+    public String getVgrId() {
+        return vgrId;
     }
 
     public Collection<ShortLink> getShortLinks() {
