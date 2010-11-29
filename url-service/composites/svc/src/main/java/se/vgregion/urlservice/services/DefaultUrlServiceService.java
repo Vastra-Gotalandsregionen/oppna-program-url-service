@@ -79,6 +79,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
             ShortLink link = shortLinkRepository.findByLongUrl(urlString);
             
             if(link != null) {
+                // shortlink already exists, return as is
                 return link;
             } else {
                 String md5 = DigestUtils.md5Hex(urlString);

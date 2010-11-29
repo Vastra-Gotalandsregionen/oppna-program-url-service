@@ -36,10 +36,8 @@
 		<form action='' method="post">
 			<p><label for="longurl">Länk</label><input id="longurl" name='longurl' value='${longUrl}'> <input type='submit' value='Förkorta länk'></p>
 			<p><label for="slug">Nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
-
-			
-
 		</form>
+		
 
 		<c:if test="${not empty shortUrl}">
 			<p><a href="${shortUrl}">${shortUrl}</a></p>
@@ -48,6 +46,18 @@
 			<p>${error}</p>
 		</c:if>
 
-		<p><a href="javascript:location.href='http://localhost:8080/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</p>
+		<div id="bookmarklet"><a href="javascript:location.href='http://localhost:8080/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
+
+		<div id="user">
+			<c:choose>
+				<c:when test="${authenticated}">
+					Du är inloggad som ${userid}. 
+					<a href="logout">Logga ut</a>
+				</c:when>
+			    <c:otherwise>
+					<a href="spring_security_login">Logga in</a>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</body>
 </html>

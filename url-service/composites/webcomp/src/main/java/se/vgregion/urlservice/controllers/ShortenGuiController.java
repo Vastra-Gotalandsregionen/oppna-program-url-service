@@ -26,6 +26,8 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,7 +58,15 @@ public class ShortenGuiController {
 
     @RequestMapping(value="/shorten")
     public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug) throws IOException {
+        
         ModelAndView mav = new ModelAndView("shorten");
+        
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof User) {
+            User user = (User) principal; 
+            mav.addObject("authenticated", true);
+            mav.addObject("userid", user.getUsername());
+        }
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
