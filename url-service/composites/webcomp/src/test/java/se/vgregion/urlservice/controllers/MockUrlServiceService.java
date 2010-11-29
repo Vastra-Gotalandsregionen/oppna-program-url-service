@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.ShortLink;
 
-@Service
 public class MockUrlServiceService implements UrlServiceService {
 
     private final Logger log = LoggerFactory.getLogger(MockUrlServiceService.class);

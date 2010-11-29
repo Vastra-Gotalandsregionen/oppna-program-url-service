@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.StaticRedirect;
 
-@ContextConfiguration("classpath:services-test.xml")
+@ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private static final String DOMAIN = "foo.vgregion.se";

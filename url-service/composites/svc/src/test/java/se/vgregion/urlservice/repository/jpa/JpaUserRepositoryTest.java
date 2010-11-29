@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.User;
 
-@ContextConfiguration("classpath:services-test.xml")
+@ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaUserRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private UserRepository dao;

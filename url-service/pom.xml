@@ -39,7 +39,7 @@
     		<dependency>
     			<groupId>se.vgregion.daoframework</groupId>
     			<artifactId>dao-framework-jpa</artifactId>
-    			<version>3.4-SNAPSHOT</version>
+    			<version>3.4</version>
     		</dependency>
     		<dependency>
     			<groupId>org.slf4j</groupId>

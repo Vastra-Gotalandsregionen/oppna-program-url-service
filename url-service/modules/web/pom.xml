@@ -73,6 +73,12 @@
 		</dependency>
 
 		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-web</artifactId>
+		    <version>3.0.4.RELEASE</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.tuckey</groupId>
 			<artifactId>urlrewritefilter</artifactId>
 		</dependency>
@@ -98,6 +104,44 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.tomcat</groupId>
+		  <artifactId>jasper</artifactId>
+		  <version>6.0.29</version>
+		  <scope>test</scope>
+		  <exclusions>
+		  	<exclusion>
+		  		<groupId>org.apache.tomcat</groupId>
+		  		<artifactId>servlet-api</artifactId>
+		  	</exclusion>
+		  </exclusions>
+		</dependency>
+		<dependency>
+		  <groupId>org.eclipse.jetty.aggregate</groupId>
+		  <artifactId>jetty-all</artifactId>
+		  <version>7.2.0.v20101020</version>
+		  <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>jstl</groupId>
+		    <artifactId>jstl</artifactId>
+		    <version>1.2</version>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>jboss</id>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<releases><enabled>true</enabled></releases>
+		</repository>
+	</repositories>
+
 
 </project>
