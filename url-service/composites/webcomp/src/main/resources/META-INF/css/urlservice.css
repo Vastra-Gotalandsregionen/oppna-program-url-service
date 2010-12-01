@@ -6,5 +6,16 @@ label {
 	width: 100px;
 	display: block;
 	float: left;
-	
 }
+
+.keyword {
+	padding: 3px;
+	margin-right: 10px;
+	text-decoration: underline;
+	background-color: #EDEDED;
+}
+
+.keyword.selected {
+	background-color: #73C5FF;
+}
+

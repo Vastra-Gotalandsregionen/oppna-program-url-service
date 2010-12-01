@@ -21,9 +21,12 @@ package se.vgregion.urlservice.services;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -35,10 +38,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
+import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.StaticRedirect;
@@ -61,6 +66,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     private RedirectRuleRepository redirectRuleRepository;
     private StaticRedirectRepository staticRedirectRepository;
     private UserRepository userRepository;
+    private KeywordRepository keywordRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -82,12 +88,21 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
         return shorten(urlString, hash, null);
     }
+
+    /** 
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
+        return shorten(urlString, hash, Collections.EMPTY_LIST, owner);
+    }
     
     /** 
      * {@inheritDoc}
      */
     @Transactional
-    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
+    public ShortLink shorten(String urlString, String hash, Collection<UUID> keywordIds, User owner) throws URISyntaxException {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
@@ -135,7 +150,13 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 } else {
                     shortUrl = domain + "/" + hash;
                 }
-                ShortLink newLink = new ShortLink(domain, hash, urlString, shortUrl, owner);
+                
+                List<Keyword> keywords = new ArrayList<Keyword>();
+                for(UUID keywordId : keywordIds) {
+                    keywords.add(keywordRepository.find(keywordId));
+                }
+                
+                ShortLink newLink = new ShortLink(domain, hash, urlString, shortUrl, keywords, owner);
                 
                 
                 
@@ -251,6 +272,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
         this.userRepository = userRepository;
     }
 
+    public KeywordRepository getKeywordRepository() {
+        return keywordRepository;
+    }
+
+    @Resource
+    public void setKeywordRepository(KeywordRepository keywordRepository) {
+        this.keywordRepository = keywordRepository;
+    }
+
 
     public String getDomain() {
         return domain;
@@ -271,6 +301,13 @@ public class DefaultUrlServiceService implements UrlServiceService {
             userRepository.persist(user);
         }
         return user;
+    }
+
+
+    @Override
+    @Transactional(readOnly=true)
+    public List<Keyword> getAllKeywords() {
+        return keywordRepository.findAllInOrder();
     }
 
 

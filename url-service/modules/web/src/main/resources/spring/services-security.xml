@@ -6,6 +6,8 @@
            http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
 	<http auto-config='true'>
+		<intercept-url pattern="/resources/**" filters="none" />
+		<intercept-url pattern="/favicon.ico" filters="none" />
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY"  />
 		<form-login default-target-url="/shorten" />
 		<logout logout-success-url="/shorten" logout-url="/logout"/>

@@ -27,14 +27,18 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.ShortLinkRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.StaticRedirect;
@@ -56,7 +60,6 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void shortenNonExistingUrl() throws URISyntaxException {
         urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
-
         ShortLink link = urlService.shorten(LONG_URL);
 
         Assert.assertEquals("a9b9f0", link.getPattern());
@@ -83,6 +86,30 @@ public class DefaultUrlServiceServiceTest {
         Assert.assertEquals("test/my_slug", link.getPattern());
         Assert.assertEquals(LONG_URL, link.getUrl());
         Assert.assertEquals(owner, link.getOwner());
+    }
+
+    @Test
+    public void shortenWithKeywords() throws URISyntaxException {
+        Keyword kw1 = new Keyword("kw1");
+        Keyword kw2 = new Keyword("kw2");
+        
+        KeywordRepository keywordRepository = mock(KeywordRepository.class);
+        when(keywordRepository.find(kw1.getId())).thenReturn(kw1);
+        when(keywordRepository.find(kw2.getId())).thenReturn(kw2);
+        
+        urlService.setKeywordRepository(keywordRepository);
+
+        urlService.setShortLinkRepository(mock(ShortLinkRepository.class));
+
+        List<UUID> keywordIds = Arrays.asList(kw1.getId(), kw2.getId()); 
+        
+        ShortLink link = urlService.shorten(LONG_URL, "my_slug", keywordIds, null);
+
+        Assert.assertEquals("my_slug", link.getPattern());
+        Assert.assertEquals(LONG_URL, link.getUrl());
+        Assert.assertEquals(2, link.getKeywords().size());
+        Assert.assertEquals(kw1.getName(), link.getKeywords().get(0).getName());
+        Assert.assertEquals(kw2.getName(), link.getKeywords().get(1).getName());
     }
 
     

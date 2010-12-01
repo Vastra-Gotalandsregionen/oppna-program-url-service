@@ -28,5 +28,6 @@
         <class>se.vgregion.urlservice.types.RedirectRule</class>
         <class>se.vgregion.urlservice.types.StaticRedirect</class>
         <class>se.vgregion.urlservice.types.User</class>
+        <class>se.vgregion.urlservice.types.Keyword</class>
     </persistence-unit>
 </persistence>

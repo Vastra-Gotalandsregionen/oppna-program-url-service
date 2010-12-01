@@ -21,23 +21,45 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib uri="http://vgregion.se/urlservice/functions" prefix="f" %>
+
 
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>Förkorta länk</title>
 		
-		<link rel="stylesheet" href="/resources/css/reset.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/typography.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/forms.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/urlservice.css" type="text/css" />
+		<link rel="shortcut icon" href="http://www.vgregion.se/VGRimages/favicon.ico" type="image/x-icon" />
+		
+		
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/typography.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/forms.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/urlservice.css" type="text/css" />
+		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-1.4.4.js"></script> 
+		<script src="${pageContext.request.contextPath}/resources/js/url-service.js"></script> 
+		
 	</head>
 	<body>
 		<form action='' method="post">
 			<p><label for="longurl">Länk</label><input id="longurl" name='longurl' value='${longUrl}'> <input type='submit' value='Förkorta länk'></p>
+			<p><label for="keywords">Nyckelord</label>
+				<select multiple="multiple" name="keywords" class="keywords">
+					<c:forEach items="${keywords}" var="keyword">
+						<c:if test="${authenticated}">
+							<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
+						</c:if>
+						
+					
+						<option value="${keyword.id}" ${(not empty keywordIds && f:contains(keywordIds, keyword.id)) ? 'selected="selected"' : ''}>${keyword.name}</option>
+    				</c:forEach>
+				</select>
+			</p>
 			
 			<c:if test="${authenticated}">
-				<p><label for="slug">Nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
+				<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
 			</c:if>
 		</form>
 		
@@ -49,7 +71,7 @@
 			<p>${error}</p>
 		</c:if>
 
-		<div id="bookmarklet"><a href="javascript:location.href='http://localhost:8080/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
+		<div id="bookmarklet"><a href="javascript:location.href='http://localhost:8080/${pageContext.request.contextPath}/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
 
 		<div id="user">
 			<c:choose>

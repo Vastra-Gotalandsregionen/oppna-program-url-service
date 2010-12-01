@@ -21,7 +21,11 @@ package se.vgregion.urlservice.services;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
+import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.User;
 
@@ -60,6 +64,8 @@ public interface UrlServiceService {
      * @throws URISyntaxException
      */
     ShortLink shorten(String url, String hash, User owner) throws URISyntaxException;
+
+    ShortLink shorten(String url, String hash, Collection<UUID> keywordIds, User owner) throws URISyntaxException;
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 
@@ -99,4 +105,6 @@ public interface UrlServiceService {
     URI redirect(String domain, String path);
     
     User getUser(String vgrId);
+    
+    List<Keyword> getAllKeywords();
 }

@@ -22,6 +22,11 @@
 
 <urlrewrite>
 	<rule match-type="wildcard">
+		<from>/favicon.ico</from>
+		<to last="true">/favicon.ico</to>
+	</rule>
+
+	<rule match-type="wildcard">
 		<from>/WEB-INF/**</from>
 		<to last="true">/WEB-INF/$1</to>
 	</rule>

@@ -22,13 +22,15 @@ package se.vgregion.urlservice.controllers;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.ShortLink;
 import se.vgregion.urlservice.types.User;
 
@@ -38,6 +40,8 @@ public class MockUrlServiceService implements UrlServiceService {
     private static final String DOMAIN = "s.vgregion.se";
     private static final String URL_PREFIX = "http://s.vgregion.se/";
     private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
+    
+    private List<Keyword> keywords = Arrays.asList(new Keyword("kw1"), new Keyword("kw2"));
     
     public MockUrlServiceService() {
         log.info("Created {}", MockUrlServiceService.class.getName());
@@ -90,6 +94,12 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
+        return shorten(urlString, hash, null, owner);
+    }
+    
+    @Override
+    public ShortLink shorten(String urlString, String hash, Collection<UUID> keywordIds, User owner)
+            throws URISyntaxException {
         URI url = new URI(urlString);
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
@@ -98,15 +108,22 @@ public class MockUrlServiceService implements UrlServiceService {
                 hash = owner.getVgrId() + "/" + hash;
             }
             
-            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, owner);
+            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, null, owner);
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
     }
 
+
     @Override
     public User getUser(String vgrId) {
         return new User(vgrId);
     }
+
+    @Override
+    public List<Keyword> getAllKeywords() {
+        return keywords;
+    }
+
 
 }

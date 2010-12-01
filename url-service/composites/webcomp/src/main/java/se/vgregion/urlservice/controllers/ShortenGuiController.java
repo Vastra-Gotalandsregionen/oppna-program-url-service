@@ -21,6 +21,9 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -59,8 +62,7 @@ public class ShortenGuiController {
     }
 
     @RequestMapping(value="/shorten")
-    public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug) throws IOException {
-        
+    public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug, @RequestParam(value="keywords", required=false) List<UUID> keywordIds) throws IOException {
         ModelAndView mav = new ModelAndView("shorten");
         
         String userName = null;
@@ -72,6 +74,8 @@ public class ShortenGuiController {
                 mav.addObject("userid", userName);
             }
         }
+        
+        mav.addObject("keywords", urlServiceService.getAllKeywords());
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
@@ -79,11 +83,13 @@ public class ShortenGuiController {
                 if(!StringUtils.isEmpty(slug) && userName != null) {
                     se.vgregion.urlservice.types.User user = urlServiceService.getUser(userName);
                     
-                    shortLink = urlServiceService.shorten(longUrl, slug, user);
+                    shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, user);
                 } else {
-                    shortLink = urlServiceService.shorten(longUrl, slug);
+                    shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, null);
                 }
+
                 mav.addObject("shortUrl", shortLink.getShortUrl());
+                mav.addObject("keywordIds", keywordIds);
                 mav.addObject("slug", slug);
             } catch (URISyntaxException e) {
                 mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");

@@ -19,8 +19,12 @@
 
 package se.vgregion.urlservice.types;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -40,6 +44,9 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
     @ManyToOne(optional=true)
     private User owner;
     
+    @ManyToMany
+    private List<Keyword> keywords = Collections.emptyList();
+    
     public ShortLink() {
     }
 
@@ -52,13 +59,14 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
         this.shortUrl = shortUrl;
     }
 
-    public ShortLink(String domain, String hash, String longUrl, String shortUrl, User owner) {
+    public ShortLink(String domain, String hash, String longUrl, String shortUrl, List<Keyword> keywords, User owner) {
         super(domain, hash, longUrl);
         
         Assert.hasLength(domain, "domain can not be empty");
         Assert.hasLength(shortUrl, "shortUrl can not be empty");
         
         this.shortUrl = shortUrl;
+        this.keywords = keywords;
         this.owner = owner;
     }
 
@@ -71,6 +79,14 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
         return owner;
     }
 
+    public List<Keyword> getKeywords() {
+        if(keywords != null) {
+            return Collections.unmodifiableList(keywords);
+        } else {
+            return null;
+        }
+    }
+    
     @Override
     public boolean matches(String domain, String path) {
         if(!domainMatches(domain)) return false;
