@@ -116,7 +116,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 if(owner != null) {
                     hash = owner.getVgrId() + "/" + hash;
                 }
-                
+
                 // check that the hash does not already exist
                 while(shortLinkRepository.findByHash(domain, hash) != null) {
                     length++;
@@ -129,7 +129,13 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                ShortLink newLink = new ShortLink(domain, hash, urlString, domain + hash, owner);
+                String shortUrl;
+                if(domain.endsWith("/")) {
+                    shortUrl = domain + hash;
+                } else {
+                    shortUrl = domain + "/" + hash;
+                }
+                ShortLink newLink = new ShortLink(domain, hash, urlString, shortUrl, owner);
                 
                 
                 
@@ -252,9 +258,6 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     @Resource(name="domain")
     public void setDomain(String domain) {
-        if(!domain.endsWith("/")) {
-            domain += "/";
-        }
         this.domain = domain;
     }
 

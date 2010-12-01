@@ -63,12 +63,14 @@ public class ShortenGuiController {
         
         ModelAndView mav = new ModelAndView("shorten");
         
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userName = null;
-        if(principal instanceof User) {
-            userName = ((User) principal).getUsername();
-            mav.addObject("authenticated", true);
-            mav.addObject("userid", userName);
+        if(SecurityContextHolder.getContext().getAuthentication() != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(principal instanceof User) {
+                userName = ((User) principal).getUsername();
+                mav.addObject("authenticated", true);
+                mav.addObject("userid", userName);
+            }
         }
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
