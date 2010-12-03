@@ -38,6 +38,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
 
@@ -51,15 +52,15 @@ public class AdminGuiControllerTest {
     
     @Test
     public void index() throws IOException {
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        
         List<RedirectRule> rules = Arrays.asList(new RedirectRule(DOMAIN, PATTERN, URL));
-        RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        when(redirectRuleRepository.findAll()).thenReturn(rules);
-        controller.setRedirectRuleRepository(redirectRuleRepository);
+        when(urlServiceService.findAllRedirectRules()).thenReturn(rules);
 
         List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(DOMAIN, PATTERN, URL));
-        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        when(staticRedirectRepository.findAll()).thenReturn(statics);
-        controller.setStaticRedirectRepository(staticRedirectRepository);
+        when(urlServiceService.findAllStaticRedirects()).thenReturn(statics);
+        
+        controller.setUrlServiceService(urlServiceService);
 
         
         ModelAndView mav = controller.index();
@@ -70,8 +71,8 @@ public class AdminGuiControllerTest {
     
     @Test
     public void addRedirectRule() throws IOException {
-        RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        controller.setRedirectRuleRepository(redirectRuleRepository);
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
         
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("add", "any value");
@@ -80,7 +81,7 @@ public class AdminGuiControllerTest {
         
         controller.updateRedirectRules(request);
 
-        verify(redirectRuleRepository).persist(Mockito.argThat(new TypeSafeMatcher<RedirectRule>() {
+        verify(urlServiceService).createRedirectRule(Mockito.argThat(new TypeSafeMatcher<RedirectRule>() {
             @Override
             public boolean matchesSafely(RedirectRule rule) {
                 return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
@@ -93,8 +94,8 @@ public class AdminGuiControllerTest {
 
     @Test
     public void deleteRedirectRule() throws IOException {
-        RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        controller.setRedirectRuleRepository(redirectRuleRepository);
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
         
         UUID id = UUID.randomUUID();
         
@@ -103,13 +104,13 @@ public class AdminGuiControllerTest {
         
         controller.updateRedirectRules(request);
 
-        verify(redirectRuleRepository).removeByPrimaryKey(id);
+        verify(urlServiceService).removeRedirectRule(id);
     }
 
     @Test
     public void addStaticRedirect() throws IOException {
-        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        controller.setStaticRedirectRepository(staticRedirectRepository);
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
         
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("add", "any value");
@@ -119,7 +120,7 @@ public class AdminGuiControllerTest {
         
         controller.updateStaticRedirects(request);
 
-        verify(staticRedirectRepository).persist(Mockito.argThat(new TypeSafeMatcher<StaticRedirect>() {
+        verify(urlServiceService).createStaticRedirect(Mockito.argThat(new TypeSafeMatcher<StaticRedirect>() {
             @Override
             public boolean matchesSafely(StaticRedirect rule) {
                 return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
@@ -132,8 +133,8 @@ public class AdminGuiControllerTest {
 
     @Test
     public void deleteStaticRedirect() throws IOException {
-        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        controller.setStaticRedirectRepository(staticRedirectRepository);
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
         
         UUID id = UUID.randomUUID();
         
@@ -142,7 +143,7 @@ public class AdminGuiControllerTest {
         
         controller.updateStaticRedirects(request);
 
-        verify(staticRedirectRepository).removeByPrimaryKey(id);
+        verify(urlServiceService).removeStaticRedirect(id);
     }
 
 }

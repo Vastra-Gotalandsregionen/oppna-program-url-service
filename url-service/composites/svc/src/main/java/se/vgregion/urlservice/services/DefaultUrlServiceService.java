@@ -216,7 +216,6 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public URI redirect(String domain, String path) {
-System.out.println("#########redirect");
         ShortLink shortLink = expand(domain, path);
         // first try short links
         if(shortLink != null) {
@@ -232,9 +231,6 @@ System.out.println("#########redirect");
                 Collection<RedirectRule> rules = redirectRuleRepository.findAll();
                 
                 for(RedirectRule rule : rules) {
-System.out.println(rule);
-System.out.println(domain);
-System.out.println(path);
                     if(rule.matches(domain, path)) {
                         return URI.create(rule.getUrl());
                     }
@@ -329,6 +325,41 @@ System.out.println(path);
         return keywordRepository.findAllInOrder();
     }
 
+    @Override
+    @Transactional    
+    public void createRedirectRule(RedirectRule rule) {
+        redirectRuleRepository.persist(rule);
+    }
 
+    @Override
+    @Transactional    
+    public void createStaticRedirect(StaticRedirect redirect) {
+        staticRedirectRepository.persist(redirect);
+    }
+
+    @Override
+    @Transactional    
+    public Collection<RedirectRule> findAllRedirectRules() {
+        return redirectRuleRepository.findAll();
+    }
+
+    @Override
+    @Transactional    
+    public Collection<StaticRedirect> findAllStaticRedirects() {
+        return staticRedirectRepository.findAll();
+    }
+
+    @Override
+    @Transactional    
+    public void removeRedirectRule(UUID id) {
+        redirectRuleRepository.remove(id);
+    }
+
+    
+    @Override
+    @Transactional    
+    public void removeStaticRedirect(UUID id) {
+        staticRedirectRepository.remove(id);
+    }
 
 }

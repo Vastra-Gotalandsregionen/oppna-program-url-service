@@ -30,17 +30,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
 
@@ -53,16 +47,8 @@ public class AdminGuiController {
 
     private final Logger log = LoggerFactory.getLogger(AdminGuiController.class);
 
-    // TODO remove
     @Resource
-    private PlatformTransactionManager transactionManager;
-
-    
-    @Resource
-    private RedirectRuleRepository redirectRuleRepository;
-
-    @Resource
-    private StaticRedirectRepository staticRedirectRepository;
+    private UrlServiceService urlServiceService;
 
     
     public AdminGuiController() {
@@ -73,20 +59,14 @@ public class AdminGuiController {
     public ModelAndView index() throws IOException {
         ModelAndView mav = new ModelAndView("admin/index");
         
-        mav.addObject("redirectRules", redirectRuleRepository.findAll());
-        mav.addObject("staticRedirects", staticRedirectRepository.findAll());
+        mav.addObject("redirectRules", urlServiceService.findAllRedirectRules());
+        mav.addObject("staticRedirects", urlServiceService.findAllStaticRedirects());
         
         return mav;
     }
 
     @RequestMapping(value="/admin/redirectrules", method=RequestMethod.POST)
     public ModelAndView updateRedirectRules(HttpServletRequest request) throws IOException {
-     // TODO Remove!
-        
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus status = transactionManager.getTransaction(def);
-
         ModelAndView mav = new ModelAndView("redirect:../admin");
         
         if(request.getParameter("add") != null) {
@@ -101,7 +81,7 @@ public class AdminGuiController {
             if(StringUtils.isNotEmpty(pattern) && StringUtils.isNotEmpty(url)) {
                 log.debug("Adding redirect rule with pattern \"{}\" and URL \"{}\"", pattern, url);
                 try { 
-                    redirectRuleRepository.persist(new RedirectRule(domain, pattern, url));
+                    urlServiceService.createRedirectRule(new RedirectRule(domain, pattern, url));
                 } catch(RuntimeException e) {
                     throw e;
                 }
@@ -113,23 +93,15 @@ public class AdminGuiController {
             UUID deletedId = findDeletedId(request);
             if(deletedId != null) {
                 log.debug("Deleting redirect rule {}", deletedId);
-                redirectRuleRepository.removeByPrimaryKey(deletedId);
+                urlServiceService.removeRedirectRule(deletedId);
             }
         }
         
-        transactionManager.commit(status);
         return mav;
     }
 
     @RequestMapping(value="/admin/staticredirects", method=RequestMethod.POST)
     public ModelAndView updateStaticRedirects(HttpServletRequest request) throws IOException {
-        
-        // TODO Remove!
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus status = transactionManager.getTransaction(def);
-
-        
         ModelAndView mav = new ModelAndView("redirect:../admin");
         
         if(request.getParameter("add") != null) {
@@ -141,7 +113,7 @@ public class AdminGuiController {
             if(StringUtils.isNotEmpty(domain) && StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(url)) {
                 log.debug("Adding static redirect with path \"{}\" and URL \"{}\"", path, url);
                 try { 
-                    staticRedirectRepository.persist(new StaticRedirect(domain, path, url));
+                    urlServiceService.createStaticRedirect(new StaticRedirect(domain, path, url));
                 } catch(RuntimeException e) {
                     // TODO do not ignore
                 }
@@ -150,11 +122,10 @@ public class AdminGuiController {
             UUID deletedId = findDeletedId(request);
             if(deletedId != null) {
                 log.debug("Deleting static redirect {}", deletedId);
-                staticRedirectRepository.removeByPrimaryKey(deletedId);
+                urlServiceService.removeStaticRedirect(deletedId);
             }
         }
         
-        transactionManager.commit(status);
         return mav;
     }
 
@@ -171,21 +142,11 @@ public class AdminGuiController {
         return null;
     }
 
-    public RedirectRuleRepository getRedirectRuleRepository() {
-        return redirectRuleRepository;
+    public UrlServiceService getUrlServiceService() {
+        return urlServiceService;
     }
 
-    public void setRedirectRuleRepository(RedirectRuleRepository redirectRuleRepository) {
-        this.redirectRuleRepository = redirectRuleRepository;
+    public void setUrlServiceService(UrlServiceService urlServiceService) {
+        this.urlServiceService = urlServiceService;
     }
-
-    public StaticRedirectRepository getStaticRedirectRepository() {
-        return staticRedirectRepository;
-    }
-
-    public void setStaticRedirectRepository(StaticRedirectRepository staticRedirectRepository) {
-        this.staticRedirectRepository = staticRedirectRepository;
-    }
-    
-    
 }

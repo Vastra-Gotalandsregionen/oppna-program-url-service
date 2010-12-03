@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.UUID;
 
 import se.vgregion.urlservice.types.Keyword;
+import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
 /**
@@ -107,4 +109,16 @@ public interface UrlServiceService {
     User getUser(String vgrId);
     
     List<Keyword> getAllKeywords();
+
+    void createRedirectRule(RedirectRule rule);
+
+    void createStaticRedirect(StaticRedirect redirect);
+
+    Collection<StaticRedirect> findAllStaticRedirects();
+
+    Collection<RedirectRule> findAllRedirectRules();
+
+    void removeRedirectRule(UUID id);
+
+    void removeStaticRedirect(UUID id);
 }

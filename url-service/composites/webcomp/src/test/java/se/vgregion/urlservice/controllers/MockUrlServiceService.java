@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Keyword;
+import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
 public class MockUrlServiceService implements UrlServiceService {
@@ -123,6 +125,42 @@ public class MockUrlServiceService implements UrlServiceService {
     @Override
     public List<Keyword> getAllKeywords() {
         return keywords;
+    }
+
+    @Override
+    public void createRedirectRule(RedirectRule rule) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void createStaticRedirect(StaticRedirect redirect) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Collection<StaticRedirect> findAllStaticRedirects() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<RedirectRule> findAllRedirectRules() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void removeRedirectRule(UUID id) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void removeStaticRedirect(UUID id) {
+        // TODO Auto-generated method stub
+        
     }
 
 
