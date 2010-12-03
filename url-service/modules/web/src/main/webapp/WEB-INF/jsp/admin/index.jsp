@@ -27,10 +27,12 @@
 	<head>
 		<title>Administration - URL tjänst</title>
 		
-		<link rel="stylesheet" href="/resources/css/reset.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/typography.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/forms.css" type="text/css" />
-		<link rel="stylesheet" href="/resources/css/urlservice.css" type="text/css" />
+		<link rel="shortcut icon" href="http://www.vgregion.se/VGRimages/favicon.ico" type="image/x-icon" />
+		
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/typography.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/forms.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/urlservice.css" type="text/css" />
 
 	</head>
 	<body>

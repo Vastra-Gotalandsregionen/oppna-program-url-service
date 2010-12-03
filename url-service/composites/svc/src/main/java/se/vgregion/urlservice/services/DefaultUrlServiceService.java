@@ -107,9 +107,19 @@ public class DefaultUrlServiceService implements UrlServiceService {
         
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             ShortLink link = shortLinkRepository.findByLongUrl(urlString);
-            
             if(link != null) {
-                // shortlink already exists, return as is
+                // shortlink already exists
+
+                // TODO complete update
+//                if(owner != null && owner.equals(link.getOwner())) {
+//                    // same owner, update
+//                    if(keywordIds != null) {
+//                        List<Keyword> keywords = findKeywords(keywordIds);
+//                    }
+//                }
+                
+                
+                
                 return link;
             } else {
                 String md5 = DigestUtils.md5Hex(urlString);
@@ -151,14 +161,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     shortUrl = domain + "/" + hash;
                 }
                 
-                List<Keyword> keywords = new ArrayList<Keyword>();
-                for(UUID keywordId : keywordIds) {
-                    keywords.add(keywordRepository.find(keywordId));
-                }
-                
+                List<Keyword> keywords = findKeywords(keywordIds);
                 ShortLink newLink = new ShortLink(domain, hash, urlString, shortUrl, keywords, owner);
-                
-                
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;
@@ -166,6 +170,17 @@ public class DefaultUrlServiceService implements UrlServiceService {
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }
+    }
+
+    // TODO move to KeywordRepository
+    private List<Keyword> findKeywords(Collection<UUID> keywordIds) {
+        List<Keyword> keywords = new ArrayList<Keyword>();
+        if(keywordIds != null) {
+            for(UUID keywordId : keywordIds) {
+                keywords.add(keywordRepository.find(keywordId));
+            }
+        }
+        return keywords;
     }
 
     /** 
@@ -201,6 +216,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public URI redirect(String domain, String path) {
+System.out.println("#########redirect");
         ShortLink shortLink = expand(domain, path);
         // first try short links
         if(shortLink != null) {
@@ -216,6 +232,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 Collection<RedirectRule> rules = redirectRuleRepository.findAll();
                 
                 for(RedirectRule rule : rules) {
+System.out.println(rule);
+System.out.println(domain);
+System.out.println(path);
                     if(rule.matches(domain, path)) {
                         return URI.create(rule.getUrl());
                     }

@@ -108,7 +108,7 @@ public class MockUrlServiceService implements UrlServiceService {
                 hash = owner.getVgrId() + "/" + hash;
             }
             
-            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, null, owner);
+            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, keywords, owner);
         } else {
             throw new URISyntaxException(urlString, "Scheme not allowed");
         }

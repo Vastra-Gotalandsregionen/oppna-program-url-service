@@ -83,9 +83,23 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         if (domain == null && otherDomain == null) {
             return true;
         } else if(domain != null) {
-            return domain.equals(otherDomain);
+            String canonicalDomain = canonicalDomain(domain);
+            String canonicalOtherDomain = canonicalDomain(otherDomain);
+System.out.println(canonicalDomain);
+System.out.println(canonicalOtherDomain);
+            return canonicalDomain.equals(canonicalOtherDomain);
         } else {
             return false;
+        }
+    }
+
+    private String canonicalDomain(String domainToFix) {
+        if(domainToFix == null) return null;
+        
+        if(domainToFix.endsWith("/")) {
+            return domainToFix.substring(0, domainToFix.length() - 1);
+        } else {
+            return domainToFix;
         }
     }
     

@@ -30,7 +30,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,6 +53,11 @@ public class AdminGuiController {
 
     private final Logger log = LoggerFactory.getLogger(AdminGuiController.class);
 
+    // TODO remove
+    @Resource
+    private PlatformTransactionManager transactionManager;
+
+    
     @Resource
     private RedirectRuleRepository redirectRuleRepository;
 
@@ -70,9 +79,14 @@ public class AdminGuiController {
         return mav;
     }
 
-    @Transactional
     @RequestMapping(value="/admin/redirectrules", method=RequestMethod.POST)
     public ModelAndView updateRedirectRules(HttpServletRequest request) throws IOException {
+     // TODO Remove!
+        
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+
         ModelAndView mav = new ModelAndView("redirect:../admin");
         
         if(request.getParameter("add") != null) {
@@ -83,14 +97,17 @@ public class AdminGuiController {
             }
             String pattern = request.getParameter("pattern");
             String url = request.getParameter("url");
-            
+
             if(StringUtils.isNotEmpty(pattern) && StringUtils.isNotEmpty(url)) {
                 log.debug("Adding redirect rule with pattern \"{}\" and URL \"{}\"", pattern, url);
                 try { 
                     redirectRuleRepository.persist(new RedirectRule(domain, pattern, url));
                 } catch(RuntimeException e) {
-                    // TODO do not ignore
+                    throw e;
                 }
+            } else {
+                // handle validation error
+                System.out.println("Validation error");
             }
         } else {
             UUID deletedId = findDeletedId(request);
@@ -100,12 +117,19 @@ public class AdminGuiController {
             }
         }
         
+        transactionManager.commit(status);
         return mav;
     }
 
-    @Transactional
     @RequestMapping(value="/admin/staticredirects", method=RequestMethod.POST)
     public ModelAndView updateStaticRedirects(HttpServletRequest request) throws IOException {
+        
+        // TODO Remove!
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+
+        
         ModelAndView mav = new ModelAndView("redirect:../admin");
         
         if(request.getParameter("add") != null) {
@@ -130,6 +154,7 @@ public class AdminGuiController {
             }
         }
         
+        transactionManager.commit(status);
         return mav;
     }
 

@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.ShortLink;
 
 /**
@@ -49,6 +50,9 @@ public class ShortenGuiController {
 
     private final Logger log = LoggerFactory.getLogger(ShortenGuiController.class);
 
+    @Resource(name="domain")
+    private String domain;
+    
     @Resource
     private UrlServiceService urlServiceService;
 
@@ -75,12 +79,13 @@ public class ShortenGuiController {
             }
         }
         
+        mav.addObject("domain", domain);
         mav.addObject("keywords", urlServiceService.getAllKeywords());
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
                 ShortLink shortLink;
-                if(!StringUtils.isEmpty(slug) && userName != null) {
+                if(userName != null) {
                     se.vgregion.urlservice.types.User user = urlServiceService.getUser(userName);
                     
                     shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, user);
@@ -89,11 +94,20 @@ public class ShortenGuiController {
                 }
 
                 mav.addObject("shortUrl", shortLink.getShortUrl());
-                mav.addObject("keywordIds", keywordIds);
+                mav.addObject("owned", shortLink.getOwner() != null && shortLink.getOwner().getVgrId().equals(userName));
+                List<UUID> storedKeywordIds = new ArrayList<UUID>();
+                if(shortLink.getKeywords() != null) {
+                    for(Keyword keyword : shortLink.getKeywords()) {
+                        storedKeywordIds.add(keyword.getId());
+                    }
+                }
+                mav.addObject("keywordIds", storedKeywordIds);
                 mav.addObject("slug", slug);
             } catch (URISyntaxException e) {
                 mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");
             }
+        } else {
+            mav.addObject("owned", true);
         }
         
         return mav;

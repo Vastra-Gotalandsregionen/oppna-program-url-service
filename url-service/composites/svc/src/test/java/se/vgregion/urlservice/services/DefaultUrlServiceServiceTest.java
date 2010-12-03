@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.services;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,7 @@ import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.vgregion.urlservice.repository.KeywordRepository;
@@ -88,6 +90,37 @@ public class DefaultUrlServiceServiceTest {
         Assert.assertEquals(owner, link.getOwner());
     }
 
+    @Test
+    @Ignore
+    public void shortenExistingWithOwnerAndUpdatedKeywords() throws URISyntaxException {
+        Keyword kw1 = new Keyword("kw1");
+        Keyword kw2 = new Keyword("kw2");
+        
+        KeywordRepository keywordRepository = mock(KeywordRepository.class);
+        when(keywordRepository.find(kw1.getId())).thenReturn(kw1);
+        when(keywordRepository.find(kw2.getId())).thenReturn(kw2);
+        
+        urlService.setKeywordRepository(keywordRepository);
+
+        List<UUID> keywordIds2 = Arrays.asList(kw1.getId(), kw2.getId()); 
+
+        
+        User owner = new User("test");
+
+        ShortLink link = new ShortLink(DOMAIN, HASH, LONG_URL, SHORT_URL, Arrays.asList(kw1), owner);
+
+        ShortLinkRepository shortLinkRepository = mock(ShortLinkRepository.class);
+        when(shortLinkRepository.findByLongUrl(anyString())).thenReturn(link);
+        urlService.setShortLinkRepository(shortLinkRepository);
+
+        link = urlService.shorten(LONG_URL, "my_slug", keywordIds2, owner);
+
+        Assert.assertEquals(2, link.getKeywords().size());
+        Assert.assertEquals(kw1.getName(), link.getKeywords().get(0).getName());
+        Assert.assertEquals(kw2.getName(), link.getKeywords().get(1).getName());
+    }
+
+    
     @Test
     public void shortenWithKeywords() throws URISyntaxException {
         Keyword kw1 = new Keyword("kw1");

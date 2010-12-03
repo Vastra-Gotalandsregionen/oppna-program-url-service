@@ -70,8 +70,12 @@
     </filter>
 	<filter-mapping>
 		<filter-name>txFilter</filter-name>
-		<url-pattern>/app/*</url-pattern>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>  
+   		<dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
+
+
 
 	<!--
 		Bootstraps the root Spring Web Application Context, responsible for

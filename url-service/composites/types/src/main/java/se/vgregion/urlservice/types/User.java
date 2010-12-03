@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -36,7 +37,7 @@ public class User extends AbstractEntity<String> {
     @Id
     private String vgrId;
     
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
     private Collection<ShortLink> shortLinks = new ArrayList<ShortLink>();
     
     protected User() {

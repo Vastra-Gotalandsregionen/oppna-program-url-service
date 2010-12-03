@@ -15,7 +15,15 @@ label {
 	background-color: #EDEDED;
 }
 
+.keyword.readonly {
+	text-decoration: none;
+	background-color: #EDEDED;
+}
+
 .keyword.selected {
 	background-color: #73C5FF;
 }
 
+.keyword.selected.readonly {
+	background-color: #BBB;
+}

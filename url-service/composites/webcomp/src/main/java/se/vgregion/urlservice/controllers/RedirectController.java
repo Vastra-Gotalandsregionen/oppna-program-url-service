@@ -62,14 +62,16 @@ public class RedirectController {
     @RequestMapping("/**")
     public ModelAndView redirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("Redirecting");
-        String domain = request.getServerName();
+        
+        // TODO clean up domain handling
+        String domain = "http://" + request.getServerName();
         if(request.getServerPort() != 80) {
             domain += ":" + request.getServerPort();
         }
-        System.out.println(domain);
+        domain += request.getContextPath();
         String path = request.getPathInfo().substring(1);
         URI uri = urlServiceService.redirect(domain, path);
-System.out.println(uri);
+
         if(uri != null) {
             ModelAndView mav = new ModelAndView("redirect");
             response.setStatus(301);
