@@ -27,7 +27,7 @@ import java.util.UUID;
 
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
@@ -41,62 +41,53 @@ public interface UrlServiceService {
      * Shorten a long URL to a short link. If the long URL already exists, 
      * the already existing short link will be returned.
      * @param url The long URL, required.
-     * @return The {@link ShortLink} representing the long URL
+     * @param Owner The owner of the bookmark
+     * @return The {@link Bookmark} representing the long URL
      * @throws URISyntaxException
      */
-    ShortLink shorten(String url) throws URISyntaxException;
+    Bookmark shorten(URI url, User owner);
 
     /**
      * Shorten a long URL to a short link. If the long URL already exists, 
      * the already existing short link will be returned.
      * @param url The long URL, required.
      * @param hash The desired hash
-     * @return The {@link ShortLink} representing the long URL
+     * @param owner The owner of the bookmark
+     * @return The {@link Bookmark} representing the long URL
      * @throws URISyntaxException
      */
-    ShortLink shorten(String url, String hash) throws URISyntaxException;
+    Bookmark shorten(URI url, String hash, User owner);
 
-    /**
-     * Shorten a long URL to a short link. If the long URL already exists, 
-     * the already existing short link will be returned.
-     * @param url The long URL, required.
-     * @param hash The desired hash
-     * @param owner The user which owns of the link
-     * @return The {@link ShortLink} representing the long URL
-     * @throws URISyntaxException
-     */
-    ShortLink shorten(String url, String hash, User owner) throws URISyntaxException;
-
-    ShortLink shorten(String url, String hash, Collection<UUID> keywordIds, User owner) throws URISyntaxException;
+    Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner);
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 
      * to the matching long URL. 
      * @param shortUrlOrHash The short URL, required
-     * @return The {@link ShortLink} containing the long URL. Null if the
+     * @return The {@link Bookmark} containing the long URL. Null if the
      *   short URL/hash is unknown.
      * @throws URISyntaxException
      */
-    ShortLink expand(String shortUrl) throws URISyntaxException;
+    Bookmark expand(URI shortUrl) throws URISyntaxException;
 
     /**
      * Expand a hash (e.g. "abc") 
      * to the matching long URL. 
      * @param shortUrlOrHash The hash, required
-     * @return The {@link ShortLink} containing the long URL. Null if the
+     * @return The {@link Bookmark} containing the long URL. Null if the
      *   short URL/hash is unknown.
      * @throws URISyntaxException
      */
-    ShortLink expand(String domain, String hash) throws URISyntaxException;
+    Bookmark expand(String hash) throws URISyntaxException;
 
     /**
      * Find the matching hash for a long URL.  
      * @param url The long URL
-     * @return The {@link ShortLink} containing the hash. Null if
+     * @return The {@link Bookmark} containing the hash. Null if
      *   the long URL is unknown
      * @throws URISyntaxException
      */
-    ShortLink lookup(String url) throws URISyntaxException;
+    Bookmark lookup(URI url, User owner) throws URISyntaxException;
 
     /**
      * Given a path, will return the URI to where the user should be redirected. 
@@ -121,4 +112,6 @@ public interface UrlServiceService {
     void removeRedirectRule(UUID id);
 
     void removeStaticRedirect(UUID id);
+
+    
 }

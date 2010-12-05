@@ -19,49 +19,59 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.springframework.util.Assert;
+import org.apache.commons.lang.Validate;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class User extends AbstractEntity<String> {
+public class LongUrl extends AbstractEntity<UUID> {
 
     @Id
-    private String username;
+    private UUID id;
+    
+    @Column(nullable=false, unique=true)
+    private String url;
     
     @OneToMany
     private Collection<Bookmark> bookmarks = new HashSet<Bookmark>();
-    
-    protected User() {
+
+    protected LongUrl() {
     }
 
-    public User(String vgrId) {
-        Assert.hasText(vgrId);
+    public LongUrl(URI url) {
+        id = UUID.randomUUID();
+        Validate.notNull(url, "url can not be null");
         
-        this.username = vgrId;
+        this.url = url.toString();
     }
 
     @Override
-    public String getId() {
-        return username;
-    }
-    
-    public String getUserName() {
-        return username;
+    public UUID getId() {
+        return id;
     }
 
-    public Collection<Bookmark> getShortLinks() {
-        return bookmarks;
+    public URI getUrl() {
+        return URI.create(url);
+    }
+
+    public Collection<Bookmark> getBookmarks() {
+        return Collections.unmodifiableCollection(bookmarks);
+    }
+
+    public void addBookmark(Bookmark bookmark) {
+        bookmarks.add(bookmark);
     }
     
-    public void addShortLink(Bookmark shortLink) {
-        bookmarks.add(shortLink);
-    }
+    
 }

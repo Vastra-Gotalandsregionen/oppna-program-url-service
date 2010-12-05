@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -76,9 +77,9 @@ public class AdminGuiController {
                 domain = null;
             }
             String pattern = request.getParameter("pattern");
-            String url = request.getParameter("url");
+            URI url = URI.create(request.getParameter("url"));
 
-            if(StringUtils.isNotEmpty(pattern) && StringUtils.isNotEmpty(url)) {
+            if(StringUtils.isNotEmpty(pattern)) {
                 log.debug("Adding redirect rule with pattern \"{}\" and URL \"{}\"", pattern, url);
                 try { 
                     urlServiceService.createRedirectRule(new RedirectRule(domain, pattern, url));
@@ -108,9 +109,9 @@ public class AdminGuiController {
             // adding a new rule
             String domain = request.getParameter("domain");
             String path = request.getParameter("pattern");
-            String url = request.getParameter("url");
+            URI url = URI.create(request.getParameter("url"));
             
-            if(StringUtils.isNotEmpty(domain) && StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(url)) {
+            if(StringUtils.isNotEmpty(domain) && StringUtils.isNotEmpty(path)) {
                 log.debug("Adding static redirect with path \"{}\" and URL \"{}\"", path, url);
                 try { 
                     urlServiceService.createStaticRedirect(new StaticRedirect(domain, path, url));

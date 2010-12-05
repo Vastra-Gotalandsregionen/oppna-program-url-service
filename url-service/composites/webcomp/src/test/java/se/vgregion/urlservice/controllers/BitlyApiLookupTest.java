@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -29,12 +30,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BitlyApiLookupTest {
 
-    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
+    private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private MockHttpServletResponse response = new MockHttpServletResponse();
     
     @Test
     public void jsonResponse() throws IOException {
-        controller.lookup(Arrays.asList("http://s.vgregion.se/foo"), "json", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "json", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -50,7 +52,7 @@ public class BitlyApiLookupTest {
 
     @Test
     public void xmlResponse() throws IOException {
-        controller.lookup(Arrays.asList("http://s.vgregion.se/foo"), "xml", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "xml", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -66,14 +68,14 @@ public class BitlyApiLookupTest {
     
     @Test
     public void txtResponseNotAllowed() throws IOException {
-        controller.lookup(Arrays.asList("http://s.vgregion.se/foo"), "txt", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "txt", response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        controller.lookup(Arrays.asList("http://example.com"), "unknown", response);
+        controller.lookup(Arrays.asList(URI.create("http://example.com")), "unknown", response);
         
         Assert.assertEquals(500, response.getStatus());
     }

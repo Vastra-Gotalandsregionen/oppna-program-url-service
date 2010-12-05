@@ -19,20 +19,22 @@
 
 package se.vgregion.urlservice.repository;
 
+import java.net.URI;
 import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.User;
     
-public interface ShortLinkRepository extends JpaRepository<ShortLink, UUID, UUID> {
+public interface BookmarkRepository extends JpaRepository<Bookmark, UUID, UUID> {
 
     /**
      * Find link by hash.
      */
-    ShortLink findByHash(String domain, String hash);
+    Bookmark findByHash(String hash);
 
     /**
      * Find link by URL.
      */
-    ShortLink findByLongUrl(String longUrl);
+    Bookmark findByLongUrl(URI longUrl, User owner);
 }

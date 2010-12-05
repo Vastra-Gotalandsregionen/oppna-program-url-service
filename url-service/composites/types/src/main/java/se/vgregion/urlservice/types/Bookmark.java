@@ -21,63 +21,78 @@ package se.vgregion.urlservice.types;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.OneToMany;
 
-import org.springframework.util.Assert;
+import org.apache.commons.lang.Validate;
+
+import com.sun.org.apache.bcel.internal.generic.LUSHR;
+
+import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-@Table(uniqueConstraints=
-    @UniqueConstraint(columnNames={"domain", "pattern"})
-    )
+public class Bookmark extends AbstractEntity<UUID> {
 
-public class ShortLink extends AbstractRedirect<ShortLink> {
+    @Id
+    private UUID id;
+    
+    @Column(nullable=false, unique=true)
+    private String hash;
 
-    @Column(nullable=false)
-    private String shortUrl;
-
-    @ManyToOne(optional=true)
+    @ManyToOne(optional=false)
+    private LongUrl longUrl;
+    
+    @ManyToOne(optional=false)
     private User owner;
     
     @ManyToMany
     private List<Keyword> keywords = Collections.emptyList();
     
-    public ShortLink() {
+    protected Bookmark() {
     }
 
-    public ShortLink(String domain, String hash, String longUrl, String shortUrl) {
-        super(domain, hash, longUrl);
-        
-        Assert.hasLength(domain, "domain can not be empty");
-        Assert.hasLength(shortUrl, "shortUrl can not be empty");
-        
-        this.shortUrl = shortUrl;
+    public Bookmark(String hash, LongUrl longUrl, User owner) {
+        this(hash, longUrl, Collections.<Keyword>emptyList(), owner);
     }
-
-    public ShortLink(String domain, String hash, String longUrl, String shortUrl, List<Keyword> keywords, User owner) {
-        super(domain, hash, longUrl);
+    
+    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, User owner) {
+        this.id = UUID.randomUUID();
         
-        Assert.hasLength(domain, "domain can not be empty");
-        Assert.hasLength(shortUrl, "shortUrl can not be empty");
+        Validate.notEmpty(hash, "hash can not be empty");
+        Validate.notNull(longUrl, "longUrl can not be null");
+        Validate.notNull(owner, "owner can not be null");
+        Validate.noNullElements(keywords, "Keyword element can not be null");
         
-        this.shortUrl = shortUrl;
+        this.hash = hash;
+        this.longUrl = longUrl;
         this.keywords = keywords;
         this.owner = owner;
+        
+        longUrl.addBookmark(this);
+        owner.addShortLink(this);
     }
 
-    
-    public String getShortUrl() {
-        return shortUrl;
+    @Override
+    public UUID getId() {
+        return id;
     }
 
     public User getOwner() {
         return owner;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public LongUrl getLongUrl() {
+        return longUrl;
     }
 
     public List<Keyword> getKeywords() {
@@ -86,12 +101,5 @@ public class ShortLink extends AbstractRedirect<ShortLink> {
         } else {
             return null;
         }
-    }
-    
-    @Override
-    public boolean matches(String domain, String path) {
-        if(!domainMatches(domain)) return false;
-        
-        return getPattern().equals(path);
     }
 }

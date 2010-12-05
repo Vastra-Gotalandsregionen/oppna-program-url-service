@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Keyword;
+import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
@@ -41,6 +43,10 @@ public class MockUrlServiceService implements UrlServiceService {
     private final Logger log = LoggerFactory.getLogger(MockUrlServiceService.class);
     private static final String DOMAIN = "s.vgregion.se";
     private static final String URL_PREFIX = "http://s.vgregion.se/";
+    private static final String HASH = "foo";
+    private static final String USERNAME = "roblu";
+    private static final URI LONG_URL = URI.create("http://example.com");
+    
     private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
     
     private List<Keyword> keywords = Arrays.asList(new Keyword("kw1"), new Keyword("kw2"));
@@ -49,70 +55,28 @@ public class MockUrlServiceService implements UrlServiceService {
         log.info("Created {}", MockUrlServiceService.class.getName());
     }
 
-    /* (non-Javadoc)
-     * @see se.vgregion.urlservice.services.UrlServiceService#shorten(java.lang.String)
-     */
-    public ShortLink shorten(String urlString) throws URISyntaxException {
-        return shorten(urlString, null);
-    }
-    
     @Override
-    public ShortLink expand(String domain, String hash) {
+    public Bookmark expand(String hash) {
         if(hash.equals("foo")) {
-            return new ShortLink(DOMAIN, "foo", "http://example.com", URL_PREFIX + "foo");
+            return new Bookmark(hash, new LongUrl(LONG_URL), keywords, new User(USERNAME));
         } else {
             return null;
         }
     }
     
-    public ShortLink expand(String shortUrl) {
-        if(shortUrl.equals("http://s.vgregion.se/foo")) {
-            return new ShortLink(DOMAIN, "foo", "http://example.com", URL_PREFIX + "foo");
-        } else {
-            return null;
-        }
-    }
-
     @Override
-    public ShortLink lookup(String url) throws URISyntaxException {
-        return new ShortLink(DOMAIN, "foo", url, URL_PREFIX + "foo");
-    }
-
-    @Override
-    public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
-        return shorten(urlString, hash, null);
+    public Bookmark expand(URI shortUrl) throws URISyntaxException {
+        return new Bookmark(HASH, new LongUrl(LONG_URL), keywords, new User(USERNAME));
     }
 
     @Override
     public URI redirect(String domain, String path) {
-        if(expand(domain, path) != null) {
-            return URI.create(expand(domain, path).getUrl()); 
+        if(expand(path) != null) {
+            return expand(path).getLongUrl().getUrl(); 
         } else if(path.equals("bar")) {
             return URI.create("http://google.com");
         } else {
             return null;
-        }
-    }
-
-    @Override
-    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
-        return shorten(urlString, hash, null, owner);
-    }
-    
-    @Override
-    public ShortLink shorten(String urlString, String hash, Collection<UUID> keywordIds, User owner)
-            throws URISyntaxException {
-        URI url = new URI(urlString);
-        
-        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            hash = (hash != null) ? hash : "foo"; 
-            if(owner != null) {
-                hash = owner.getVgrId() + "/" + hash;
-            }
-            
-            return new ShortLink(DOMAIN, hash, urlString, URL_PREFIX + hash, keywords, owner);
-        } else {
-            throw new URISyntaxException(urlString, "Scheme not allowed");
         }
     }
 
@@ -129,38 +93,58 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public void createRedirectRule(RedirectRule rule) {
-        // TODO Auto-generated method stub
         
     }
 
     @Override
     public void createStaticRedirect(StaticRedirect redirect) {
-        // TODO Auto-generated method stub
         
     }
 
     @Override
     public Collection<StaticRedirect> findAllStaticRedirects() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Collection<RedirectRule> findAllRedirectRules() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void removeRedirectRule(UUID id) {
-        // TODO Auto-generated method stub
         
     }
 
     @Override
     public void removeStaticRedirect(UUID id) {
-        // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public Bookmark shorten(URI url, User owner) {
+        return shorten(url, null, owner);
+    }
+
+    @Override
+    public Bookmark shorten(URI url, String hash, User owner) {
+        return shorten(url, hash, Collections.<UUID>emptyList(), owner);
+    }
+
+    @Override
+    public Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner) {
+        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
+            hash = (hash != null) ? hash : HASH; 
+            
+            return new Bookmark(hash, new LongUrl(url), keywords, owner);
+        } else {
+            throw new IllegalArgumentException("Scheme not allowed");
+        }
+    }
+
+    @Override
+    public Bookmark lookup(URI url, User owner) throws URISyntaxException {
+        return new Bookmark(HASH, new LongUrl(url), Collections.<Keyword>emptyList(), owner);
     }
 
 

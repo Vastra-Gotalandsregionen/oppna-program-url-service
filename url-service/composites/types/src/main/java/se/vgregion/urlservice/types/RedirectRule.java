@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
 import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
@@ -36,12 +37,11 @@ public class RedirectRule extends AbstractRedirect<RedirectRule> {
     protected RedirectRule() {
     }
 
-    public RedirectRule(String domain, String pattern, String url) {
+    public RedirectRule(String domain, String pattern, URI url) {
         super(domain, pattern, url);
     }
     
     public boolean matches(String domain, String path) {
-System.out.println("########matched");
         if(!domainMatches(domain)) return false;
         
         Pattern regex = Pattern.compile(getPattern());

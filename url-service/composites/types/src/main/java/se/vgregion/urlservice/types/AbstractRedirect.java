@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -27,7 +28,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
@@ -50,19 +51,15 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     public AbstractRedirect() {
     }
 
-    public AbstractRedirect(String domain, String pattern, String url) {
+    public AbstractRedirect(String domain, String pattern, URI url) {
         this.id = UUID.randomUUID();
         
-        if(StringUtils.isEmpty(pattern)) {
-            throw new IllegalArgumentException("Patter can not be empty");
-        }
-        if(StringUtils.isEmpty(url)) {
-            throw new IllegalArgumentException("URL can not be empty");
-        }
+        Validate.notEmpty(pattern, "pattern can not be empty");
+        Validate.notNull(url, "url can not be null");
         
         this.domain = domain;
         this.pattern = pattern;
-        this.url = url;
+        this.url = url.toString();
     }
     
     public UUID getId() {
@@ -75,8 +72,8 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     public String getPattern() {
         return pattern;
     }
-    public String getUrl() {
-        return url;
+    public URI getUrl() {
+        return URI.create(url);
     }
     
     protected boolean domainMatches(String otherDomain) {
@@ -85,8 +82,6 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         } else if(domain != null) {
             String canonicalDomain = canonicalDomain(domain);
             String canonicalOtherDomain = canonicalDomain(otherDomain);
-System.out.println(canonicalDomain);
-System.out.println(canonicalOtherDomain);
             return canonicalDomain.equals(canonicalOtherDomain);
         } else {
             return false;

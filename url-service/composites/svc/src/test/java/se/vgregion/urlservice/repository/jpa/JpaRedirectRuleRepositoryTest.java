@@ -19,6 +19,8 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.net.URI;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +36,9 @@ import se.vgregion.urlservice.types.RedirectRule;
 public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private static final String DOMAIN = "foo.vgregion.se";
-    
+    private static final String HASH = "foo";
+    private static final URI LONG_URL = URI.create("http://example.com");
+
     private RedirectRuleRepository dao;
     
     private RedirectRule rule1;
@@ -42,7 +46,7 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
     @Before
     public void setup() {
         dao = applicationContext.getBean(RedirectRuleRepository.class);
-        rule1 = dao.persist(new RedirectRule(DOMAIN, "foo", "http://example.com/1"));
+        rule1 = dao.persist(new RedirectRule(DOMAIN, HASH, LONG_URL));
     }
     
     @Test
@@ -51,7 +55,7 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
     public void find() {
         RedirectRule loaded = dao.find(rule1.getId());
         
-        Assert.assertEquals(rule1.getPattern(), loaded.getPattern());
-        Assert.assertEquals(rule1.getUrl(), loaded.getUrl());
+        Assert.assertEquals(HASH, loaded.getPattern());
+        Assert.assertEquals(LONG_URL, loaded.getUrl());
     }
 }

@@ -17,28 +17,18 @@
  *
  */
 
-package se.vgregion.urlservice.types;
+package se.vgregion.urlservice.repository;
 
-import org.junit.Test;
+import java.net.URI;
+import java.util.UUID;
 
-public class ShortLinkTest {
-
-    private static final String DOMAIN = "foo.vgregion.se";
-
-    private static final String URL = "http://example.com";
+import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
+import se.vgregion.urlservice.types.LongUrl;
     
-    @Test(expected=IllegalArgumentException.class)
-    public void nullDomainNotAllowed() {
-        new ShortLink(null, "foo", URL, "");
-    }
+public interface LongUrlRepository extends JpaRepository<LongUrl, UUID, UUID> {
 
-    @Test(expected=IllegalArgumentException.class)
-    public void nullPatterNotAllowed() {
-        new ShortLink(DOMAIN, null, URL, "");
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void nullUrlNotAllowed() {
-        new ShortLink(DOMAIN, "foo", null, "");
-    }
+    /**
+     * Find link by URL.
+     */
+    LongUrl findByUrl(URI longUrl);
 }

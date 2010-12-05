@@ -39,13 +39,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.KeywordRepository;
+import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.ShortLinkRepository;
+import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Keyword;
+import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
@@ -62,31 +64,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
     
     private String domain;
     
-    private ShortLinkRepository shortLinkRepository;
+    private BookmarkRepository shortLinkRepository;
     private RedirectRuleRepository redirectRuleRepository;
     private StaticRedirectRepository staticRedirectRepository;
     private UserRepository userRepository;
     private KeywordRepository keywordRepository;
+    private LongUrlRepository longUrlRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
-    }
-
-    
-    /** 
-     * {@inheritDoc}
-     */
-    @Transactional
-    public ShortLink shorten(String urlString) throws URISyntaxException {
-        return shorten(urlString, null);
-    }
-    
-    /** 
-     * {@inheritDoc}
-     */
-    @Transactional
-    public ShortLink shorten(String urlString, String hash) throws URISyntaxException {
-        return shorten(urlString, hash, null);
     }
 
     /** 
@@ -94,35 +80,41 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @SuppressWarnings("unchecked")
     @Transactional
-    public ShortLink shorten(String urlString, String hash, User owner) throws URISyntaxException {
-        return shorten(urlString, hash, Collections.EMPTY_LIST, owner);
+    @Override
+    public Bookmark shorten(URI url, User owner) {
+        return shorten(url, null, Collections.EMPTY_LIST, owner);
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional
+    @Override
+    public Bookmark shorten(URI url, String hash, User owner) {
+        return shorten(url, hash, Collections.EMPTY_LIST, owner);
     }
     
     /** 
      * {@inheritDoc}
      */
     @Transactional
-    public ShortLink shorten(String urlString, String hash, Collection<UUID> keywordIds, User owner) throws URISyntaxException {
-        URI url = new URI(urlString);
-        
+    public Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            ShortLink link = shortLinkRepository.findByLongUrl(urlString);
+            // does the LongUrl exist?
+            LongUrl longUrl = longUrlRepository.findByUrl(url);
+            
+            if(longUrl == null) {
+                // new LongUrl, create and persist
+                longUrl = new LongUrl(url);
+                longUrlRepository.persist(longUrl);
+            }
+            
+            Bookmark link = shortLinkRepository.findByLongUrl(url, owner);
             if(link != null) {
-                // shortlink already exists
-
-                // TODO complete update
-//                if(owner != null && owner.equals(link.getOwner())) {
-//                    // same owner, update
-//                    if(keywordIds != null) {
-//                        List<Keyword> keywords = findKeywords(keywordIds);
-//                    }
-//                }
-                
-                
-                
                 return link;
             } else {
-                String md5 = DigestUtils.md5Hex(urlString);
+                String md5 = DigestUtils.md5Hex(url.toString());
                 
                 int length = INITIAL_HASH_LENGTH;
                 
@@ -138,12 +130,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash = hash + md5.substring(hash.length(), length);
                 }
                 
-                if(owner != null) {
-                    hash = owner.getVgrId() + "/" + hash;
-                }
-
                 // check that the hash does not already exist
-                while(shortLinkRepository.findByHash(domain, hash) != null) {
+                while(shortLinkRepository.findByHash(hash) != null) {
                     length++;
                     
                     if(length > md5.length()) {
@@ -154,21 +142,14 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                String shortUrl;
-                if(domain.endsWith("/")) {
-                    shortUrl = domain + hash;
-                } else {
-                    shortUrl = domain + "/" + hash;
-                }
-                
                 List<Keyword> keywords = findKeywords(keywordIds);
-                ShortLink newLink = new ShortLink(domain, hash, urlString, shortUrl, keywords, owner);
+                Bookmark newLink = new Bookmark(hash, longUrl, keywords, owner);
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;
             }
         } else {
-            throw new URISyntaxException(urlString, "Scheme not allowed");
+            throw new IllegalArgumentException("Scheme not allowed: " + url.getScheme());
         }
     }
 
@@ -188,13 +169,12 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ShortLink expand(String domain, String hash) {
-        return shortLinkRepository.findByHash(domain, hash);
+    public Bookmark expand(String hash) {
+        return shortLinkRepository.findByHash(hash);
     }
     
     @Override
-    public ShortLink expand(String shortUrl) throws URISyntaxException {
-        URI url = URI.create(shortUrl);
+    public Bookmark expand(URI url) throws URISyntaxException {
         String domain = url.getHost();
         if(url.getPort() > 0) {
             domain += ":" + url.getPort();
@@ -205,9 +185,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
         if(lastSlash == -1) {
             hash = url.getPath();
         } else {
-            hash = url.getPath().substring(lastSlash);
+            hash = url.getPath().substring(lastSlash + 1);
         }
-        return expand(domain, hash);
+        return expand(hash);
     }
 
     /** 
@@ -216,23 +196,23 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public URI redirect(String domain, String path) {
-        ShortLink shortLink = expand(domain, path);
+        Bookmark shortLink = expand(path);
         // first try short links
         if(shortLink != null) {
-            return URI.create(shortLink.getUrl());
+            return shortLink.getLongUrl().getUrl();
         } else {
             // next, try static redirects
             StaticRedirect redirect = staticRedirectRepository.findByPath(domain, path);
 
             if(redirect != null) {
-                return URI.create(redirect.getUrl());
+                return redirect.getUrl();
             } else {
                 // finally, check redirect rules
                 Collection<RedirectRule> rules = redirectRuleRepository.findAll();
                 
                 for(RedirectRule rule : rules) {
                     if(rule.matches(domain, path)) {
-                        return URI.create(rule.getUrl());
+                        return rule.getUrl();
                     }
                 }
                 
@@ -247,16 +227,16 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ShortLink lookup(String url) throws URISyntaxException {
-        return shortLinkRepository.findByLongUrl(url);
+    public Bookmark lookup(URI url, User owner) {
+        return shortLinkRepository.findByLongUrl(url, owner);
     }
 
-    public ShortLinkRepository getShortLinkRepository() {
+    public BookmarkRepository getShortLinkRepository() {
         return shortLinkRepository;
     }
 
     @Resource
-    public void setShortLinkRepository(ShortLinkRepository shortLinkRepository) {
+    public void setShortLinkRepository(BookmarkRepository shortLinkRepository) {
         this.shortLinkRepository = shortLinkRepository;
     }
     
@@ -294,6 +274,16 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Resource
     public void setKeywordRepository(KeywordRepository keywordRepository) {
         this.keywordRepository = keywordRepository;
+    }
+
+
+    public LongUrlRepository getLongUrlRepository() {
+        return longUrlRepository;
+    }
+
+    @Resource
+    public void setLongUrlRepository(LongUrlRepository longUrlRepository) {
+        this.longUrlRepository = longUrlRepository;
     }
 
 

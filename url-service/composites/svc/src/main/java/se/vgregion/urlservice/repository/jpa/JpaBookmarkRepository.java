@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,21 +30,22 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.repository.BookmarkRepository;
+import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.User;
     
 @Repository
-public class JpaShortLinkRepository extends AbstractJpaRepository<ShortLink, UUID, UUID> implements ShortLinkRepository {
+public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID, UUID> implements BookmarkRepository {
     
-    public JpaShortLinkRepository() {
-        setType(ShortLink.class);
+    public JpaBookmarkRepository() {
+        setType(Bookmark.class);
     }
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public ShortLink find(UUID id) {
+    public Bookmark find(UUID id) {
         try {
-            return (ShortLink) entityManager.createQuery("select l from ShortLink l where l.id = :id")
+            return (Bookmark) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.id = :id")
             .setParameter("id", id)
             .getSingleResult();
             
@@ -57,24 +59,11 @@ public class JpaShortLinkRepository extends AbstractJpaRepository<ShortLink, UUI
      */
     @SuppressWarnings("unchecked")
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public ShortLink findByHash(String domain, String hash) {
+    public Bookmark findByHash(String hash) {
         try {
-            // TODO is this the desired behavior, with null domain, any matching link will be returned
-            if(domain == null) {
-                List<ShortLink> links = entityManager.createQuery("select l from ShortLink l where l.pattern = :pattern")
-                    .setParameter("pattern", hash)
-                    .getResultList();
-                if(links.isEmpty()) {
-                    return null;
-                } else {
-                    return links.get(0);
-                }
-            } else {
-                return (ShortLink) entityManager.createQuery("select l from ShortLink l where l.domain = :domain and l.pattern = :pattern")
-                    .setParameter("domain", domain)
-                    .setParameter("pattern", hash)
-                    .getSingleResult();
-            }
+            return (Bookmark) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.hash = :hash")
+                .setParameter("hash", hash)
+                .getSingleResult();
             
         } catch(NoResultException e) {
             return null;
@@ -84,12 +73,16 @@ public class JpaShortLinkRepository extends AbstractJpaRepository<ShortLink, UUI
 
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public ShortLink findByLongUrl(String longUrl) {
+    public Bookmark findByLongUrl(URI longUrl, User owner) {
         try {
-            return (ShortLink)entityManager.createQuery("select l from ShortLink l where l.url = :url")
-            .setParameter("url", longUrl).getSingleResult();
+            return (Bookmark)entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.owner.username = :username " +
+            		"and l.longUrl.url = :longurl")
+	    .setParameter("username", owner.getUserName())
+            .setParameter("longurl", longUrl.toString())
+            .getSingleResult();
         } catch(NoResultException e) {
             return null;
         }
-    }   
+    }
+
 }

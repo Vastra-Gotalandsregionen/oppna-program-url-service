@@ -21,6 +21,7 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import se.vgregion.urlservice.services.UrlServiceService;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.User;
 
 /**
  * Controller implementing the bit.ly version 3 API (http://code.google.com/p/bitly-api/wiki/ApiDocumentation)
@@ -52,6 +54,9 @@ public class BitlyApiController {
 
     private final Logger log = LoggerFactory.getLogger(BitlyApiController.class);
 
+    @Resource(name="domain")
+    private String shortLinkPrefix;
+
     @Resource
     private UrlServiceService urlServiceService;
 
@@ -59,17 +64,23 @@ public class BitlyApiController {
         log.info("Created {}", BitlyApiController.class.getName());
     }
 
-    public BitlyApiController(UrlServiceService urlServiceService) {
+    public BitlyApiController(UrlServiceService urlServiceService, URI shortLinkPrefix) {
         this();
         this.urlServiceService = urlServiceService;
+        this.shortLinkPrefix = shortLinkPrefix.toString();
+        if(!this.shortLinkPrefix.endsWith("/")) {
+            this.shortLinkPrefix += "/";
+        }
     }
+    
+    private User systemUser = new User("SYSTEM");
 
     @RequestMapping("/shorten")
-    public void shorten(@RequestParam("longUrl") String url,
+    public void shorten(@RequestParam("longUrl") URI url,
             @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
             throws IOException {
         try {
-            ShortLink link = urlServiceService.shorten(url);
+            Bookmark link = urlServiceService.shorten(url, systemUser);
 
             PrintWriter writer = response.getWriter();
 
@@ -79,10 +90,10 @@ public class BitlyApiController {
                 root.put("status_code", 200);
                 root.put("status_txt", "OK");
                 ObjectNode data = root.putObject("data");
-                data.put("url", link.getShortUrl());
-                data.put("hash", link.getPattern());
-                data.put("global_hash", link.getPattern());
-                data.put("long_url", link.getUrl());
+                data.put("url", buildShortUrl(link.getHash()));
+                data.put("hash", link.getHash());
+                data.put("global_hash", link.getHash());
+                data.put("long_url", link.getLongUrl().getUrl().toString());
                 data.put("new_hash", 0);
 
                 treeMapper.writeValue(writer, root);
@@ -91,35 +102,39 @@ public class BitlyApiController {
                 root.appendChild(createElement("status_code", "200"));
                 root.appendChild(createElement("status_txt", "OK"));
                 Element data = new Element("data");
-                data.appendChild(createElement("url", link.getShortUrl()));
-                data.appendChild(createElement("hash", link.getPattern()));
-                data.appendChild(createElement("global_hash", link.getPattern()));
-                data.appendChild(createElement("long_url", link.getUrl()));
+                data.appendChild(createElement("url", buildShortUrl(link.getHash())));
+                data.appendChild(createElement("hash", link.getHash()));
+                data.appendChild(createElement("global_hash", link.getHash()));
+                data.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
                 data.appendChild(createElement("new_hash", "0"));
 
                 root.appendChild(data);
 
                 writer.write(root.toXML());
             } else if ("txt".equals(format)) {
-                writer.write(link.getPattern());
+                writer.write(link.getHash());
             } else {
                 sendUnknownFormatError(response);
             }
-        } catch (URISyntaxException e) {
+        } catch (IllegalArgumentException e) {
             sendInvalidUriError(response);
         }
     }
+    
+    private String buildShortUrl(String hash) {
+        return shortLinkPrefix + hash;
+    }
 
     @RequestMapping("/expand")
-    public void expand(@RequestParam(value = "shortUrl", required = false) List<String> shortUrls,
+    public void expand(@RequestParam(value = "shortUrl", required = false) List<URI> shortUrls,
             @RequestParam(value = "hash", required = false) List<String> hashes,
             @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
             throws IOException {
 
         try {
-            List<ShortLink> links = new ArrayList<ShortLink>();
+            List<Bookmark> links = new ArrayList<Bookmark>();
             if(shortUrls != null) {
-                for (String shortUrl : shortUrls) {
+                for (URI shortUrl : shortUrls) {
                     links.add(urlServiceService.expand(shortUrl));
                 }
             }
@@ -143,14 +158,14 @@ public class BitlyApiController {
                     root.put("status_txt", "OK");
                     ObjectNode data = root.putObject("data");
                     ArrayNode array = data.putArray("expand");
-
-                    for (ShortLink link : links) {
+System.out.println(links);
+                    for (Bookmark link : links) {
                         ObjectNode node = mapper.createObjectNode();
-                        node.put("hash", link.getPattern());
-                        node.put("short_url", link.getShortUrl());
-                        node.put("global_hash", link.getPattern());
-                        node.put("long_url", link.getUrl());
-                        node.put("user_hash", link.getPattern());
+                        node.put("hash", link.getHash());
+                        node.put("short_url", buildShortUrl(link.getHash()));
+                        node.put("global_hash", link.getHash());
+                        node.put("long_url", link.getLongUrl().getUrl().toString());
+                        node.put("user_hash", link.getHash());
                         array.add(node);
                     }
 
@@ -160,13 +175,13 @@ public class BitlyApiController {
                     root.appendChild(createElement("status_code", "200"));
                     root.appendChild(createElement("status_txt", "OK"));
                     Element data = new Element("data");
-                    for (ShortLink link : links) {
+                    for (Bookmark link : links) {
                         Element entry = new Element("entry");
-                        entry.appendChild(createElement("hash", link.getPattern()));
-                        entry.appendChild(createElement("short_url", link.getShortUrl()));
-                        entry.appendChild(createElement("global_hash", link.getPattern()));
-                        entry.appendChild(createElement("long_url", link.getUrl()));
-                        entry.appendChild(createElement("user_hash", link.getPattern()));
+                        entry.appendChild(createElement("hash", link.getHash()));
+                        entry.appendChild(createElement("short_url", buildShortUrl(link.getHash())));
+                        entry.appendChild(createElement("global_hash", link.getHash()));
+                        entry.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
+                        entry.appendChild(createElement("user_hash", link.getHash()));
 
                         data.appendChild(entry);
                     }
@@ -178,7 +193,7 @@ public class BitlyApiController {
                     if (links.size() > 1) {
                         response.sendError(500, "TOO_MANY_EXPAND_PARAMETERS");
                     } else {
-                        writer.write(links.get(0).getUrl());
+                        writer.write(links.get(0).getLongUrl().getUrl().toString());
                     }
                 } else {
                     sendUnknownFormatError(response);
@@ -190,14 +205,14 @@ public class BitlyApiController {
     }
 
     @RequestMapping("/lookup")
-    public void lookup(@RequestParam(value = "url") List<String> urls,
+    public void lookup(@RequestParam(value = "url") List<URI> urls,
             @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
             throws IOException {
 
         try {
-            List<ShortLink> links = new ArrayList<ShortLink>();
+            List<Bookmark> links = new ArrayList<Bookmark>();
             if(urls != null) {
-                for (String shortUrl : urls) {
+                for (URI shortUrl : urls) {
                     links.add(urlServiceService.expand(shortUrl));
                 }
             }
@@ -217,11 +232,11 @@ public class BitlyApiController {
                     ObjectNode data = root.putObject("data");
                     ArrayNode array = data.putArray("lookup");
 
-                    for (ShortLink link : links) {
+                    for (Bookmark link : links) {
                         ObjectNode node = mapper.createObjectNode();
-                        node.put("short_url", link.getShortUrl());
-                        node.put("global_hash", link.getPattern());
-                        node.put("long_url", link.getUrl());
+                        node.put("short_url", buildShortUrl(link.getHash()));
+                        node.put("global_hash", link.getHash());
+                        node.put("long_url", link.getLongUrl().getUrl().toString());
                         array.add(node);
                     }
 
@@ -231,11 +246,11 @@ public class BitlyApiController {
                     root.appendChild(createElement("status_code", "200"));
                     root.appendChild(createElement("status_txt", "OK"));
                     Element data = new Element("data");
-                    for (ShortLink link : links) {
+                    for (Bookmark link : links) {
                         Element entry = new Element("lookup");
-                        entry.appendChild(createElement("short_url", link.getShortUrl()));
-                        entry.appendChild(createElement("global_hash", link.getPattern()));
-                        entry.appendChild(createElement("long_url", link.getUrl()));
+                        entry.appendChild(createElement("short_url", buildShortUrl(link.getHash())));
+                        entry.appendChild(createElement("global_hash", link.getHash()));
+                        entry.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
 
                         data.appendChild(entry);
                     }

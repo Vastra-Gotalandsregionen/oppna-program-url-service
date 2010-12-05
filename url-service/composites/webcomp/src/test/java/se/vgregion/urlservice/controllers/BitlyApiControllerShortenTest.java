@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,13 +29,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BitlyApiControllerShortenTest {
 
-    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
+    private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
+    private static final URI LONG_URL = URI.create("http://example.com");
     
     @Test
     public void jsonResponse() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("http://example.com", "json", response);
+        controller.shorten(LONG_URL, "json", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -53,7 +56,7 @@ public class BitlyApiControllerShortenTest {
     public void xmlResponse() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("http://example.com", "xml", response);
+        controller.shorten(LONG_URL, "xml", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -74,7 +77,7 @@ public class BitlyApiControllerShortenTest {
     public void txtResponse() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("http://example.com", "txt", response);
+        controller.shorten(LONG_URL, "txt", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("foo", response.getContentAsString());
@@ -84,7 +87,7 @@ public class BitlyApiControllerShortenTest {
     public void unknownFormatMustNotBeAllowed() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("http://example.com", "unknown", response);
+        controller.shorten(LONG_URL, "unknown", response);
         
         Assert.assertEquals(500, response.getStatus());
     }
@@ -93,7 +96,7 @@ public class BitlyApiControllerShortenTest {
     public void invalidUrlMustBeRefused() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("invalid", "txt", response);
+        controller.shorten(URI.create("dummy:/invalid"), "txt", response);
         
         Assert.assertEquals(500, response.getStatus());
     }
@@ -102,7 +105,7 @@ public class BitlyApiControllerShortenTest {
     public void httpUrlShouldBeAllowed() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("http://example.com", "txt", response);
+        controller.shorten(LONG_URL, "txt", response);
         
         Assert.assertEquals(200, response.getStatus());
     }
@@ -111,7 +114,7 @@ public class BitlyApiControllerShortenTest {
     public void HttpsUrlShouldBeAllowed() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        controller.shorten("https://example.com", "txt", response);
+        controller.shorten(URI.create("https://example.com"), "txt", response);
         
         Assert.assertEquals(200, response.getStatus());
     }

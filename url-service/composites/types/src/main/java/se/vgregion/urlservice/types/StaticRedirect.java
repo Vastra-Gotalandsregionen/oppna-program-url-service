@@ -19,6 +19,8 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -34,7 +36,7 @@ public class StaticRedirect extends AbstractRedirect<StaticRedirect> {
     protected StaticRedirect() {
     }
 
-    public StaticRedirect(String domain, String path, String url) {
+    public StaticRedirect(String domain, String path, URI url) {
         super(domain, path, url);
         
         if(StringUtils.isEmpty(domain)) {

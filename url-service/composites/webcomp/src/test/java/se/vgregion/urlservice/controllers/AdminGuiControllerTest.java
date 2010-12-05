@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class AdminGuiControllerTest {
 
     private static final String PATTERN = "foo";
     private static final String DOMAIN = "vgregion.se";
-    private static final String URL = "http://google.com";
+    private static final URI URL = URI.create("http://google.com");
     private AdminGuiController controller = new AdminGuiController();
     
     @Test
@@ -77,7 +78,7 @@ public class AdminGuiControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("add", "any value");
         request.addParameter("pattern", PATTERN);
-        request.addParameter("url", URL);
+        request.addParameter("url", URL.toString());
         
         controller.updateRedirectRules(request);
 
@@ -116,7 +117,7 @@ public class AdminGuiControllerTest {
         request.addParameter("add", "any value");
         request.addParameter("domain", DOMAIN);
         request.addParameter("pattern", PATTERN);
-        request.addParameter("url", URL);
+        request.addParameter("url", URL.toString());
         
         controller.updateStaticRedirects(request);
 

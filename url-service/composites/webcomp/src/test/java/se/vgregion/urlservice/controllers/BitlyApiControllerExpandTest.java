@@ -20,6 +20,7 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -29,12 +30,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 public class BitlyApiControllerExpandTest {
 
-    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService());
+    private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
+    private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private MockHttpServletResponse response = new MockHttpServletResponse();
 
     @Test
     public void jsonResponse() throws IOException {
-        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "json", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "json", response);
 
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -52,7 +54,7 @@ public class BitlyApiControllerExpandTest {
 
     @Test
     public void xmlResponse() throws IOException {
-        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "xml", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "xml", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -70,7 +72,7 @@ public class BitlyApiControllerExpandTest {
     
     @Test
     public void txtResponse() throws IOException {
-        controller.expand(Arrays.asList("http://s.vgregion.se/foo"), null, "txt", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "txt", response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("http://example.com", response.getContentAsString());
@@ -78,7 +80,7 @@ public class BitlyApiControllerExpandTest {
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        controller.expand(Arrays.asList("http://example.com"), null, "unknown", response);
+        controller.expand(Arrays.asList(URI.create("http://example.com")), null, "unknown", response);
         
         Assert.assertEquals(500, response.getStatus());
     }

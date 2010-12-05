@@ -19,6 +19,8 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.net.URI;
+
 import javax.persistence.PersistenceException;
 
 import org.junit.Assert;
@@ -36,6 +38,8 @@ import se.vgregion.urlservice.types.StaticRedirect;
 public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private static final String DOMAIN = "foo.vgregion.se";
+    private static final String HASH = "foo";
+    private static final URI LONG_URL = URI.create("http://example.com");
     
     private StaticRedirectRepository dao;
     
@@ -45,7 +49,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     public void setup() {
         dao = applicationContext.getBean(StaticRedirectRepository.class);
-        redirect1 = dao.persist(new StaticRedirect(DOMAIN, "foo", "http://example.com/1"));
+        redirect1 = dao.persist(new StaticRedirect(DOMAIN, HASH, LONG_URL));
         dao.flush();
     }
     
@@ -90,7 +94,7 @@ public class JpaStaticRedirectRepositoryTest extends AbstractTransactionalJUnit4
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        dao.persist(new StaticRedirect(DOMAIN, redirect1.getPattern(), "http://dummy"));
+        dao.persist(new StaticRedirect(DOMAIN, HASH, URI.create("http://dummy")));
         dao.flush();
     }
 

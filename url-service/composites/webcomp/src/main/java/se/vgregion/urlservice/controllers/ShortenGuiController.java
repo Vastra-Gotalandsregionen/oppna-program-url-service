@@ -20,18 +20,16 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +37,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Keyword;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.User;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
@@ -51,7 +50,7 @@ public class ShortenGuiController {
     private final Logger log = LoggerFactory.getLogger(ShortenGuiController.class);
 
     @Resource(name="domain")
-    private String domain;
+    private String shortLinkPrefix;
     
     @Resource
     private UrlServiceService urlServiceService;
@@ -60,41 +59,47 @@ public class ShortenGuiController {
         log.info("Created {}", ShortenGuiController.class.getName());
     }
 
-    public ShortenGuiController(UrlServiceService urlServiceService) {
+    public ShortenGuiController(UrlServiceService urlServiceService, URI shortLinkPrefix) {
         this();
+        this.shortLinkPrefix = shortLinkPrefix.toString();
         this.urlServiceService = urlServiceService;
     }
 
     @RequestMapping(value="/shorten")
-    public ModelAndView index(@RequestParam(value="longurl", required=false) String longUrl, @RequestParam(value="slug", required=false) String slug, @RequestParam(value="keywords", required=false) List<UUID> keywordIds) throws IOException {
+    public ModelAndView index(@RequestParam(value="longurl", required=false) URI longUrl, @RequestParam(value="slug", required=false) String slug, 
+            @RequestParam(value="keywords", required=false) List<UUID> keywordIds, Authentication authentication) throws IOException {
+        // check shortlink prefix
+        if(!this.shortLinkPrefix.endsWith("/")) {
+            this.shortLinkPrefix += "/";
+        }
+
+        
         ModelAndView mav = new ModelAndView("shorten");
         
-        String userName = null;
-        if(SecurityContextHolder.getContext().getAuthentication() != null) {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(principal instanceof User) {
-                userName = ((User) principal).getUsername();
-                mav.addObject("authenticated", true);
+        User user;
+        if(authentication != null) {
+            Object principal = authentication.getPrincipal();
+            if(principal instanceof org.springframework.security.core.userdetails.User) {
+                String userName = ((org.springframework.security.core.userdetails.User) principal).getUsername();
+                
+                user = urlServiceService.getUser(userName);
+                
                 mav.addObject("userid", userName);
+            } else {
+                throw new RuntimeException("Authentication missing");
             }
+        } else {
+            throw new RuntimeException("Authentication missing");
         }
         
-        mav.addObject("domain", domain);
+        mav.addObject("domain", shortLinkPrefix);
         mav.addObject("keywords", urlServiceService.getAllKeywords());
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
-                ShortLink shortLink;
-                if(userName != null) {
-                    se.vgregion.urlservice.types.User user = urlServiceService.getUser(userName);
-                    
-                    shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, user);
-                } else {
-                    shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, null);
-                }
+                Bookmark shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, user);
 
-                mav.addObject("shortUrl", shortLink.getShortUrl());
-                mav.addObject("owned", shortLink.getOwner() != null && shortLink.getOwner().getVgrId().equals(userName));
+                mav.addObject("shortUrl", shortLinkPrefix + shortLink.getHash());
                 List<UUID> storedKeywordIds = new ArrayList<UUID>();
                 if(shortLink.getKeywords() != null) {
                     for(Keyword keyword : shortLink.getKeywords()) {
@@ -103,7 +108,7 @@ public class ShortenGuiController {
                 }
                 mav.addObject("keywordIds", storedKeywordIds);
                 mav.addObject("slug", slug);
-            } catch (URISyntaxException e) {
+            } catch (IllegalArgumentException e) {
                 mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");
             }
         } else {

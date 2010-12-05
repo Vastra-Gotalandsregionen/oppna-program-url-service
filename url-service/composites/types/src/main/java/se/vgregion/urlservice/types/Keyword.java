@@ -33,7 +33,7 @@ public class Keyword extends AbstractEntity<UUID> {
     @Id
     private UUID id;
     
-    @Column(nullable=false)
+    @Column(nullable=false, unique=true)
     private String name;
     
     protected Keyword() {

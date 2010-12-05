@@ -19,13 +19,15 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class RedirectRuleTest {
 
     private static final String DOMAIN = "foo.vgregion.se";
-    private static final String URL = "http://example.com";
+    private static final URI URL = URI.create("http://example.com");
     
     @Test
     public void nullDomain() {

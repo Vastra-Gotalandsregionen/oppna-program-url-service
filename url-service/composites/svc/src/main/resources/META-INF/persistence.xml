@@ -24,10 +24,11 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
              version="1.0">
     <persistence-unit name="URLService">
-        <class>se.vgregion.urlservice.types.ShortLink</class>
+        <class>se.vgregion.urlservice.types.Bookmark</class>
         <class>se.vgregion.urlservice.types.RedirectRule</class>
         <class>se.vgregion.urlservice.types.StaticRedirect</class>
         <class>se.vgregion.urlservice.types.User</class>
         <class>se.vgregion.urlservice.types.Keyword</class>
+        <class>se.vgregion.urlservice.types.LongUrl</class>
     </persistence-unit>
 </persistence>
