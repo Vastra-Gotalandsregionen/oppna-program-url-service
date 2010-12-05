@@ -47,7 +47,7 @@
 			<p><label for="keywords">Nyckelord</label>
 				<select multiple="multiple" name="keywords" class="keywords ${not owned ? 'readonly' : ''}">
 					<c:forEach items="${keywords}" var="keyword">
-						<option value="${keyword.id}" ${(not empty keywordIds && f:contains(keywordIds, keyword.id)) ? 'selected="selected"' : ''}>${keyword.name}</option>
+						<option value="${keyword.id}" ${(not empty selectedKeywords && f:contains(selectedKeywords, keyword.id)) ? 'selected="selected"' : ''}>${keyword.name}</option>
     				</c:forEach>
 				</select>
 			</p>

@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,5 +29,9 @@ import se.vgregion.urlservice.types.Keyword;
 public interface KeywordRepository extends JpaRepository<Keyword, UUID, UUID> {
 
     List<Keyword> findAllInOrder();
+
+    Keyword findByName(String name);
+    
+    List<Keyword> findOrCreateKeywords(Collection<String> keywordNames);
 
 }

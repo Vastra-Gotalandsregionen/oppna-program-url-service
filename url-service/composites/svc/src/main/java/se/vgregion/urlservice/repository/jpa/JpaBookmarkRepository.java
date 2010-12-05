@@ -20,7 +20,6 @@
 package se.vgregion.urlservice.repository.jpa;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.NoResultException;
@@ -57,7 +56,7 @@ public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID,
     /**
      * Find link by hash.
      */
-    @SuppressWarnings("unchecked")
+    @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Bookmark findByHash(String hash) {
         try {

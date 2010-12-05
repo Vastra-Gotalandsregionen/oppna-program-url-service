@@ -128,11 +128,11 @@ public class MockUrlServiceService implements UrlServiceService {
 
     @Override
     public Bookmark shorten(URI url, String hash, User owner) {
-        return shorten(url, hash, Collections.<UUID>emptyList(), owner);
+        return shorten(url, hash, Collections.<String>emptyList(), owner);
     }
 
     @Override
-    public Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner) {
+    public Bookmark shorten(URI url, String hash, Collection<String> keywordNames, User owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             hash = (hash != null) ? hash : HASH; 
             

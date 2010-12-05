@@ -19,6 +19,9 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +31,7 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.KeywordRepository;
-import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Keyword;
-import se.vgregion.urlservice.types.User;
 
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaKeywordRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -43,7 +44,7 @@ public class JpaKeywordRepositoryTest extends AbstractTransactionalJUnit4SpringC
     @Transactional
     public void setup() {
         dao = applicationContext.getBean(KeywordRepository.class);
-        keyword1 = dao.persist(new Keyword("keyw"));
+        keyword1 = dao.persist(new Keyword("kw1"));
         dao.flush();
     }
     
@@ -55,4 +56,25 @@ public class JpaKeywordRepositoryTest extends AbstractTransactionalJUnit4SpringC
         
         Assert.assertEquals(keyword1.getId(), loaded.getId());
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findByName() {
+        Keyword loaded = dao.findByName(keyword1.getName());
+        
+        Assert.assertEquals(keyword1.getId(), loaded.getId());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findOrCreateKeywords() {
+        List<Keyword> loaded = dao.findOrCreateKeywords(Arrays.asList(keyword1.getName(), "kw2"));
+        
+        Assert.assertEquals(2, loaded.size());
+        Assert.assertEquals(keyword1, loaded.get(0));
+        Assert.assertEquals("kw2", loaded.get(1).getName());
+    }
+
 }

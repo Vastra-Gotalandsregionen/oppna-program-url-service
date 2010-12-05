@@ -99,7 +99,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
      * {@inheritDoc}
      */
     @Transactional
-    public Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner) {
+    public Bookmark shorten(URI url, String hash, Collection<String> keywordNames, User owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             // does the LongUrl exist?
             LongUrl longUrl = longUrlRepository.findByUrl(url);
@@ -114,7 +114,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
             if(link != null) {
                 return link;
             } else {
-                String md5 = DigestUtils.md5Hex(url.toString());
+                String md5 = DigestUtils.md5Hex("{" + owner.getUserName() + "}" + url.toString());
                 
                 int length = INITIAL_HASH_LENGTH;
                 
@@ -125,7 +125,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                         throw new IllegalArgumentException("Hash contains invalid characters");
                     }
                 }
-                
+
                 if(hash.length() < INITIAL_HASH_LENGTH) {
                     hash = hash + md5.substring(hash.length(), length);
                 }
@@ -142,7 +142,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                List<Keyword> keywords = findKeywords(keywordIds);
+                List<Keyword> keywords = keywordRepository.findOrCreateKeywords(keywordNames);
                 Bookmark newLink = new Bookmark(hash, longUrl, keywords, owner);
                 
                 shortLinkRepository.persist(newLink);
@@ -153,16 +153,6 @@ public class DefaultUrlServiceService implements UrlServiceService {
         }
     }
 
-    // TODO move to KeywordRepository
-    private List<Keyword> findKeywords(Collection<UUID> keywordIds) {
-        List<Keyword> keywords = new ArrayList<Keyword>();
-        if(keywordIds != null) {
-            for(UUID keywordId : keywordIds) {
-                keywords.add(keywordRepository.find(keywordId));
-            }
-        }
-        return keywords;
-    }
 
     /** 
      * {@inheritDoc}

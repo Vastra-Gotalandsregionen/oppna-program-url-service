@@ -19,6 +19,8 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +46,7 @@ public class JpaKeywordRepository extends AbstractJpaRepository<Keyword, UUID, U
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Keyword find(UUID id) {
         try {
-            return (Keyword) entityManager.createQuery("select l from Keyword l where l.id = :id")
+            return (Keyword) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.id = :id")
             .setParameter("id", id)
             .getSingleResult();
         } catch(NoResultException e) {
@@ -57,11 +59,40 @@ public class JpaKeywordRepository extends AbstractJpaRepository<Keyword, UUID, U
     @SuppressWarnings("unchecked")
     public List<Keyword> findAllInOrder() {
         try {
-            return entityManager.createQuery("select l from Keyword l order by name")
+            return entityManager.createQuery("select l from " + type.getSimpleName() + " l order by name")
             .getResultList();
         } catch(NoResultException e) {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public Keyword findByName(String name) {
+        try {
+            return (Keyword) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.name = :name")
+            .setParameter("name", name)
+            .getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
+    }
+
+    @Transactional(propagation=Propagation.MANDATORY)
+    public List<Keyword> findOrCreateKeywords(Collection<String> keywordNames) {
+        List<Keyword> keywords = new ArrayList<Keyword>();
+        if(keywordNames != null) {
+            for(String keywordName : keywordNames) {
+                Keyword keyword = findByName(keywordName);
+                
+                if(keyword == null) {
+                    keyword = new Keyword(keywordName);
+                    persist(keyword);
+                }
+                keywords.add(keyword);
+            }
+        }
+        return keywords;
     }
 
     

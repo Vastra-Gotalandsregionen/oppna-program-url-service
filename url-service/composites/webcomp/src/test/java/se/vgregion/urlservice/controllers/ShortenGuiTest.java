@@ -93,14 +93,15 @@ public class ShortenGuiTest {
     public void shortenLongUrlWithKeywords() throws IOException {
         List<Keyword> keywords = urlServiceService.getAllKeywords(); 
         List<UUID> keywordIds = Arrays.asList(keywords.get(0).getId(), keywords.get(1).getId()); 
+        List<String> keywordNames = Arrays.asList(keywords.get(0).getName(), keywords.get(1).getName()); 
         
-        ModelAndView mav = controller.index(LONG_URL, "slug", keywordIds, authentication);
+        ModelAndView mav = controller.index(LONG_URL, "slug", keywordNames, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
         Assert.assertEquals("slug", mav.getModel().get("slug"));
         Assert.assertEquals(keywords, mav.getModel().get("keywords"));
-        Assert.assertEquals(keywordIds, mav.getModel().get("keywordIds"));
+        Assert.assertEquals(keywordIds, mav.getModel().get("selectedKeywords"));
         Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
         Assert.assertNull(mav.getModel().get("error"));
     }

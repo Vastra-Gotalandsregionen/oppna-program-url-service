@@ -58,7 +58,7 @@ public interface UrlServiceService {
      */
     Bookmark shorten(URI url, String hash, User owner);
 
-    Bookmark shorten(URI url, String hash, Collection<UUID> keywordIds, User owner);
+    Bookmark shorten(URI url, String hash, Collection<String> keywordIds, User owner);
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 

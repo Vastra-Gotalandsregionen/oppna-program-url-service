@@ -67,7 +67,7 @@ public class ShortenGuiController {
 
     @RequestMapping(value="/shorten")
     public ModelAndView index(@RequestParam(value="longurl", required=false) URI longUrl, @RequestParam(value="slug", required=false) String slug, 
-            @RequestParam(value="keywords", required=false) List<UUID> keywordIds, Authentication authentication) throws IOException {
+            @RequestParam(value="keywords", required=false) List<String> keywordNames, Authentication authentication) throws IOException {
         // check shortlink prefix
         if(!this.shortLinkPrefix.endsWith("/")) {
             this.shortLinkPrefix += "/";
@@ -97,7 +97,7 @@ public class ShortenGuiController {
         if(longUrl != null) {
             mav.addObject("longUrl", longUrl);
             try {
-                Bookmark shortLink = urlServiceService.shorten(longUrl, slug, keywordIds, user);
+                Bookmark shortLink = urlServiceService.shorten(longUrl, slug, keywordNames, user);
 
                 mav.addObject("shortUrl", shortLinkPrefix + shortLink.getHash());
                 List<UUID> storedKeywordIds = new ArrayList<UUID>();
@@ -106,7 +106,7 @@ public class ShortenGuiController {
                         storedKeywordIds.add(keyword.getId());
                     }
                 }
-                mav.addObject("keywordIds", storedKeywordIds);
+                mav.addObject("selectedKeywords", storedKeywordIds);
                 mav.addObject("slug", slug);
             } catch (IllegalArgumentException e) {
                 mav.addObject("error", "Felaktig address, måste börja med \"http://\" eller \"https://\"");
