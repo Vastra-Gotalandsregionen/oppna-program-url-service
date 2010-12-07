@@ -28,18 +28,33 @@ import org.junit.Test;
 
 public class BookmarkTest {
 
+    private static final String GLOBAL_HASH = "abcdef";
     private static final String HASH = "12345";
-    private static final LongUrl LONGURL = new LongUrl(URI.create("http://example.com"));
     private static final User OWNER = new User("roblu");
     private static final List<Keyword> KEYWORDS = Arrays.asList(new Keyword("kw1"));
     
+    private final LongUrl longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);
+
     @Test
     public void cstr() {
-        Bookmark bookmark = new Bookmark(HASH, LONGURL, KEYWORDS, OWNER);
+        Bookmark bookmark = new Bookmark(HASH, longUrl, KEYWORDS, OWNER);
         
         Assert.assertNotNull(bookmark.getId());
         Assert.assertEquals(HASH, bookmark.getHash());
-        Assert.assertEquals(LONGURL, bookmark.getLongUrl());
+        Assert.assertNull(bookmark.getSlug());
+        Assert.assertEquals(longUrl, bookmark.getLongUrl());
+        Assert.assertEquals(KEYWORDS, bookmark.getKeywords());
+        Assert.assertEquals(OWNER, bookmark.getOwner());
+    }
+
+    @Test
+    public void cstrWithSlug() {
+        Bookmark bookmark = new Bookmark(HASH, longUrl, KEYWORDS, "slug", OWNER);
+        
+        Assert.assertNotNull(bookmark.getId());
+        Assert.assertEquals(HASH, bookmark.getHash());
+        Assert.assertEquals("slug", bookmark.getSlug());
+        Assert.assertEquals(longUrl, bookmark.getLongUrl());
         Assert.assertEquals(KEYWORDS, bookmark.getKeywords());
         Assert.assertEquals(OWNER, bookmark.getOwner());
     }
@@ -47,7 +62,7 @@ public class BookmarkTest {
     
     @Test(expected=IllegalArgumentException.class)
     public void nullHashNotAllowed() {
-        new Bookmark(null, LONGURL, KEYWORDS, OWNER);
+        new Bookmark(null, longUrl, KEYWORDS, OWNER);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -57,17 +72,17 @@ public class BookmarkTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void nullOwnerNotAllowed() {
-        new Bookmark(HASH, LONGURL, KEYWORDS, null);
+        new Bookmark(HASH, longUrl, KEYWORDS, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void nullKeywordsNotAllowed() {
-        new Bookmark(HASH, LONGURL, null, OWNER);
+        new Bookmark(HASH, longUrl, null, OWNER);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void nullKeywordElementNotAllowed() {
-        new Bookmark(HASH, LONGURL, Arrays.asList(new Keyword("kw2"), null), OWNER);
+        new Bookmark(HASH, longUrl, Arrays.asList(new Keyword("kw2"), null), OWNER);
     }
 
 }

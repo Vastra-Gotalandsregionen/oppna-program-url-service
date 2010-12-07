@@ -23,10 +23,17 @@ import java.net.URI;
 import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.LongUrl;
     
 public interface LongUrlRepository extends JpaRepository<LongUrl, UUID, UUID> {
 
+    /**
+     * Find link by hash.
+     */
+    LongUrl findByHash(String hash);
+
+    
     /**
      * Find link by URL.
      */

@@ -27,13 +27,16 @@ import org.junit.Test;
 
 public class LongUrlTest {
 
+    private static final String HASH = "abcdef";
+
     private static final URI URL = URI.create("http://example.com");
 
     @Test
     public void cstr() {
-        LongUrl longUrl = new LongUrl(URL);
+        LongUrl longUrl = new LongUrl(URL, HASH);
         Assert.assertNotNull(longUrl.getId());
         Assert.assertEquals(URL, longUrl.getUrl());
+        Assert.assertEquals(HASH, longUrl.getHash());
         
         // must not be null
         Assert.assertEquals(0, longUrl.getBookmarks().size());
@@ -41,7 +44,7 @@ public class LongUrlTest {
     
     @Test
     public void addBookmark() {
-        LongUrl longUrl = new LongUrl(URL);
+        LongUrl longUrl = new LongUrl(URL, HASH);
         
         // bookmark addded on longUrl in constructor 
         Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new User("roblu"));
@@ -51,7 +54,7 @@ public class LongUrlTest {
 
     @Test
     public void addBookmarkIdempotent() {
-        LongUrl longUrl = new LongUrl(URL);
+        LongUrl longUrl = new LongUrl(URL, HASH);
         
         Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new User("roblu"));
 
@@ -62,10 +65,14 @@ public class LongUrlTest {
     }
 
 
-    
     @Test(expected=IllegalArgumentException.class)
     public void nullUrlNotAllowed() {
-        new LongUrl(null);
+        new LongUrl(null, HASH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void nullHashNotAllowed() {
+        new LongUrl(URL, null);
     }
 
 }

@@ -29,9 +29,9 @@ import se.vgregion.urlservice.types.User;
 public interface BookmarkRepository extends JpaRepository<Bookmark, UUID, UUID> {
 
     /**
-     * Find link by hash.
+     * Find link by hash or slug.
      */
-    Bookmark findByHash(String hash);
+    Bookmark findByHash(String hash, boolean includeSlugs);
 
     /**
      * Find link by URL.

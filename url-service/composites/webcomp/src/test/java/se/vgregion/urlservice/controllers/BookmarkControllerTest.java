@@ -25,10 +25,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
@@ -40,13 +43,13 @@ import org.springframework.web.servlet.ModelAndView;
 import se.vgregion.urlservice.types.Keyword;
 
 
-public class ShortenGuiTest {
+public class BookmarkControllerTest {
 
     private static final URI LONG_URL = URI.create("http://example.com");
     private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
     
     private MockUrlServiceService urlServiceService = new MockUrlServiceService();
-    private ShortenGuiController controller = new ShortenGuiController(urlServiceService, SHORT_LINK_PREFIX);
+    private BookmarkController controller = new BookmarkController(urlServiceService, SHORT_LINK_PREFIX);
     
     private User user = new User("roblu", "password", true, true, true, true, Arrays.asList(new GrantedAuthorityImpl("ROLE_USER")));
     private Authentication authentication = new TestingAuthenticationToken(user, "credentials");
@@ -58,7 +61,7 @@ public class ShortenGuiTest {
     
     @Test
     public void shortenLongUrl() throws IOException {
-        ModelAndView  mav = controller.index(LONG_URL, null, null, authentication);
+        ModelAndView  mav = controller.create(LONG_URL, null, null, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
@@ -69,7 +72,7 @@ public class ShortenGuiTest {
 
     @Test
     public void shortenLongUrlWithSlug() throws IOException {
-        ModelAndView  mav = controller.index(LONG_URL, "slug", null, authentication);
+        ModelAndView  mav = controller.create(LONG_URL, "slug", null, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
@@ -80,7 +83,7 @@ public class ShortenGuiTest {
 
     @Test
     public void shortenLongUrlWithSlugAndOwner() throws IOException {
-        ModelAndView mav = controller.index(LONG_URL, "slug", null, authentication);
+        ModelAndView mav = controller.create(LONG_URL, "slug", null, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
@@ -92,16 +95,16 @@ public class ShortenGuiTest {
     @Test
     public void shortenLongUrlWithKeywords() throws IOException {
         List<Keyword> keywords = urlServiceService.getAllKeywords(); 
-        List<UUID> keywordIds = Arrays.asList(keywords.get(0).getId(), keywords.get(1).getId()); 
         List<String> keywordNames = Arrays.asList(keywords.get(0).getName(), keywords.get(1).getName()); 
+        String keywordNameString = StringUtils.join(keywordNames, " ");
         
-        ModelAndView mav = controller.index(LONG_URL, "slug", keywordNames, authentication);
+        ModelAndView mav = controller.create(LONG_URL, "slug", keywordNameString, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
         Assert.assertEquals("slug", mav.getModel().get("slug"));
         Assert.assertEquals(keywords, mav.getModel().get("keywords"));
-        Assert.assertEquals(keywordIds, mav.getModel().get("selectedKeywords"));
+        Assert.assertEquals(keywordNameString, mav.getModel().get("selectedKeywords"));
         Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
         Assert.assertNull(mav.getModel().get("error"));
     }
@@ -110,7 +113,7 @@ public class ShortenGuiTest {
     @Test
     public void shortenInvalidLongUrl() throws IOException {
         URI invalidUrl = URI.create("dummy://example.com");
-        ModelAndView  mav = controller.index(invalidUrl, null, null, authentication);
+        ModelAndView  mav = controller.create(invalidUrl, null, null, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertEquals(invalidUrl, mav.getModel().get("longUrl"));
@@ -121,7 +124,7 @@ public class ShortenGuiTest {
     
     @Test
     public void show() throws IOException {
-        ModelAndView  mav = controller.index(null, null, null, authentication);
+        ModelAndView  mav = controller.create(null, null, null, authentication);
         
         Assert.assertEquals("shorten", mav.getViewName());
         Assert.assertNull(mav.getModel().get("longUrl"));
@@ -129,6 +132,27 @@ public class ShortenGuiTest {
         Assert.assertNull(mav.getModel().get("shortUrl"));
         Assert.assertNull(mav.getModel().get("error"));
     }
+    
+    @Test
+    public void redirectWithExistingHash() throws IOException {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
+        ModelAndView mav = controller.redirect("foo", response);
+        
+        Assert.assertEquals(301, response.getStatus());
+        Assert.assertEquals("http://example.com", response.getHeader("Location"));
+        Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
+    }
+
+    @Test
+    public void redirectWithNonExistingHash() throws IOException {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ModelAndView mav = controller.redirect("dummy", response);
+        
+        Assert.assertEquals(404, response.getStatus());
+        Assert.assertNull(mav);
+    }
+
     
     @After
     public void after() {

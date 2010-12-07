@@ -45,7 +45,9 @@ import se.vgregion.urlservice.types.User;
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
+    private static final String GLOBAL_HASH = "abcdef";
     private static final String HASH = "12345";
+    private static final String SLUG = "slug";
 
     private BookmarkRepository dao;
     
@@ -55,7 +57,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     public void setup() {
         User owner = new User("roblu");
-        LongUrl longUrl = new LongUrl(URI.create("http://example.com"));
+        LongUrl longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);
         Keyword kw1 = new Keyword("kw1");
         List<Keyword> keywords = Arrays.asList(kw1);
         
@@ -73,7 +75,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
         keywordRepository.flush();
 
         
-        Bookmark shortLink = new Bookmark(HASH, longUrl, keywords, owner);
+        Bookmark shortLink = new Bookmark(HASH, longUrl, keywords, SLUG, owner);
 
         dao = applicationContext.getBean(BookmarkRepository.class);
         
@@ -95,7 +97,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     @Rollback
     public void findByHash() {
-        Bookmark loaded = dao.findByHash(bookmark1.getHash());
+        Bookmark loaded = dao.findByHash(HASH, false);
         
         Assert.assertEquals(bookmark1.getHash(), loaded.getHash());
         Assert.assertEquals(bookmark1.getOwner(), loaded.getOwner());
@@ -104,8 +106,19 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Test
     @Transactional
     @Rollback
-    public void findNonExistingByHash() {
-        Assert.assertNull(dao.findByHash("dummy"));
+    public void findBySlug() {
+        Bookmark loaded = dao.findByHash(SLUG, true);
+        
+        Assert.assertEquals(bookmark1.getHash(), loaded.getHash());
+        Assert.assertEquals(bookmark1.getOwner(), loaded.getOwner());
+    }
+
+    
+    @Test
+    @Transactional
+    @Rollback
+    public void findNonExistingByHashOrSlug() {
+        Assert.assertNull(dao.findByHash("dummy", true));
     }
 
     @Test
@@ -131,7 +144,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Rollback
     public void duplicateHashNotAllowed() {
         User owner = new User("roblu");
-        LongUrl otherLongUrl = new LongUrl(URI.create("http://dummy"));
+        LongUrl otherLongUrl = new LongUrl(URI.create("http://dummy"), GLOBAL_HASH);
         List<Keyword> keywords = Arrays.asList(new Keyword("kw1"));
         
         dao.persist(new Bookmark(bookmark1.getHash(), otherLongUrl, keywords, owner));

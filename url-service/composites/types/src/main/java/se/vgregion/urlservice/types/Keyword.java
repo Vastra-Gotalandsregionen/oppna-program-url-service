@@ -25,6 +25,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.apache.commons.lang.Validate;
+
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
@@ -41,6 +43,9 @@ public class Keyword extends AbstractEntity<UUID> {
 
     public Keyword(String name) {
         this.id = UUID.randomUUID();
+        
+        Validate.notEmpty(name, "Name can not be empty");
+        
         this.name = name;
     }
 

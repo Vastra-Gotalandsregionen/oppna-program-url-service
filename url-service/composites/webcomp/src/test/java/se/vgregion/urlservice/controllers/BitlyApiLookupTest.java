@@ -33,6 +33,8 @@ public class BitlyApiLookupTest {
     private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
     private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private MockHttpServletResponse response = new MockHttpServletResponse();
+    private static final String GLOBAL_HASH = "abcdef";
+
     
     @Test
     public void jsonResponse() throws IOException {
@@ -45,7 +47,7 @@ public class BitlyApiLookupTest {
                         "\"data\":{" +
                         "\"lookup\":[{" +
                         "\"short_url\":\"http://s.vgregion.se/foo\"," +
-                        "\"global_hash\":\"foo\"," +
+                        "\"global_hash\":\"" + GLOBAL_HASH + "\"," +
                         "\"long_url\":\"http://example.com\"" +
                         "}]}}", response.getContentAsString());
     }
@@ -60,7 +62,7 @@ public class BitlyApiLookupTest {
                 "<status_txt>OK</status_txt>" +
                 "<data><lookup>" +
                 "<short_url>http://s.vgregion.se/foo</short_url>" +
-                "<global_hash>foo</global_hash>" +
+                "<global_hash>" + GLOBAL_HASH + "</global_hash>" +
                 "<long_url>http://example.com</long_url>" +
                 "</lookup></data></response>", response.getContentAsString());
     }

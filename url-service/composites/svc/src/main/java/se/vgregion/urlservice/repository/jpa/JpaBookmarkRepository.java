@@ -53,23 +53,26 @@ public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID,
         }
     }
     
-    /**
-     * Find link by hash.
-     */
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public Bookmark findByHash(String hash) {
+    public Bookmark findByHash(String hash, boolean includeSlugs) {
         try {
-            return (Bookmark) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.hash = :hash")
-                .setParameter("hash", hash)
-                .getSingleResult();
+            // TODO could have multiple matches, handle
+            String query = "select l from " + type.getSimpleName() + " l where l.hash = :hash";
+            
+            if(includeSlugs) {
+                query += " or l.slug = :hash";
+            }
+            return (Bookmark) entityManager.createQuery(query)
+            .setParameter("hash", hash)
+            .getSingleResult();
             
         } catch(NoResultException e) {
             return null;
         }
-
+        
     }
-
+    
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Bookmark findByLongUrl(URI longUrl, User owner) {

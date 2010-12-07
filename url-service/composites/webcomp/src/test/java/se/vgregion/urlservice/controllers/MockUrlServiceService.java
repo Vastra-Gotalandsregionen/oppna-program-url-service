@@ -43,6 +43,7 @@ public class MockUrlServiceService implements UrlServiceService {
     private final Logger log = LoggerFactory.getLogger(MockUrlServiceService.class);
     private static final String DOMAIN = "s.vgregion.se";
     private static final String URL_PREFIX = "http://s.vgregion.se/";
+    private static final String GLOBAL_HASH = "abcdef";
     private static final String HASH = "foo";
     private static final String USERNAME = "roblu";
     private static final URI LONG_URL = URI.create("http://example.com");
@@ -56,9 +57,19 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
+    public LongUrl expandGlobal(String hash) {
+        if(hash.equals("foo")) {
+            return new LongUrl(LONG_URL, GLOBAL_HASH);
+        } else {
+            return null;
+        }
+    }
+
+    
+    @Override
     public Bookmark expand(String hash) {
         if(hash.equals("foo")) {
-            return new Bookmark(hash, new LongUrl(LONG_URL), keywords, new User(USERNAME));
+            return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new User(USERNAME));
         } else {
             return null;
         }
@@ -66,7 +77,7 @@ public class MockUrlServiceService implements UrlServiceService {
     
     @Override
     public Bookmark expand(URI shortUrl) throws URISyntaxException {
-        return new Bookmark(HASH, new LongUrl(LONG_URL), keywords, new User(USERNAME));
+        return new Bookmark(HASH, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new User(USERNAME));
     }
 
     @Override
@@ -136,15 +147,15 @@ public class MockUrlServiceService implements UrlServiceService {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             hash = (hash != null) ? hash : HASH; 
             
-            return new Bookmark(hash, new LongUrl(url), keywords, owner);
+            return new Bookmark(hash, new LongUrl(url, GLOBAL_HASH), keywords, owner);
         } else {
             throw new IllegalArgumentException("Scheme not allowed");
         }
     }
 
     @Override
-    public Bookmark lookup(URI url, User owner) throws URISyntaxException {
-        return new Bookmark(HASH, new LongUrl(url), Collections.<Keyword>emptyList(), owner);
+    public Bookmark lookup(URI url, User owner) {
+        return new Bookmark(HASH, new LongUrl(url, GLOBAL_HASH), Collections.<Keyword>emptyList(), owner);
     }
 
 

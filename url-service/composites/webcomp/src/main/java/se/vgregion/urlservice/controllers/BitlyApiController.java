@@ -92,7 +92,7 @@ public class BitlyApiController {
                 ObjectNode data = root.putObject("data");
                 data.put("url", buildShortUrl(link.getHash()));
                 data.put("hash", link.getHash());
-                data.put("global_hash", link.getHash());
+                data.put("global_hash", link.getLongUrl().getHash());
                 data.put("long_url", link.getLongUrl().getUrl().toString());
                 data.put("new_hash", 0);
 
@@ -104,7 +104,7 @@ public class BitlyApiController {
                 Element data = new Element("data");
                 data.appendChild(createElement("url", buildShortUrl(link.getHash())));
                 data.appendChild(createElement("hash", link.getHash()));
-                data.appendChild(createElement("global_hash", link.getHash()));
+                data.appendChild(createElement("global_hash", link.getLongUrl().getHash()));
                 data.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
                 data.appendChild(createElement("new_hash", "0"));
 
@@ -158,12 +158,11 @@ public class BitlyApiController {
                     root.put("status_txt", "OK");
                     ObjectNode data = root.putObject("data");
                     ArrayNode array = data.putArray("expand");
-System.out.println(links);
                     for (Bookmark link : links) {
                         ObjectNode node = mapper.createObjectNode();
                         node.put("hash", link.getHash());
                         node.put("short_url", buildShortUrl(link.getHash()));
-                        node.put("global_hash", link.getHash());
+                        node.put("global_hash", link.getLongUrl().getHash());
                         node.put("long_url", link.getLongUrl().getUrl().toString());
                         node.put("user_hash", link.getHash());
                         array.add(node);
@@ -179,7 +178,7 @@ System.out.println(links);
                         Element entry = new Element("entry");
                         entry.appendChild(createElement("hash", link.getHash()));
                         entry.appendChild(createElement("short_url", buildShortUrl(link.getHash())));
-                        entry.appendChild(createElement("global_hash", link.getHash()));
+                        entry.appendChild(createElement("global_hash", link.getLongUrl().getHash()));
                         entry.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
                         entry.appendChild(createElement("user_hash", link.getHash()));
 
@@ -235,7 +234,7 @@ System.out.println(links);
                     for (Bookmark link : links) {
                         ObjectNode node = mapper.createObjectNode();
                         node.put("short_url", buildShortUrl(link.getHash()));
-                        node.put("global_hash", link.getHash());
+                        node.put("global_hash", link.getLongUrl().getHash());
                         node.put("long_url", link.getLongUrl().getUrl().toString());
                         array.add(node);
                     }
@@ -249,7 +248,7 @@ System.out.println(links);
                     for (Bookmark link : links) {
                         Element entry = new Element("lookup");
                         entry.appendChild(createElement("short_url", buildShortUrl(link.getHash())));
-                        entry.appendChild(createElement("global_hash", link.getHash()));
+                        entry.appendChild(createElement("global_hash", link.getLongUrl().getHash()));
                         entry.appendChild(createElement("long_url", link.getLongUrl().getUrl().toString()));
 
                         data.appendChild(entry);

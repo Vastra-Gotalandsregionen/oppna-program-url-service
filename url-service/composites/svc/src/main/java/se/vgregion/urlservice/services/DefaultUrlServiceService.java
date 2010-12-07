@@ -21,7 +21,6 @@ package se.vgregion.urlservice.services;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,16 +37,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.User;
 
@@ -99,14 +98,32 @@ public class DefaultUrlServiceService implements UrlServiceService {
      * {@inheritDoc}
      */
     @Transactional
-    public Bookmark shorten(URI url, String hash, Collection<String> keywordNames, User owner) {
+    public Bookmark shorten(URI url, String slug, Collection<String> keywordNames, User owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             // does the LongUrl exist?
             LongUrl longUrl = longUrlRepository.findByUrl(url);
             
             if(longUrl == null) {
                 // new LongUrl, create and persist
-                longUrl = new LongUrl(url);
+                String md5 = DigestUtils.md5Hex(url.toString());
+                
+                int length = INITIAL_HASH_LENGTH;
+                
+                String globalHash = md5.substring(0, length);
+                // check that the hash does not already exist
+                while(longUrlRepository.findByHash(globalHash) != null) {
+                    length++;
+                    
+                    if(length > md5.length()) {
+                        // should never happen...
+                        throw new RuntimeException("Failed to generate hash");
+                    }
+                    
+                    globalHash += md5.substring(length-1, length);
+                }
+
+                
+                longUrl = new LongUrl(url, globalHash);
                 longUrlRepository.persist(longUrl);
             }
             
@@ -118,20 +135,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 
                 int length = INITIAL_HASH_LENGTH;
                 
-                if(StringUtils.isBlank(hash)) {
-                    hash = md5.substring(0, length);
-                } else {
-                    if(!HASH_PATTERN.matcher(hash).matches()) {
-                        throw new IllegalArgumentException("Hash contains invalid characters");
-                    }
-                }
-
-                if(hash.length() < INITIAL_HASH_LENGTH) {
-                    hash = hash + md5.substring(hash.length(), length);
+                if(!StringUtils.isEmpty(slug) && !HASH_PATTERN.matcher(slug).matches()) {
+                    throw new IllegalArgumentException("Hash contains invalid characters");
                 }
                 
+                
+                String hash = md5.substring(0, length);
+
                 // check that the hash does not already exist
-                while(shortLinkRepository.findByHash(hash) != null) {
+                while(shortLinkRepository.findByHash(hash, false) != null) {
                     length++;
                     
                     if(length > md5.length()) {
@@ -142,8 +154,8 @@ public class DefaultUrlServiceService implements UrlServiceService {
                     hash += md5.substring(length-1, length);
                 }
                 
-                List<Keyword> keywords = keywordRepository.findOrCreateKeywords(keywordNames);
-                Bookmark newLink = new Bookmark(hash, longUrl, keywords, owner);
+                List<Keyword> keywords = findOrCreateKeywords(keywordNames);
+                Bookmark newLink = new Bookmark(hash, longUrl, keywords, slug, owner);
                 
                 shortLinkRepository.persist(newLink);
                 return newLink;
@@ -153,6 +165,39 @@ public class DefaultUrlServiceService implements UrlServiceService {
         }
     }
 
+    /** 
+     * {@inheritDoc}
+     */
+    @Transactional
+    public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
+        Bookmark bookmark = shortLinkRepository.findByHash(hash, false);
+        
+        if(bookmark != null) {
+            if(StringUtils.isEmpty(slug)) slug = null;
+            
+            bookmark.setSlug(slug);
+            bookmark.setKeywords(findOrCreateKeywords(keywordNames));
+            return bookmark;
+        } else {
+            return null;
+        }
+
+    }
+    
+    @Transactional
+    private List<Keyword> findOrCreateKeywords(Collection<String> keywordNames) {
+        return keywordRepository.findOrCreateKeywords(keywordNames);
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public LongUrl expandGlobal(String hash) {
+        return longUrlRepository.findByHash(hash);
+    }
+
 
     /** 
      * {@inheritDoc}
@@ -160,7 +205,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @Override
     @Transactional(readOnly = true)
     public Bookmark expand(String hash) {
-        return shortLinkRepository.findByHash(hash);
+        return shortLinkRepository.findByHash(hash, true);
     }
     
     @Override

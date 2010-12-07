@@ -47,6 +47,23 @@ public class JpaLongUrlRepository extends AbstractJpaRepository<LongUrl, UUID, U
             return null;
         }
     }
+    
+    /**
+     * Find link by hash.
+     */
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public LongUrl findByHash(String hash) {
+        try {
+            return (LongUrl) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.hash = :hash")
+                .setParameter("hash", hash)
+                .getSingleResult();
+            
+        } catch(NoResultException e) {
+            return null;
+        }
+
+    }
 
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)

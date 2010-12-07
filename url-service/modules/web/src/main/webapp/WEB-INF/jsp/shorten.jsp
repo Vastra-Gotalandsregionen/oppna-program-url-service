@@ -43,40 +43,36 @@
 	</head>
 	<body>
 		<form action='' method="post">
-			<p><label for="longurl">Länk</label><input id="longurl" name='longurl' value='${longUrl}'> <input type='submit' value='Förkorta länk'></p>
+			<p><label for="longurl">Länk</label>
+			<c:choose>
+				<c:when test="${edit}">
+					<span>${longUrl}</span> 
+				</c:when>
+				<c:otherwise>
+					<input id="longurl" name='longurl' value='${longUrl}'>
+				</c:otherwise>
+			</c:choose>
+			</p>
 			<p><label for="keywords">Nyckelord</label>
-				<select multiple="multiple" name="keywords" class="keywords ${not owned ? 'readonly' : ''}">
-					<c:forEach items="${keywords}" var="keyword">
-						<option value="${keyword.id}" ${(not empty selectedKeywords && f:contains(selectedKeywords, keyword.id)) ? 'selected="selected"' : ''}>${keyword.name}</option>
-    				</c:forEach>
-				</select>
+				<input name="keywords" value="${selectedKeywords}" class="keywords" />
 			</p>
 			
-			<c:if test="${authenticated}">
-				<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
-			</c:if>
+			<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>
+			
+			<p><input type='submit' value='Spara favorit'></p>
 		</form>
 		
 
 		<c:if test="${not empty shortUrl}">
-			<p><a href="${shortUrl}">${shortUrl}</a></p>
+			<p>Din privata kortlänk: <a href="${shortUrl}">${shortUrl}</a></p>
+			<p>Delad kortlänk: <a href="${globalShortUrl}">${globalShortUrl}</a></p>
 		</c:if>
 		<c:if test="${not empty error}">
 			<p>${error}</p>
 		</c:if>
 
-		<div id="bookmarklet"><a href="javascript:location.href='${domain}/shorten?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
+		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
 
-		<div id="user">
-			<c:choose>
-				<c:when test="${authenticated}">
-					Du är inloggad som ${userid}. 
-					<a href="logout">Logga ut</a>
-				</c:when>
-			    <c:otherwise>
-					<a href="spring_security_login">Logga in</a>
-				</c:otherwise>
-			</c:choose>
-		</div>
+		<div><a href="${pageContext.request.contextPath}/b/new">Skapa ny favorit</a></div>
 	</body>
 </html>

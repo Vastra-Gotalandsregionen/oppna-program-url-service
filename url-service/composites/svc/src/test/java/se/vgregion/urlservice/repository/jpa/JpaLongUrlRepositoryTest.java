@@ -43,10 +43,8 @@ import se.vgregion.urlservice.types.User;
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaLongUrlRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-    private static final String HASH = "12345";
+    private static final String HASH = "abcdef";
     private static final URI URL = URI.create("http://example.com");
-    private static final User OWNER = new User("roblu");
-    private static final List<Keyword> KEYWORDS = Arrays.asList(new Keyword("kw1"));
 
     private LongUrlRepository dao;
     
@@ -55,7 +53,7 @@ public class JpaLongUrlRepositoryTest extends AbstractTransactionalJUnit4SpringC
     @Before
     public void setup() {
         dao = applicationContext.getBean(LongUrlRepository.class);
-        longUrl1 = dao.persist(new LongUrl(URL));
+        longUrl1 = dao.persist(new LongUrl(URL, HASH));
         dao.flush();
     }
     
@@ -68,6 +66,25 @@ public class JpaLongUrlRepositoryTest extends AbstractTransactionalJUnit4SpringC
         Assert.assertEquals(longUrl1.getUrl(), loaded.getUrl());
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void findByHash() {
+        LongUrl loaded = dao.findByHash(longUrl1.getHash());
+        
+        Assert.assertEquals(HASH, loaded.getHash());
+        Assert.assertEquals(URL, loaded.getUrl());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findNonExistingByHash() {
+        Assert.assertNull(dao.findByHash("dummy"));
+    }
+
+
+    
     @Test
     @Transactional
     @Rollback
@@ -88,7 +105,15 @@ public class JpaLongUrlRepositoryTest extends AbstractTransactionalJUnit4SpringC
     @Transactional
     @Rollback
     public void duplicateUrlNotAllowed() {
-        dao.persist(new LongUrl(URL));
+        dao.persist(new LongUrl(URL, "ghj"));
+        dao.flush();
+    }
+
+    @Test(expected=PersistenceException.class)
+    @Transactional
+    @Rollback
+    public void duplicateHashNotAllowed() {
+        dao.persist(new LongUrl(URI.create("http://google.com"), HASH));
         dao.flush();
     }
 

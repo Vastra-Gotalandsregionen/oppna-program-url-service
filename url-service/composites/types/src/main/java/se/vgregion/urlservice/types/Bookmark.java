@@ -45,6 +45,9 @@ public class Bookmark extends AbstractEntity<UUID> {
     @Column(nullable=false, unique=true)
     private String hash;
 
+    @Column
+    private String slug;
+
     @ManyToOne(optional=false)
     private LongUrl longUrl;
     
@@ -62,6 +65,10 @@ public class Bookmark extends AbstractEntity<UUID> {
     }
     
     public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, User owner) {
+        this(hash, longUrl, keywords, null, owner);
+    }
+    
+    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, String slug, User owner) {
         this.id = UUID.randomUUID();
         
         Validate.notEmpty(hash, "hash can not be empty");
@@ -72,6 +79,7 @@ public class Bookmark extends AbstractEntity<UUID> {
         this.hash = hash;
         this.longUrl = longUrl;
         this.keywords = keywords;
+        this.slug = slug;
         this.owner = owner;
         
         longUrl.addBookmark(this);
@@ -91,6 +99,14 @@ public class Bookmark extends AbstractEntity<UUID> {
         return hash;
     }
 
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+    
     public LongUrl getLongUrl() {
         return longUrl;
     }
@@ -102,4 +118,9 @@ public class Bookmark extends AbstractEntity<UUID> {
             return null;
         }
     }
+
+    public void setKeywords(List<Keyword> keywords) {
+        this.keywords = keywords;
+    }
+
 }

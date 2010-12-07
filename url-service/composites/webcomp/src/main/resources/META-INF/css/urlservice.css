@@ -10,20 +10,15 @@ label {
 
 .keyword {
 	padding: 3px;
+	padding-right: 0px;
 	margin-right: 10px;
-	text-decoration: underline;
 	background-color: #EDEDED;
 }
 
-.keyword.readonly {
-	text-decoration: none;
-	background-color: #EDEDED;
-}
-
-.keyword.selected {
-	background-color: #73C5FF;
-}
-
-.keyword.selected.readonly {
+.remove-keyword {
+	padding: 3px;
+	margin-left: 3px;
 	background-color: #BBB;
+	cursor: pointer;
+	height: 100%
 }

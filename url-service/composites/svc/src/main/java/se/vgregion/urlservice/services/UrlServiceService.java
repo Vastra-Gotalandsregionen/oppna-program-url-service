@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import se.vgregion.urlservice.types.Keyword;
+import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
@@ -78,7 +79,9 @@ public interface UrlServiceService {
      *   short URL/hash is unknown.
      * @throws URISyntaxException
      */
-    Bookmark expand(String hash) throws URISyntaxException;
+    LongUrl expandGlobal(String hash);
+    
+    Bookmark expand(String hash);
 
     /**
      * Find the matching hash for a long URL.  
@@ -87,7 +90,7 @@ public interface UrlServiceService {
      *   the long URL is unknown
      * @throws URISyntaxException
      */
-    Bookmark lookup(URI url, User owner) throws URISyntaxException;
+    Bookmark lookup(URI url, User owner);
 
     /**
      * Given a path, will return the URI to where the user should be redirected. 
@@ -113,5 +116,5 @@ public interface UrlServiceService {
 
     void removeStaticRedirect(UUID id);
 
-    
+    Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames);
 }

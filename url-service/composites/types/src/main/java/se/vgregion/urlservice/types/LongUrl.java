@@ -43,17 +43,22 @@ public class LongUrl extends AbstractEntity<UUID> {
     @Column(nullable=false, unique=true)
     private String url;
     
+    @Column(nullable=false, unique=true)
+    private String hash;
+    
     @OneToMany
     private Collection<Bookmark> bookmarks = new HashSet<Bookmark>();
 
     protected LongUrl() {
     }
 
-    public LongUrl(URI url) {
+    public LongUrl(URI url, String hash) {
         id = UUID.randomUUID();
         Validate.notNull(url, "url can not be null");
+        Validate.notNull(hash, "hash can not be null");
         
         this.url = url.toString();
+        this.hash = hash;
     }
 
     @Override
@@ -63,6 +68,10 @@ public class LongUrl extends AbstractEntity<UUID> {
 
     public URI getUrl() {
         return URI.create(url);
+    }
+    
+    public String getHash() {
+        return hash;
     }
 
     public Collection<Bookmark> getBookmarks() {
