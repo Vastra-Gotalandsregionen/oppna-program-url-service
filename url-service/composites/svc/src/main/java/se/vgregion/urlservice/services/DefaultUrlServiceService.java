@@ -170,7 +170,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Transactional
     public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
-        Bookmark bookmark = shortLinkRepository.findByHash(hash, false);
+        Bookmark bookmark = shortLinkRepository.findByHash(hash, true);
         
         if(bookmark != null) {
             if(StringUtils.isEmpty(slug)) slug = null;

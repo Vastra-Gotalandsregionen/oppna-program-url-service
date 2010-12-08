@@ -28,7 +28,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Förkorta länk</title>
+		<title>Spara favorit</title>
 		
 		<link rel="shortcut icon" href="http://www.vgregion.se/VGRimages/favicon.ico" type="image/x-icon" />
 		
@@ -42,6 +42,8 @@
 		
 	</head>
 	<body>
+		<h2>Spara favorit</h2>
+	
 		<form action='' method="post">
 			<p><label for="longurl">Länk</label>
 			<c:choose>
@@ -71,8 +73,9 @@
 			<p>${error}</p>
 		</c:if>
 
+		<div><a href="${pageContext.request.contextPath}/u/${user.userName}/b"><img src="${pageContext.request.contextPath}/resources/img/link.png" /> Se alla dina favoriter</a></div>
+
 		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
 
-		<div><a href="${pageContext.request.contextPath}/b/new">Skapa ny favorit</a></div>
 	</body>
 </html>

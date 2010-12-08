@@ -158,5 +158,10 @@ public class MockUrlServiceService implements UrlServiceService {
         return new Bookmark(HASH, new LongUrl(url, GLOBAL_HASH), Collections.<Keyword>emptyList(), owner);
     }
 
+    @Override
+    public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
+        return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), new User(USERNAME));
+    }
+
 
 }

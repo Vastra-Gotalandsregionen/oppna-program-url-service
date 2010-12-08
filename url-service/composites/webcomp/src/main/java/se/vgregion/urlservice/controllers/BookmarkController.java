@@ -28,6 +28,10 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
@@ -80,9 +84,31 @@ public class BookmarkController {
         }        
     }
 
+    @RequestMapping(value="/u/{username}/b", method=RequestMethod.GET)
+    public ModelAndView index(@PathVariable(value="username") String username,
+            Authentication authentication) throws IOException {
+        
+        User user = urlServiceService.getUser(username);
+        if(user == null) {
+            throw new ResourceNotFoundException("Unknown user");
+        }
+
+        ModelAndView mav = new ModelAndView("bookmarks/index");
+        
+        User loggedInUser = getUser(authentication);
+        mav.addObject("user", loggedInUser);
+        mav.addObject("owner", user.equals(loggedInUser));
+
+        mav.addObject("bookmarks", user.getShortLinks());
+        return mav;
+    }
+
+    
     @RequestMapping(value="/b/new", method=RequestMethod.GET)
-    public ModelAndView newBookmark() {
-        ModelAndView mav = new ModelAndView("shorten");
+    public ModelAndView newBookmark(Authentication authentication) {
+        ModelAndView mav = new ModelAndView("bookmarks/edit");
+        
+        mav.addObject("user", getUser(authentication));
         
         return mav;
     }
@@ -92,6 +118,10 @@ public class BookmarkController {
             @RequestParam(value="keywords", required=false) String keywordNameString, Authentication authentication) throws IOException {
         
         User user = getUser(authentication);
+        if(user == null) {
+            throw new ForbiddenException();
+        }
+        
         try {
             List<String> keywordNames = parseKeywordNames(keywordNameString);
 
@@ -106,6 +136,11 @@ public class BookmarkController {
 
     private List<String> parseKeywordNames(String keywordNameString) {
         List<String> keywordNames = new ArrayList<String>();
+
+        if(StringUtils.isEmpty(keywordNameString)) {
+            return keywordNames;
+        }
+        
         if(keywordNameString != null) {
             keywordNames = Arrays.asList(keywordNameString.split("[\\s,;]+"));
         }
@@ -115,11 +150,13 @@ public class BookmarkController {
     @RequestMapping(value="/u/{username}/b/{hash}/edit", method=RequestMethod.GET)
     public ModelAndView edit(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username, 
             Authentication authentication) throws IOException {
-        ModelAndView mav = new ModelAndView("shorten");
+        ModelAndView mav = new ModelAndView("bookmarks/edit");
         mav.addObject("edit", true);
 
         User user = getUser(authentication);
-        if(!username.equals(user.getUserName())) {
+        mav.addObject("user", getUser(authentication));
+        
+        if(user == null || !username.equals(user.getUserName())) {
             throw new ForbiddenException();
         }
         
@@ -128,13 +165,7 @@ public class BookmarkController {
         Bookmark bookmark = urlServiceService.expand(hash);
         if(bookmark != null) {
             mav.addObject("longUrl", bookmark.getLongUrl().getUrl());
-            String shortLink = shortLinkPrefix + "u/" + user.getUserName() + "/b/";
-            if(bookmark.getSlug() != null) {
-                shortLink += bookmark.getSlug();
-            } else {
-                shortLink += bookmark.getHash();
-            }
-            mav.addObject("shortUrl",  shortLink);
+            mav.addObject("shortUrl",  createShortLink(user, bookmark));
             mav.addObject("globalShortUrl", shortLinkPrefix + "b/" + bookmark.getLongUrl().getHash());
 
             List<String> storedKeywordNames = new ArrayList<String>();
@@ -152,12 +183,22 @@ public class BookmarkController {
         }
     }
 
+    private String createShortLink(User user, Bookmark bookmark) {
+        String shortLink = shortLinkPrefix + "u/" + user.getUserName() + "/b/";
+        if(bookmark.getSlug() != null) {
+            shortLink += bookmark.getSlug();
+        } else {
+            shortLink += bookmark.getHash();
+        }
+        return shortLink;
+    }
+
     @RequestMapping(value="/u/{username}/b/{hash}/edit", method=RequestMethod.POST)
     public ModelAndView update(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username,
             @RequestParam(value="keywords") String keywordNameString, @RequestParam(value="slug", required=false) String slug, 
             Authentication authentication) throws IOException {
         User user = getUser(authentication);
-        if(!username.equals(user.getUserName())) {
+        if(user == null || !username.equals(user.getUserName())) {
             throw new ForbiddenException();
         }
         
@@ -179,10 +220,10 @@ public class BookmarkController {
                 
                 return urlServiceService.getUser(userName);
             } else {
-                throw new RuntimeException("Authentication missing");
+                return null;
             }
         } else {
-            throw new RuntimeException("Authentication missing");
+            return null;
         }
     }
     

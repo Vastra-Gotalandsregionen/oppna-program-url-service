@@ -8,7 +8,8 @@
 	<http auto-config='true'>
 		<intercept-url pattern="/resources/**" filters="none" />
 		<intercept-url pattern="/favicon.ico" filters="none" />
-		<intercept-url pattern="/**" access="ROLE_USER"  />
+		<intercept-url pattern="/b/new" access="ROLE_USER"  />
+		<intercept-url pattern="/u/*/*/edit" access="ROLE_USER"  />
 		<form-login default-target-url="/shorten" />
 		<logout logout-success-url="/shorten" logout-url="/logout"/>
 	</http>

@@ -32,11 +32,9 @@ $(function() {
 		container.after(newKeywordSpan)
 
 		// convert the input to a hidden field
-		/*
 		var marker = $('<span />').insertBefore(input)
 		input.detach().attr('type', 'hidden').insertAfter(marker)
 		marker.remove()
-		*/
 	})
 });
 
@@ -47,7 +45,7 @@ function addKeyword(name, input, container, readonly) {
 	if(readonly) {
 		span.addClass("readonly")
 	} else {
-		var removeKeywordSpan = $("<span class='remove-keyword'> X</span>")
+		var removeKeywordSpan = $("<span class='remove-keyword'>X</span>")
 		removeKeywordSpan.click(function() {
 			var val = " " + input.val() + " ";
 			input.val($.trim(val.replace(" " + name + " ", " ")))

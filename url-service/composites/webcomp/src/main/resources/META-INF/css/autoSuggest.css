@@ -11,8 +11,7 @@ ul.as-selections {
 	overflow: auto;
 	background-color: #fff;
 	box-shadow:inset 0 1px 2px #888;
-	-webkit-box-shadow:inset 0 1px 2px #888;
-	-moz-box-shadow:inset 0 1px 2px #888;
+	width: 400px;
 }
 
 ul.as-selections.loading {
@@ -26,7 +25,7 @@ ul.as-selections li {
 
 ul.as-selections li.as-selection-item {
 	color: #2b3840;
-	font-size: 13px;
+	font-size: 11px;
 	font-family: "Lucida Grande", arial, sans-serif;
 	text-shadow: 0 1px 1px #fff;
 	background-color: #ddeefe;
@@ -105,7 +104,7 @@ ul.as-selections li.as-original {
 ul.as-selections li.as-original input {
 	border: none;
 	outline: none;
-	font-size: 13px;
+	font-size: 11px;
 	width: 120px;
 	height: 18px;
 	padding-top: 3px;

@@ -9,16 +9,33 @@ label {
 }
 
 .keyword {
-	padding: 3px;
-	padding-right: 0px;
-	margin-right: 10px;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	margin-right: 3px;
 	background-color: #EDEDED;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .remove-keyword {
-	padding: 3px;
-	margin-left: 3px;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+
+	margin-left: 5px;
 	background-color: #BBB;
 	cursor: pointer;
 	height: 100%
+
+	color: #5491be;
+	font-family: "Helvetica", helvetica, arial, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	text-shadow: 0 1px 1px #fff;
+	-webkit-transition: color .1s ease-in;
+
 }
