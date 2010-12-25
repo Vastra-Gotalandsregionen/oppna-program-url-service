@@ -8,34 +8,31 @@ label {
 	float: left;
 }
 
-.keyword {
-	padding-left: 3px;
-	padding-right: 3px;
-	padding-top: 1px;
-	padding-bottom: 1px;
-	margin-right: 3px;
-	background-color: #EDEDED;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-}
+    input {
+    	width: 300px;
+        border: 1px solid black;
+    }
+    
+    .tags {
+        border: 1px solid black;
+        padding: 1px;
+        overflow: auto;
+    }
 
-.remove-keyword {
-	padding-left: 3px;
-	padding-right: 3px;
-	padding-top: 1px;
-	padding-bottom: 1px;
+    .tags span {
+        background-color: #ccc;
+        padding-left: 1px;
+        padding-right: 1px;
+        margin-right: 5px;
+    }
 
-	margin-left: 5px;
-	background-color: #BBB;
-	cursor: pointer;
-	height: 100%
+    .tags span.x {
+        cursor: pointer;
+        padding-left: 3px;
+    }
 
-	color: #5491be;
-	font-family: "Helvetica", helvetica, arial, sans-serif;
-	font-size: 11px;
-	font-weight: bold;
-	text-shadow: 0 1px 1px #fff;
-	-webkit-transition: color .1s ease-in;
-
-}
+    
+    .tags input {
+        border: 1px solid #eee;
+        width: 50px;
+    }

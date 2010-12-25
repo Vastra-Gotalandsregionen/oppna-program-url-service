@@ -36,8 +36,10 @@
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/typography.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/forms.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/urlservice.css" type="text/css" />
-		
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/jquery-ui-1.8.7.custom.css" type="text/css" />
+
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-1.4.4.js"></script> 
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-ui-1.8.7.custom.min.js"></script> 
 		<script src="${pageContext.request.contextPath}/resources/js/url-service.js"></script> 
 		
 	</head>
@@ -56,7 +58,7 @@
 			</c:choose>
 			</p>
 			<p><label for="keywords">Nyckelord</label>
-				<input name="keywords" value="${selectedKeywords}" class="keywords" />
+				<input name="keywords" value="${selectedKeywords}" class="tags" />
 			</p>
 			
 			<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}'></p>

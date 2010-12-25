@@ -77,4 +77,33 @@ public class JpaKeywordRepositoryTest extends AbstractTransactionalJUnit4SpringC
         Assert.assertEquals("kw2", loaded.get(1).getName());
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void findByNamePrefix() {
+        List<Keyword> loaded = dao.findByNamePrefix("k");
+        
+        Assert.assertEquals(1, loaded.size());
+        Assert.assertEquals(keyword1, loaded.get(0));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findByNameFullPrefix() {
+        List<Keyword> loaded = dao.findByNamePrefix(keyword1.getName());
+        
+        Assert.assertEquals(1, loaded.size());
+        Assert.assertEquals(keyword1, loaded.get(0));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findByNameNonMatchingPrefix() {
+        List<Keyword> loaded = dao.findByNamePrefix("c");
+        
+        Assert.assertEquals(0, loaded.size());
+    }
+
 }

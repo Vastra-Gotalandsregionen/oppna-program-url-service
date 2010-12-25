@@ -20,4 +20,15 @@ public class IntegrationTest extends IntegrationTestTemplate {
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         
     }
+
+    @Test
+    public void keywords() throws Exception {
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet get = new HttpGet(hubUrl.toString() + "/keywords/?prefix=A");
+        
+        HttpResponse response = httpClient.execute(get);
+        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        
+    }
+
 }

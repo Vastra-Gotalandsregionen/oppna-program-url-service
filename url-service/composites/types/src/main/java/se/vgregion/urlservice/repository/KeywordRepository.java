@@ -30,8 +30,10 @@ public interface KeywordRepository extends JpaRepository<Keyword, UUID, UUID> {
 
     List<Keyword> findAllInOrder();
 
+    List<Keyword> findByNamePrefix(String prefix);
+
     Keyword findByName(String name);
-    
+
     List<Keyword> findOrCreateKeywords(Collection<String> keywordNames);
 
 }

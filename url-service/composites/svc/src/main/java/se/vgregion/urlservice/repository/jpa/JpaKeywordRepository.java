@@ -95,5 +95,20 @@ public class JpaKeywordRepository extends AbstractJpaRepository<Keyword, UUID, U
         return keywords;
     }
 
+    @Override
+    @Transactional(propagation=Propagation.SUPPORTS, readOnly=true)
+    @SuppressWarnings("unchecked")
+    public List<Keyword> findByNamePrefix(String prefix) {
+        try {
+            return entityManager.createQuery("select l from " + type.getSimpleName() + " l " +
+            		"where name LIKE :prefix " +
+            		"order by name")
+            .setParameter("prefix", prefix + "%")
+            .getResultList();
+        } catch(NoResultException e) {
+            return Collections.emptyList();
+        }
+    }
+
     
 }
