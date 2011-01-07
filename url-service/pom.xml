@@ -214,6 +214,7 @@
   <modules>
     <module>composites/types</module>
     <module>composites/svc</module>
+    <module>composites/metadata-int</module>
     <module>composites/webcomp</module>
     <module>modules/web</module>
   </modules>
