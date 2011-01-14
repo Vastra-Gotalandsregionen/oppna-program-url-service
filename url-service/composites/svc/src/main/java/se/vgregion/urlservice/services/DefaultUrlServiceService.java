@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -38,12 +39,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.BookmarkRepository;
+import se.vgregion.urlservice.repository.HitRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.Hit;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
@@ -69,6 +72,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     private UserRepository userRepository;
     private KeywordRepository keywordRepository;
     private LongUrlRepository longUrlRepository;
+    private HitRepository hitRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -321,6 +325,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
         this.longUrlRepository = longUrlRepository;
     }
 
+    public HitRepository getHitRepository() {
+        return hitRepository;
+    }
+    
+    @Resource
+    public void setHitRepository(HitRepository hitRepository) {
+        this.hitRepository = hitRepository;
+    }
+
 
     public String getDomain() {
         return domain;
@@ -387,4 +400,17 @@ public class DefaultUrlServiceService implements UrlServiceService {
         staticRedirectRepository.remove(id);
     }
 
+    @Override
+    @Transactional    
+    public void addHit(Bookmark bookmark) {
+        Hit hit = new Hit(bookmark.getId(), null, new Date().getTime());
+        hitRepository.persist(hit);
+    }
+
+    @Override
+    @Transactional    
+    public void addHit(LongUrl longUrl) {
+        Hit hit = new Hit(null, longUrl.getId(), new Date().getTime());
+        hitRepository.persist(hit);
+    }
 }

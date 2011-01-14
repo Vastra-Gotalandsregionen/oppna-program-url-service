@@ -117,4 +117,7 @@ public interface UrlServiceService {
     void removeStaticRedirect(UUID id);
 
     Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames);
+    
+    void addHit(Bookmark bookmark);
+    void addHit(LongUrl longUrl);
 }

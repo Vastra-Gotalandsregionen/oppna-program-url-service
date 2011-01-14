@@ -163,5 +163,15 @@ public class MockUrlServiceService implements UrlServiceService {
         return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), new User(USERNAME));
     }
 
+    @Override
+    public void addHit(Bookmark bookmark) {
+        
+    }
+
+    @Override
+    public void addHit(LongUrl longUrl) {
+        
+    }
+
 
 }
