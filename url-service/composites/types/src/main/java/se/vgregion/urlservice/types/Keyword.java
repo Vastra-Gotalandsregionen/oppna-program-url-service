@@ -32,21 +32,36 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 @Entity
 public class Keyword extends AbstractEntity<UUID> {
 
+    public static enum KeywordClass {
+        WHITE,
+        GREEN,
+        GREY,
+        BLACK
+    }
+    
     @Id
     private UUID id;
     
     @Column(nullable=false, unique=true)
     private String name;
     
+    @Column
+    private KeywordClass classification;
+    
     protected Keyword() {
     }
 
     public Keyword(String name) {
+        this(name, KeywordClass.GREY);
+    }
+    
+    public Keyword(String name, KeywordClass classification) {
         this.id = UUID.randomUUID();
         
         Validate.notEmpty(name, "Name can not be empty");
-        
+        Validate.notNull(classification, "Classification can not be empty");
         this.name = name;
+        this.classification = classification;
     }
 
     @Override
@@ -56,5 +71,13 @@ public class Keyword extends AbstractEntity<UUID> {
 
     public String getName() {
         return name;
+    }
+
+    public KeywordClass getClassification() {
+        return classification;
+    }
+
+    public void setClassification(KeywordClass classification) {
+        this.classification = classification;
     }
 }
