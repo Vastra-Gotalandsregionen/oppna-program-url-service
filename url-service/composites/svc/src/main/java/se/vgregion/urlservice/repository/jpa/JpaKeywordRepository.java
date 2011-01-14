@@ -35,7 +35,7 @@ import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.types.Keyword;
     
-@Repository
+@Repository("keywordRepository")
 public class JpaKeywordRepository extends AbstractJpaRepository<Keyword, UUID, UUID> implements KeywordRepository {
     
     public JpaKeywordRepository() {

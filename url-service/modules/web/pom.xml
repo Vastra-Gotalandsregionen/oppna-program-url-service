@@ -57,6 +57,10 @@
 			<artifactId>url-service-url-service-composite-webcomp</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>url-service-url-service-composite-metadata-int</artifactId>
+		</dependency>
+		<dependency>
 			<!-- Use the resource-loading servlet from Spring-JS -->
 			<groupId>org.springframework.webflow</groupId>
 			<artifactId>org.springframework.js</artifactId>

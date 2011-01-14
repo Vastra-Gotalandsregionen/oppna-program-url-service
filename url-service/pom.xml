@@ -30,6 +30,11 @@
 				<artifactId>url-service-url-service-composite-webcomp</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>url-service-url-service-composite-metadata-int</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
     		<dependency>
     			<groupId>org.apache.geronimo.specs</groupId>

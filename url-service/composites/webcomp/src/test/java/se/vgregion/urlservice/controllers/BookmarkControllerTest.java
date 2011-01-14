@@ -61,33 +61,21 @@ public class BookmarkControllerTest {
     public void shortenLongUrl() throws IOException {
         ModelAndView  mav = controller.create(LONG_URL, null, null, authentication);
         
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
-        Assert.assertNull(mav.getModel().get("slug"));
-        Assert.assertEquals("http://s.vgregion.se/foo", mav.getModel().get("shortUrl"));
-        Assert.assertNull(mav.getModel().get("error"));
+        Assert.assertEquals("redirect:/u/roblu/b/foo/edit", mav.getViewName());
     }
 
     @Test
     public void shortenLongUrlWithSlug() throws IOException {
         ModelAndView  mav = controller.create(LONG_URL, "slug", null, authentication);
         
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
-        Assert.assertEquals("slug", mav.getModel().get("slug"));
-        Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
-        Assert.assertNull(mav.getModel().get("error"));
+        Assert.assertEquals("redirect:/u/roblu/b/slug/edit", mav.getViewName());
     }
 
     @Test
     public void shortenLongUrlWithSlugAndOwner() throws IOException {
         ModelAndView mav = controller.create(LONG_URL, "slug", null, authentication);
         
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
-        Assert.assertEquals("slug", mav.getModel().get("slug"));
-        Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
-        Assert.assertNull(mav.getModel().get("error"));
+        Assert.assertEquals("redirect:/u/roblu/b/slug/edit", mav.getViewName());
     }
 
     @Test
@@ -98,39 +86,16 @@ public class BookmarkControllerTest {
         
         ModelAndView mav = controller.create(LONG_URL, "slug", keywordNameString, authentication);
         
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertEquals(LONG_URL, mav.getModel().get("longUrl"));
-        Assert.assertEquals("slug", mav.getModel().get("slug"));
-        Assert.assertEquals(keywords, mav.getModel().get("keywords"));
-        Assert.assertEquals(keywordNameString, mav.getModel().get("selectedKeywords"));
-        Assert.assertEquals("http://s.vgregion.se/slug", mav.getModel().get("shortUrl"));
-        Assert.assertNull(mav.getModel().get("error"));
+        Assert.assertEquals("redirect:/u/roblu/b/slug/edit", mav.getViewName());
     }
 
     
-    @Test
+    @Test(expected=IllegalArgumentException.class)
     public void shortenInvalidLongUrl() throws IOException {
         URI invalidUrl = URI.create("dummy://example.com");
-        ModelAndView  mav = controller.create(invalidUrl, null, null, authentication);
-        
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertEquals(invalidUrl, mav.getModel().get("longUrl"));
-        Assert.assertNull(mav.getModel().get("slug"));
-        Assert.assertNotNull(mav.getModel().get("error"));
+        controller.create(invalidUrl, null, null, authentication);
     }
 
-    
-    @Test
-    public void show() throws IOException {
-        ModelAndView  mav = controller.create(null, null, null, authentication);
-        
-        Assert.assertEquals("shorten", mav.getViewName());
-        Assert.assertNull(mav.getModel().get("longUrl"));
-        Assert.assertNull(mav.getModel().get("slug"));
-        Assert.assertNull(mav.getModel().get("shortUrl"));
-        Assert.assertNull(mav.getModel().get("error"));
-    }
-    
     @Test
     public void redirectWithExistingHash() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();

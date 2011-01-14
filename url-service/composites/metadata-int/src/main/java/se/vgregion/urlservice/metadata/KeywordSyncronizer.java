@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -49,6 +50,7 @@ public class KeywordSyncronizer {
         this.transactionTemplate = transactionTemplate;
     }
 
+    @Autowired
     public KeywordSyncronizer(KeywordRepository keywordRepository, TransactionTemplate transactionTemplate) {
         this.keywordRepository = keywordRepository;
         URL wsdlURL = KeywordSyncronizer.class.getClassLoader().getResource("wsdl/VocabularyService.wsdl");

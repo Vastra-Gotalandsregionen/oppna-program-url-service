@@ -32,8 +32,8 @@
 	</bean>
 	
 	<task:scheduled-tasks scheduler="taskScheduler">
-    	<task:scheduled ref="keywordSyncronizer" method="run" cron="0 * * * *" />
+    	<task:scheduled ref="keywordSyncronizer" method="run" cron="* * * * * *" />
 	</task:scheduled-tasks>
 
-	<task:scheduler id="keywordSyncronizer" pool-size="10"/>
+	<task:scheduler id="taskScheduler" pool-size="10"/>
 </beans>
