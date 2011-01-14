@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="VocabularyServiceIntServiceImplService" targetNamespace="http://intsvc.vocabularyservice.metaservice.vgregion.se/" xmlns:ns1="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://intsvc.vocabularyservice.metaservice.vgregion.se/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:import location="VocabularyService-types.wsdl" namespace="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2">
+    </wsdl:import>
+  <wsdl:binding name="VocabularyServiceIntServiceImplServiceSoapBinding" type="ns1:VocabularyService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddVocabularyNode">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="AddVocabularyNode">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="AddVocabularyNodeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateVocabularyNode">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="UpdateVocabularyNode">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="UpdateVocabularyNodeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LookupWord">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="LookupWord">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="LookupWordResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FindNodes">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="FindNodes">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="FindNodesResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLastChange">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetLastChange">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetLastChangeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MoveVocabularyNode">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="MoveVocabularyNode">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="MoveVocabularyNodeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FindNodesByName">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="FindNodesByName">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="FindNodesByNameResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNamespaceXml">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetNamespaceXml">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetNamespaceXmlResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVocabulary">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetVocabulary">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetVocabularyResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VocabularyServiceIntServiceImplService">
+    <wsdl:port binding="tns:VocabularyServiceIntServiceImplServiceSoapBinding" name="VocabularyServiceIntServiceImplPort">
+      <soap:address location="http://metadataservice.vgregion.se/vocabularyservice/VocabularyService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

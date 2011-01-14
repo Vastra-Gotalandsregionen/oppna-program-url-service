@@ -1,0 +1,431 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="VocabularyService" targetNamespace="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2" xmlns:ns1="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:Document.schema.metaservice.vgr.se:v1" xmlns="urn:Document.schema.metaservice.vgr.se:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:complexType name="TextDocumentType">
+<xs:complexContent>
+<xs:extension base="DocumentType">
+<xs:sequence>
+<xs:element form="qualified" minOccurs="0" name="textContent" type="xs:string" />
+<xs:element form="qualified" minOccurs="0" name="title" type="xs:string" />
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType abstract="true" name="DocumentType" />
+<xs:complexType name="FileDocumentType">
+<xs:complexContent>
+<xs:extension base="DocumentType">
+<xs:sequence>
+<xs:element form="qualified" minOccurs="0" name="encoding" type="xs:string" />
+<xs:element form="qualified" minOccurs="0" name="filename" type="xs:string" />
+<xs:element form="qualified" minOccurs="0" name="data" type="xs:base64Binary" />
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:schema>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:Request.schema.metaservice.vgr.se:v1" xmlns="urn:Request.schema.metaservice.vgr.se:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:complexType name="IdentificationType">
+<xs:sequence>
+<xs:element form="qualified" name="userId" type="xs:string" />
+<xs:element form="qualified" name="profileId" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OptionsType">
+<xs:sequence>
+<xs:element form="qualified" name="includeSourceIds" nillable="true">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="entry">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" minOccurs="0" name="key" type="xs:int" />
+<xs:element form="qualified" minOccurs="0" name="value" type="IncludeSourceIdsListType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element form="qualified" name="filterByProperties" nillable="true">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="entry">
+<xs:complexType>
+<xs:sequence>
+<xs:element form="qualified" minOccurs="0" name="key" type="xs:string" />
+<xs:element form="qualified" minOccurs="0" name="value" type="filterByPropertiesListType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element form="qualified" name="wordsToReturn" nillable="true" type="xs:int" />
+<xs:element form="qualified" name="inputWords" nillable="true" type="xs:int" />
+<xs:element form="qualified" name="url" nillable="true" type="xs:string" />
+<xs:element form="qualified" name="matchSynonyms" nillable="true" type="xs:boolean" />
+<xs:element form="qualified" name="synomize" nillable="true" type="xs:boolean" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="IncludeSourceIdsListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="includeSourceId" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="filterByPropertiesListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="filter" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:Response.schema.metaservice.vgr.se:v1" xmlns="urn:Response.schema.metaservice.vgr.se:v1" xmlns:ns1="urn:Node.schema.metaservice.vgr.se:v2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:import namespace="urn:Node.schema.metaservice.vgr.se:v2" />
+<xs:complexType name="ResponseObjectType">
+<xs:sequence>
+<xs:element form="qualified" name="requestId" type="xs:string" />
+<xs:element form="qualified" name="statusCode" type="ns1:statusCodeEnum" />
+<xs:element form="qualified" minOccurs="0" name="errorMessage" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="LookupResponseObjectType">
+<xs:sequence>
+<xs:element form="qualified" name="requestId" type="xs:string" />
+<xs:element form="qualified" name="statusCode" type="ns1:statusCodeEnum" />
+<xs:element form="qualified" minOccurs="0" name="errorMessage" type="xs:string" />
+<xs:element form="qualified" name="listType" type="ns1:listTypeEnum" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="NodeListResponseObjectType">
+<xs:sequence>
+<xs:element form="qualified" name="requestId" type="xs:string" />
+<xs:element form="qualified" name="statusCode" type="ns1:statusCodeEnum" />
+<xs:element form="qualified" minOccurs="0" name="errorMessage" type="xs:string" />
+<xs:element form="qualified" name="nodeList" type="ns1:NodeListType" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="LastChangeResponseObjectType">
+<xs:sequence>
+<xs:element form="qualified" name="requestId" type="xs:string" />
+<xs:element form="qualified" name="statusCode" type="ns1:statusCodeEnum" />
+<xs:element form="qualified" minOccurs="0" name="errorMessage" type="xs:string" />
+<xs:element form="qualified" name="lastChange" type="xs:long" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="XMLResponseObjectType">
+<xs:sequence>
+<xs:element form="qualified" name="requestId" type="xs:string" />
+<xs:element form="qualified" name="statusCode" type="ns1:statusCodeEnum" />
+<xs:element form="qualified" minOccurs="0" name="errorMessage" type="xs:string" />
+<xs:element form="qualified" name="xml" type="xs:string" />
+<xs:element form="qualified" name="time" type="xs:long" />
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2" xmlns="urn:VocabularyServices:wsdl:metaservice.vgr.se:v2" xmlns:ns1="urn:Request.schema.metaservice.vgr.se:v1" xmlns:ns2="urn:Node.schema.metaservice.vgr.se:v2" xmlns:ns3="urn:Response.schema.metaservice.vgr.se:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:import namespace="urn:Request.schema.metaservice.vgr.se:v1" />
+<xs:import namespace="urn:Node.schema.metaservice.vgr.se:v2" />
+<xs:import namespace="urn:Response.schema.metaservice.vgr.se:v1" />
+<xs:element name="AddVocabularyNodeRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="node" type="ns2:NodeType" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="AddVocabularyNodeResponse" nillable="true" type="ns3:ResponseObjectType" />
+<xs:element name="FindNodesByNameRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="name" type="xs:string" />
+<xs:element name="nameSpaceName" type="xs:string" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="FindNodesByNameResponse" nillable="true" type="ns3:NodeListResponseObjectType" />
+<xs:element name="FindNodesRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="nameSpaceName" type="xs:string" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="FindNodesResponse" nillable="true" type="ns3:NodeListResponseObjectType" />
+<xs:element name="GetNamespaceXmlRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="namespace" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetNamespaceXmlResponse" nillable="true" type="ns3:XMLResponseObjectType" />
+<xs:element name="GetVocabularyRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="path" type="xs:string" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetVocabularyResponse" nillable="true" type="ns3:NodeListResponseObjectType" />
+<xs:element name="LastChangeRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="namespace" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="LastChangeResponse" nillable="true" type="ns3:LastChangeResponseObjectType" />
+<xs:element name="LookupWordRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="word" type="xs:string" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="LookupWordResponse" nillable="true" type="ns3:LookupResponseObjectType" />
+<xs:element name="MoveVocabularyNodeRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="node" type="ns2:NodeType" />
+<xs:element name="destNodePath" type="xs:string" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="MoveVocabularyNodeResponse" nillable="true" type="ns3:ResponseObjectType" />
+<xs:element name="UpdateVocabularyNodeRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="identification" type="ns1:IdentificationType" />
+<xs:element name="requestId" type="xs:string" />
+<xs:element name="node" type="ns2:NodeType" />
+<xs:element name="options" type="ns1:OptionsType" />
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="UpdateVocabularyNodeResponse" nillable="true" type="ns3:ResponseObjectType" />
+</xs:schema>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:Node.schema.metaservice.vgr.se:v2" xmlns:tns="urn:Node.schema.metaservice.vgr.se:v2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:complexType name="NodeType">
+<xs:sequence>
+<xs:element form="qualified" name="name" type="xs:string" />
+<xs:element form="qualified" name="namespaceId" type="xs:string" />
+<xs:element form="qualified" name="internalId" type="xs:string" />
+<xs:element form="qualified" name="sourceId" type="xs:string" />
+<xs:element form="qualified" minOccurs="0" name="synonyms" type="tns:SynonymsListType" />
+<xs:element form="qualified" minOccurs="0" name="nodeProperties" type="tns:NodePropertyListType" />
+<xs:element form="qualified" minOccurs="0" name="parents" type="tns:NodeListType" />
+<xs:element form="qualified" minOccurs="0" name="userStatus" type="tns:UserStatusListType" />
+<xs:element form="qualified" name="hasChildren" type="xs:boolean" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="SynonymsListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="Synonym" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="NodePropertyListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="NodeProperty" type="tns:NodePropertyType" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="NodePropertyType">
+<xs:sequence>
+<xs:element form="qualified" name="name" type="xs:string" />
+<xs:element form="qualified" name="value" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="NodeListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="Node" type="tns:NodeType" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="UserStatusListType">
+<xs:sequence>
+<xs:element form="qualified" maxOccurs="unbounded" name="UserStatus" type="tns:userStatusEnum" />
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="userStatusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="Tagged" />
+<xs:enumeration value="Bookmarked" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="statusCodeEnum">
+<xs:restriction base="xs:int">
+<xs:enumeration value="1001" />
+<xs:enumeration value="6001" />
+<xs:enumeration value="200" />
+<xs:enumeration value="1003" />
+<xs:enumeration value="3004" />
+<xs:enumeration value="3007" />
+<xs:enumeration value="3003" />
+<xs:enumeration value="3008" />
+<xs:enumeration value="3006" />
+<xs:enumeration value="2001" />
+<xs:enumeration value="3010" />
+<xs:enumeration value="3009" />
+<xs:enumeration value="3005" />
+<xs:enumeration value="3001" />
+<xs:enumeration value="1002" />
+<xs:enumeration value="3002" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="listTypeEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="WHITELIST" />
+<xs:enumeration value="NONE" />
+<xs:enumeration value="BLACKLIST" />
+</xs:restriction>
+</xs:simpleType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="FindNodesByName">
+    <wsdl:part element="ns1:FindNodesByNameRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVocabularyResponse">
+    <wsdl:part element="ns1:GetVocabularyResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetNamespaceXmlResponse">
+    <wsdl:part element="ns1:GetNamespaceXmlResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetNamespaceXml">
+    <wsdl:part element="ns1:GetNamespaceXmlRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="LookupWordResponse">
+    <wsdl:part element="ns1:LookupWordResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MoveVocabularyNodeResponse">
+    <wsdl:part element="ns1:MoveVocabularyNodeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddVocabularyNode">
+    <wsdl:part element="ns1:AddVocabularyNodeRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateVocabularyNodeResponse">
+    <wsdl:part element="ns1:UpdateVocabularyNodeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindNodesByNameResponse">
+    <wsdl:part element="ns1:FindNodesByNameResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="LookupWord">
+    <wsdl:part element="ns1:LookupWordRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindNodesResponse">
+    <wsdl:part element="ns1:FindNodesByNameResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVocabulary">
+    <wsdl:part element="ns1:GetVocabularyRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLastChange">
+    <wsdl:part element="ns1:LastChangeRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MoveVocabularyNode">
+    <wsdl:part element="ns1:MoveVocabularyNodeRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindNodes">
+    <wsdl:part element="ns1:FindNodesRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLastChangeResponse">
+    <wsdl:part element="ns1:LastChangeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateVocabularyNode">
+    <wsdl:part element="ns1:UpdateVocabularyNodeRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddVocabularyNodeResponse">
+    <wsdl:part element="ns1:AddVocabularyNodeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="VocabularyService">
+    <wsdl:operation name="AddVocabularyNode">
+      <wsdl:input message="ns1:AddVocabularyNode" name="AddVocabularyNode">
+    </wsdl:input>
+      <wsdl:output message="ns1:AddVocabularyNodeResponse" name="AddVocabularyNodeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateVocabularyNode">
+      <wsdl:input message="ns1:UpdateVocabularyNode" name="UpdateVocabularyNode">
+    </wsdl:input>
+      <wsdl:output message="ns1:UpdateVocabularyNodeResponse" name="UpdateVocabularyNodeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LookupWord">
+      <wsdl:input message="ns1:LookupWord" name="LookupWord">
+    </wsdl:input>
+      <wsdl:output message="ns1:LookupWordResponse" name="LookupWordResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FindNodes">
+      <wsdl:input message="ns1:FindNodes" name="FindNodes">
+    </wsdl:input>
+      <wsdl:output message="ns1:FindNodesResponse" name="FindNodesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLastChange">
+      <wsdl:input message="ns1:GetLastChange" name="GetLastChange">
+    </wsdl:input>
+      <wsdl:output message="ns1:GetLastChangeResponse" name="GetLastChangeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MoveVocabularyNode">
+      <wsdl:input message="ns1:MoveVocabularyNode" name="MoveVocabularyNode">
+    </wsdl:input>
+      <wsdl:output message="ns1:MoveVocabularyNodeResponse" name="MoveVocabularyNodeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FindNodesByName">
+      <wsdl:input message="ns1:FindNodesByName" name="FindNodesByName">
+    </wsdl:input>
+      <wsdl:output message="ns1:FindNodesByNameResponse" name="FindNodesByNameResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNamespaceXml">
+      <wsdl:input message="ns1:GetNamespaceXml" name="GetNamespaceXml">
+    </wsdl:input>
+      <wsdl:output message="ns1:GetNamespaceXmlResponse" name="GetNamespaceXmlResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVocabulary">
+      <wsdl:input message="ns1:GetVocabulary" name="GetVocabulary">
+    </wsdl:input>
+      <wsdl:output message="ns1:GetVocabularyResponse" name="GetVocabularyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>
