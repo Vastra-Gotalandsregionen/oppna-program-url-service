@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.urlservice.repository.ApplicationRepository;
 import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.HitRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
@@ -45,6 +46,7 @@ import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Hit;
 import se.vgregion.urlservice.types.Keyword;
@@ -73,6 +75,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     private KeywordRepository keywordRepository;
     private LongUrlRepository longUrlRepository;
     private HitRepository hitRepository;
+    private ApplicationRepository applicationRepository;
     
     public DefaultUrlServiceService() {
         log.info("Created {}", DefaultUrlServiceService.class.getName());
@@ -135,7 +138,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
             if(link != null) {
                 return link;
             } else {
-                String md5 = DigestUtils.md5Hex("{" + owner.getUserName() + "}" + url.toString());
+                String md5 = DigestUtils.md5Hex("{" + owner.getName() + "}" + url.toString());
                 
                 int length = INITIAL_HASH_LENGTH;
                 
@@ -333,7 +336,15 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public void setHitRepository(HitRepository hitRepository) {
         this.hitRepository = hitRepository;
     }
+    
+    public ApplicationRepository getApplicationRepository() {
+        return applicationRepository;
+    }
 
+    @Resource
+    public void setApplicationRepository(ApplicationRepository applicationRepository) {
+        this.applicationRepository = applicationRepository;
+    }
 
     public String getDomain() {
         return domain;
@@ -347,10 +358,10 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     @Override
     @Transactional
-    public User getUser(String vgrId) {
-        User user = userRepository.find(vgrId);
+    public User getUser(String username) {
+        User user = userRepository.findByName(username);
         if(user == null) {
-            user = new User(vgrId);
+            user = new User(username);
             userRepository.persist(user);
         }
         return user;
@@ -412,5 +423,29 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public void addHit(LongUrl longUrl) {
         Hit hit = new Hit(null, longUrl.getId(), new Date().getTime());
         hitRepository.persist(hit);
+    }
+
+    @Override
+    @Transactional
+    public Application getApplication(String apiKey) {
+        return applicationRepository.findByApiKey(apiKey);
+    }
+
+    @Override
+    @Transactional
+    public void createApplication(Application application) {
+        applicationRepository.persist(application);
+    }
+
+    @Override
+    @Transactional
+    public Collection<Application> findAllApplications() {
+        return applicationRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void removeApplication(UUID id) {
+        applicationRepository.remove(id);
     }
 }

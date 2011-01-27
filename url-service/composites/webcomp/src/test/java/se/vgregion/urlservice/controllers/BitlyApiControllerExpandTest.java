@@ -34,10 +34,11 @@ public class BitlyApiControllerExpandTest {
     private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private MockHttpServletResponse response = new MockHttpServletResponse();
     private static final String GLOBAL_HASH = "abcdef";
+    private static final String API_KEY = "123456";
 
     @Test
     public void jsonResponse() throws IOException {
-        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "json", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "json", API_KEY, response);
 
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -55,7 +56,7 @@ public class BitlyApiControllerExpandTest {
 
     @Test
     public void xmlResponse() throws IOException {
-        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "xml", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "xml", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -73,7 +74,7 @@ public class BitlyApiControllerExpandTest {
     
     @Test
     public void txtResponse() throws IOException {
-        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "txt", response);
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "txt", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("http://example.com", response.getContentAsString());
@@ -81,15 +82,23 @@ public class BitlyApiControllerExpandTest {
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        controller.expand(Arrays.asList(URI.create("http://example.com")), null, "unknown", response);
+        controller.expand(Arrays.asList(URI.create("http://example.com")), null, "unknown", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void noShortLinkNorHashMustBeRefused() throws IOException {
-        controller.expand(null, null, "txt", response);
+        controller.expand(null, null, "txt", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
+
+    @Test
+    public void invalidApiKey() throws IOException {
+        controller.expand(Arrays.asList(URI.create("http://s.vgregion.se/foo")), null, "json", "dummy", response);
+
+        Assert.assertEquals(500, response.getStatus());
+    }
+
 }

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
@@ -120,4 +121,13 @@ public interface UrlServiceService {
     
     void addHit(Bookmark bookmark);
     void addHit(LongUrl longUrl);
+    
+    Application getApplication(String apikey);
+    
+    void createApplication(Application application);
+
+    Collection<Application> findAllApplications();
+
+    void removeApplication(UUID id);
+
 }

@@ -127,7 +127,7 @@ public class BookmarkController {
 
             Bookmark shortLink = urlServiceService.shorten(longUrl, slug, keywordNames, user);
 
-            return new ModelAndView("redirect:/u/" +  user.getUserName() + "/b/" + shortLink.getHash() + "/edit");
+            return new ModelAndView("redirect:/u/" +  user.getName() + "/b/" + shortLink.getHash() + "/edit");
         } catch (IllegalArgumentException e) {
             // TODO add validation support
             throw e;
@@ -156,11 +156,11 @@ public class BookmarkController {
         User user = getUser(authentication);
         mav.addObject("user", getUser(authentication));
         
-        if(user == null || !username.equals(user.getUserName())) {
+        if(user == null || !username.equals(user.getName())) {
             throw new ForbiddenException();
         }
         
-        mav.addObject("userid", user.getUserName());
+        mav.addObject("userid", user.getName());
         
         Bookmark bookmark = urlServiceService.expand(hash);
         if(bookmark != null) {
@@ -184,7 +184,7 @@ public class BookmarkController {
     }
 
     private String createShortLink(User user, Bookmark bookmark) {
-        String shortLink = shortLinkPrefix + "u/" + user.getUserName() + "/b/";
+        String shortLink = shortLinkPrefix + "u/" + user.getName() + "/b/";
         if(bookmark.getSlug() != null) {
             shortLink += bookmark.getSlug();
         } else {
@@ -198,7 +198,7 @@ public class BookmarkController {
             @RequestParam(value="keywords") String keywordNameString, @RequestParam(value="slug", required=false) String slug, 
             Authentication authentication) throws IOException {
         User user = getUser(authentication);
-        if(user == null || !username.equals(user.getUserName())) {
+        if(user == null || !username.equals(user.getName())) {
             throw new ForbiddenException();
         }
         

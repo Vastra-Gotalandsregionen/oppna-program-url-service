@@ -21,20 +21,29 @@ package se.vgregion.urlservice.types;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class User extends AbstractEntity<String> {
+@javax.persistence.Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+public class User extends AbstractEntity<UUID> {
 
+    @SuppressWarnings("unused")
     @Id
-    private String username;
+    private UUID id;
+    
+    @Column(nullable=false, unique=true)
+    private String name;
     
     @OneToMany
     private Collection<Bookmark> bookmarks = new HashSet<Bookmark>();
@@ -42,19 +51,20 @@ public class User extends AbstractEntity<String> {
     protected User() {
     }
 
-    public User(String vgrId) {
-        Assert.hasText(vgrId);
-        
-        this.username = vgrId;
+    public User(String name) {
+        Assert.hasText(name);
+
+        this.id = UUID.randomUUID();
+        this.name = name;
     }
 
     @Override
-    public String getId() {
-        return username;
+    public UUID getId() {
+        return id;
     }
     
-    public String getUserName() {
-        return username;
+    public String getName() {
+        return name;
     }
 
     public Collection<Bookmark> getShortLinks() {

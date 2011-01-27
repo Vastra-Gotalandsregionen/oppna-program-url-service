@@ -30,5 +30,6 @@
         <class>se.vgregion.urlservice.types.User</class>
         <class>se.vgregion.urlservice.types.Keyword</class>
         <class>se.vgregion.urlservice.types.LongUrl</class>
+        <class>se.vgregion.urlservice.types.Application</class>
     </persistence-unit>
 </persistence>

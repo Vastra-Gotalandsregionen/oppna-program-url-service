@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.User;
 
@@ -73,14 +74,20 @@ public class BitlyApiController {
         }
     }
     
-    private User systemUser = new User("SYSTEM");
-
     @RequestMapping("/shorten")
     public void shorten(@RequestParam("longUrl") URI url,
-            @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
+            @RequestParam(value = "format", defaultValue = "json") String format, 
+            @RequestParam("apiKey") String apiKey,
+            HttpServletResponse response)
             throws IOException {
         try {
-            Bookmark link = urlServiceService.shorten(url, systemUser);
+            Application application = urlServiceService.getApplication(apiKey);
+            if(application == null) {
+                sendAccessDeniedError(response);
+                return;
+            }
+            
+            Bookmark link = urlServiceService.shorten(url, application);
 
             PrintWriter writer = response.getWriter();
 
@@ -128,10 +135,18 @@ public class BitlyApiController {
     @RequestMapping("/expand")
     public void expand(@RequestParam(value = "shortUrl", required = false) List<URI> shortUrls,
             @RequestParam(value = "hash", required = false) List<String> hashes,
-            @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
+            @RequestParam(value = "format", defaultValue = "json") String format, 
+            @RequestParam("apiKey") String apiKey,
+            HttpServletResponse response)
             throws IOException {
 
         try {
+            Application application = urlServiceService.getApplication(apiKey);
+            if(application == null) {
+                sendAccessDeniedError(response);
+                return;
+            }
+
             List<Bookmark> links = new ArrayList<Bookmark>();
             if(shortUrls != null) {
                 for (URI shortUrl : shortUrls) {
@@ -205,10 +220,18 @@ public class BitlyApiController {
 
     @RequestMapping("/lookup")
     public void lookup(@RequestParam(value = "url") List<URI> urls,
-            @RequestParam(value = "format", defaultValue = "json") String format, HttpServletResponse response)
+            @RequestParam(value = "format", defaultValue = "json") String format, 
+            @RequestParam("apiKey") String apiKey,
+            HttpServletResponse response)
             throws IOException {
 
         try {
+            Application application = urlServiceService.getApplication(apiKey);
+            if(application == null) {
+                sendAccessDeniedError(response);
+                return;
+            }
+
             List<Bookmark> links = new ArrayList<Bookmark>();
             if(urls != null) {
                 for (URI shortUrl : urls) {
@@ -278,5 +301,9 @@ public class BitlyApiController {
 
     private void sendInvalidUriError(HttpServletResponse response) throws IOException {
         response.sendError(500, "INVALID_URI");
+    }
+    
+    private void sendAccessDeniedError(HttpServletResponse response) throws IOException {
+        response.sendError(500, "ACCESS_DENIED");
     }
 }

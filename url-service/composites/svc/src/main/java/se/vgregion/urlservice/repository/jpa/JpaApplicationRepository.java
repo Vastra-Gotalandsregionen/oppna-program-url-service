@@ -19,6 +19,10 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.NoResultException;
@@ -28,30 +32,30 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
-import se.vgregion.urlservice.repository.UserRepository;
+import se.vgregion.urlservice.repository.ApplicationRepository;
+import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.types.Application;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Keyword;
     
-@Repository
-public class JpaUserRepository extends AbstractJpaRepository<User, UUID, UUID> implements UserRepository {
+@Repository("applicationRepository")
+public class JpaApplicationRepository extends AbstractJpaRepository<Application, UUID, UUID> implements ApplicationRepository {
     
-    public JpaUserRepository() {
-        super(User.class);
+    public JpaApplicationRepository() {
+        super(Application.class);
     }
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public User find(UUID id) {
+    public Application find(UUID id) {
         try {
-            return (User) entityManager.createQuery("select l from User l where l.id = :id")
+            return (Application) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.id = :id")
             .setParameter("id", id)
             .getSingleResult();
-            
         } catch(NoResultException e) {
             return null;
         }
     }
-    
+
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Application findByName(String name) {
@@ -63,4 +67,19 @@ public class JpaUserRepository extends AbstractJpaRepository<User, UUID, UUID> i
             return null;
         }
     }
+
+    @Override
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public Application findByApiKey(String apikey) {
+        try {
+            return (Application) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.apikey = :apikey")
+            .setParameter("apikey", apikey)
+            .getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
+    }
+
+
+    
 }

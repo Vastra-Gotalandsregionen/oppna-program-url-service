@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
 
@@ -62,6 +63,7 @@ public class AdminGuiController {
         
         mav.addObject("redirectRules", urlServiceService.findAllRedirectRules());
         mav.addObject("staticRedirects", urlServiceService.findAllStaticRedirects());
+        mav.addObject("applications", urlServiceService.findAllApplications());
         
         return mav;
     }
@@ -124,6 +126,29 @@ public class AdminGuiController {
             if(deletedId != null) {
                 log.debug("Deleting static redirect {}", deletedId);
                 urlServiceService.removeStaticRedirect(deletedId);
+            }
+        }
+        
+        return mav;
+    }
+
+    @RequestMapping(value="/admin/applications", method=RequestMethod.POST)
+    public ModelAndView updateApplications(HttpServletRequest request) throws IOException {
+        ModelAndView mav = new ModelAndView("redirect:../admin");
+        
+        if(request.getParameter("add") != null) {
+            // adding a new application
+            String name = request.getParameter("name");
+            
+            if(StringUtils.isNotEmpty(name)) {
+                log.debug("Adding application with name \"{}\"", name);
+                urlServiceService.createApplication(new Application(name));
+            }
+        } else {
+            UUID deletedId = findDeletedId(request);
+            if(deletedId != null) {
+                log.debug("Deleting application {}", deletedId);
+                urlServiceService.removeApplication(deletedId);
             }
         }
         

@@ -34,11 +34,12 @@ public class BitlyApiLookupTest {
     private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private MockHttpServletResponse response = new MockHttpServletResponse();
     private static final String GLOBAL_HASH = "abcdef";
+    private static final String API_KEY = "123456";
 
     
     @Test
     public void jsonResponse() throws IOException {
-        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "json", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "json", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -54,7 +55,7 @@ public class BitlyApiLookupTest {
 
     @Test
     public void xmlResponse() throws IOException {
-        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "xml", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "xml", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -70,22 +71,30 @@ public class BitlyApiLookupTest {
     
     @Test
     public void txtResponseNotAllowed() throws IOException {
-        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "txt", response);
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "txt", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        controller.lookup(Arrays.asList(URI.create("http://example.com")), "unknown", response);
+        controller.lookup(Arrays.asList(URI.create("http://example.com")), "unknown", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void noUrlMustBeRefused() throws IOException {
-        controller.lookup(null, "txt", response);
+        controller.lookup(null, "txt", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
+    
+    @Test
+    public void invalidApiKey() throws IOException {
+        controller.lookup(Arrays.asList(URI.create("http://s.vgregion.se/foo")), "xml", "dummy", response);
+
+        Assert.assertEquals(500, response.getStatus());
+    }
+
 }

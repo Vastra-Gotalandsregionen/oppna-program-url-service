@@ -40,6 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
 
@@ -145,6 +146,43 @@ public class AdminGuiControllerTest {
         controller.updateStaticRedirects(request);
 
         verify(urlServiceService).removeStaticRedirect(id);
+    }
+
+    @Test
+    public void addApplication() throws IOException {
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
+        
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("add", "any value");
+        request.addParameter("name", "App");
+        
+        controller.updateApplications(request);
+
+        verify(urlServiceService).createApplication(Mockito.argThat(new TypeSafeMatcher<Application>() {
+            @Override
+            public boolean matchesSafely(Application app) {
+                return app.getName().equals("App");
+            }
+
+            @Override
+            public void describeTo(Description arg0) {
+            }}));
+    }
+
+    @Test
+    public void deleteApplication() throws IOException {
+        UrlServiceService urlServiceService = mock(UrlServiceService.class);
+        controller.setUrlServiceService(urlServiceService);
+        
+        UUID id = UUID.randomUUID();
+        
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("delete-" + id.toString(), "any value");
+        
+        controller.updateApplications(request);
+
+        verify(urlServiceService).removeApplication(id);
     }
 
 }

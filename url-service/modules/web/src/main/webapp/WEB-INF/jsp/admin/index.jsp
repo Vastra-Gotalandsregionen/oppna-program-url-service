@@ -80,6 +80,34 @@
 					</tr>
 			</table>
 		</form>		
+
+		<h2>Applikationer</h2>
+
+		<form action="admin/applications" method="post">
+			<div style="height:0px; width:0px; position:absolute; overflow:hidden">
+				<!-- Hack, make sure the add action happens on user pressing Enter -->
+    			<input type="submit" name="add" />
+			</div>
+			<table>
+				<tr>
+					<th>Namn</th>
+					<th>API nyckel</th>
+					<th></th>
+				</tr>
+				<c:forEach var="application" items="${applications}">
+					<tr>
+						<td>${application.name}</td>
+						<td>${application.apikey}</td>
+						<td><input type="submit" value="Ta bort" name="delete-${redirect.id}">
+					</tr>
+				</c:forEach>
+					<tr>
+						<td><input name="name"></td>
+						<td></td>
+						<td><input type="submit" value="Lägg till" name="add">
+					</tr>
+			</table>
+		</form>		
 	
 	</body>
 </html>

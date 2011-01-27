@@ -21,6 +21,7 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,13 +34,12 @@ public class BitlyApiControllerShortenTest {
     private BitlyApiController controller = new BitlyApiController(new MockUrlServiceService(), SHORT_LINK_PREFIX);
     private static final URI LONG_URL = URI.create("http://example.com");
     private static final String GLOBAL_HASH = "abcdef";
-
+    private static final String API_KEY = "123456";
+    private MockHttpServletResponse response = new MockHttpServletResponse();
     
     @Test
     public void jsonResponse() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(LONG_URL, "json", response);
+        controller.shorten(LONG_URL, "json", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -56,9 +56,7 @@ public class BitlyApiControllerShortenTest {
 
     @Test
     public void xmlResponse() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(LONG_URL, "xml", response);
+        controller.shorten(LONG_URL, "xml", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(
@@ -77,9 +75,7 @@ public class BitlyApiControllerShortenTest {
     
     @Test
     public void txtResponse() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(LONG_URL, "txt", response);
+        controller.shorten(LONG_URL, "txt", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("foo", response.getContentAsString());
@@ -87,38 +83,38 @@ public class BitlyApiControllerShortenTest {
 
     @Test
     public void unknownFormatMustNotBeAllowed() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(LONG_URL, "unknown", response);
+        controller.shorten(LONG_URL, "unknown", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void invalidUrlMustBeRefused() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(URI.create("dummy:/invalid"), "txt", response);
+        controller.shorten(URI.create("dummy:/invalid"), "txt", API_KEY, response);
         
         Assert.assertEquals(500, response.getStatus());
     }
 
     @Test
     public void httpUrlShouldBeAllowed() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(LONG_URL, "txt", response);
+        controller.shorten(LONG_URL, "txt", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
     }
 
     @Test
     public void HttpsUrlShouldBeAllowed() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        
-        controller.shorten(URI.create("https://example.com"), "txt", response);
+        controller.shorten(URI.create("https://example.com"), "txt", API_KEY, response);
         
         Assert.assertEquals(200, response.getStatus());
     }
+    
+    @Test
+    public void invalidApiKey() throws IOException {
+        controller.shorten(LONG_URL, "txt", "dummy", response);
+
+        Assert.assertEquals(500, response.getStatus());
+    }
+
 
 }

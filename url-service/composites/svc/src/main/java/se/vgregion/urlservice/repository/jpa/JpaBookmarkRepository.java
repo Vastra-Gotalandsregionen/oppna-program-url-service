@@ -77,9 +77,9 @@ public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID,
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Bookmark findByLongUrl(URI longUrl, User owner) {
         try {
-            return (Bookmark)entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.owner.username = :username " +
+            return (Bookmark)entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.owner.name = :name " +
             		"and l.longUrl.url = :longurl")
-	    .setParameter("username", owner.getUserName())
+	    .setParameter("name", owner.getName())
             .setParameter("longurl", longUrl.toString())
             .getSingleResult();
         } catch(NoResultException e) {

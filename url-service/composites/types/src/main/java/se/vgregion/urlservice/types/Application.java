@@ -17,15 +17,28 @@
  *
  */
 
-package se.vgregion.urlservice.repository;
+package se.vgregion.urlservice.types;
 
 import java.util.UUID;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
-import se.vgregion.urlservice.types.Application;
-import se.vgregion.urlservice.types.User;
-    
-public interface UserRepository extends JpaRepository<User, UUID, UUID> {
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
-    Application findByName(String name);
+@Entity
+public class Application extends User {
+
+    @Column(nullable=false, unique=true)
+    private String apikey;
+    
+    protected Application() {
+    }
+
+    public Application(String name) {
+        super(name);
+        this.apikey = UUID.randomUUID().toString();
+    }
+
+    public String getApikey() {
+        return apikey;
+    }
 }

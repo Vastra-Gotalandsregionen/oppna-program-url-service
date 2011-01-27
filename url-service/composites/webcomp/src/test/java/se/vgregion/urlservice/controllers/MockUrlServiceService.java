@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
@@ -173,5 +174,27 @@ public class MockUrlServiceService implements UrlServiceService {
         
     }
 
+    @Override
+    public Application getApplication(String apiKey) {
+        if("123456".equals(apiKey)) {
+            return new Application("test");
+        } else {
+            return null;
+        }
+    }
 
+    @Override
+    public void createApplication(Application application) {
+        
+    }
+
+    @Override
+    public Collection<Application> findAllApplications() {
+        return null;
+    }
+
+    @Override
+    public void removeApplication(UUID id) {
+        
+    }
 }
