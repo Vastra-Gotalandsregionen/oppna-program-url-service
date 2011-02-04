@@ -38,7 +38,7 @@ public class RedirectTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/foo");
         request.setServerName("s.vgregion.se");
         request.setPathInfo("/foo");
-        ModelAndView mav = controller.redirect(request, response);
+        ModelAndView mav = controller.redirect("foo", request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
@@ -49,7 +49,7 @@ public class RedirectTest {
     public void redirectWithNonExistingHash() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/dummy");
         request.setPathInfo("/dummy");
-        ModelAndView mav = controller.redirect(request, response);
+        ModelAndView mav = controller.redirect("dummy", request, response);
         
         Assert.assertEquals(404, response.getStatus());
         Assert.assertNull(mav);
@@ -60,7 +60,7 @@ public class RedirectTest {
     public void redirectWithRedirectRule() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/bar");
         request.setPathInfo("/bar");
-        ModelAndView mav = controller.redirect(request, response);
+        ModelAndView mav = controller.redirect("bar", request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://google.com", response.getHeader("Location"));

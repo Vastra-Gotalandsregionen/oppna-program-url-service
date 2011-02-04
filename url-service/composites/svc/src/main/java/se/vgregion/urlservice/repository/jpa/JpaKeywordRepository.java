@@ -86,10 +86,14 @@ public class JpaKeywordRepository extends AbstractJpaRepository<Keyword, UUID, U
                 Keyword keyword = findByName(keywordName);
                 
                 if(keyword == null) {
-                    keyword = new Keyword(keywordName);
-                    persist(keyword);
+                    if(keywordName.trim().length() > 0) {
+                        keyword = new Keyword(keywordName);
+                        persist(keyword);
+                        keywords.add(keyword);
+                    }
+                } else {
+                    keywords.add(keyword);
                 }
-                keywords.add(keyword);
             }
         }
         return keywords;

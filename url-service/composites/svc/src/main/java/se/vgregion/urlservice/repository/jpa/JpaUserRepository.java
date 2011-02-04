@@ -54,9 +54,9 @@ public class JpaUserRepository extends AbstractJpaRepository<User, UUID, UUID> i
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public Application findByName(String name) {
+    public User findByName(String name) {
         try {
-            return (Application) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.name = :name")
+            return (User) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.name = :name")
             .setParameter("name", name)
             .getSingleResult();
         } catch(NoResultException e) {

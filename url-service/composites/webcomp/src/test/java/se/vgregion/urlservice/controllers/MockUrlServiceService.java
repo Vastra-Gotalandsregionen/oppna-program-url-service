@@ -197,4 +197,9 @@ public class MockUrlServiceService implements UrlServiceService {
     public void removeApplication(UUID id) {
         
     }
+
+    @Override
+    public Collection<User> findAllUsers() {
+        return null;
+    }
 }

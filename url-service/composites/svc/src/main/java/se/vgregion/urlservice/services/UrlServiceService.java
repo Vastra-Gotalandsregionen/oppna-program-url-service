@@ -109,6 +109,8 @@ public interface UrlServiceService {
 
     void createStaticRedirect(StaticRedirect redirect);
 
+    Collection<User> findAllUsers();
+
     Collection<StaticRedirect> findAllStaticRedirects();
 
     Collection<RedirectRule> findAllRedirectRules();

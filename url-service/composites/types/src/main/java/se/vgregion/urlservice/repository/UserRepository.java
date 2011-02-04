@@ -27,5 +27,5 @@ import se.vgregion.urlservice.types.User;
     
 public interface UserRepository extends JpaRepository<User, UUID, UUID> {
 
-    Application findByName(String name);
+    User findByName(String name);
 }

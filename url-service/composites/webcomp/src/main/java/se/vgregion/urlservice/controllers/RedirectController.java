@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -59,8 +60,8 @@ public class RedirectController {
     /**
      * Handle redirects
      */
-    @RequestMapping("/**")
-    public ModelAndView redirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping("/{path}")
+    public ModelAndView redirect(@PathVariable("path") String path, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("Redirecting");
         
         // TODO clean up domain handling
@@ -69,7 +70,7 @@ public class RedirectController {
             domain += ":" + request.getServerPort();
         }
         domain += request.getContextPath();
-        String path = request.getPathInfo().substring(1);
+        //String path = request.getPathInfo().substring(1);
         URI uri = urlServiceService.redirect(domain, path);
 
         if(uri != null) {

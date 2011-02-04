@@ -448,4 +448,9 @@ public class DefaultUrlServiceService implements UrlServiceService {
     public void removeApplication(UUID id) {
         applicationRepository.remove(id);
     }
+
+    @Override
+    public Collection<User> findAllUsers() {
+        return userRepository.findAll();
+    }
 }

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,9 +84,20 @@ public class BookmarkController {
             this.shortLinkPrefix += "/";
         }        
     }
+    
+    @RequestMapping(value="/", method=RequestMethod.GET)
+    public ModelAndView index() throws IOException {
+        Collection<User> users = urlServiceService.findAllUsers();
+
+        ModelAndView mav = new ModelAndView("index");
+        
+        mav.addObject("users", users);
+        return mav;
+    }
+
 
     @RequestMapping(value="/u/{username}/b", method=RequestMethod.GET)
-    public ModelAndView index(@PathVariable(value="username") String username,
+    public ModelAndView bookmarks(@PathVariable(value="username") String username,
             Authentication authentication) throws IOException {
         
         User user = urlServiceService.getUser(username);
