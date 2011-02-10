@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
     
 public interface BookmarkRepository extends JpaRepository<Bookmark, UUID, UUID> {
 
@@ -36,5 +36,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, UUID, UUID> 
     /**
      * Find link by URL.
      */
-    Bookmark findByLongUrl(URI longUrl, User owner);
+    Bookmark findByLongUrl(URI longUrl, Owner owner);
 }

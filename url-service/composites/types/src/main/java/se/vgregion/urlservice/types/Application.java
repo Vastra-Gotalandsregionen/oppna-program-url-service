@@ -25,7 +25,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
-public class Application extends User {
+public class Application extends Owner {
 
     @Column(nullable=false, unique=true)
     private String apikey;

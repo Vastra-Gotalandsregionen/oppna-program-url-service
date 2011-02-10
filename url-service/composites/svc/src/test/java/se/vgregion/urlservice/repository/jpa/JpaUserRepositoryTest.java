@@ -28,20 +28,20 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.urlservice.repository.UserRepository;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaUserRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private UserRepository dao;
     
-    private User user1;
+    private Owner user1;
     
     @Before
     @Transactional
     public void setup() {
         dao = applicationContext.getBean(UserRepository.class);
-        user1 = dao.persist(new User("SE123-123"));
+        user1 = dao.persist(new Owner("SE123-123"));
         dao.flush();
     }
     
@@ -49,7 +49,7 @@ public class JpaUserRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Transactional
     @Rollback
     public void find() {
-        User loaded = dao.find(user1.getId());
+        Owner loaded = dao.find(user1.getId());
         
         Assert.assertEquals(user1.getId(), loaded.getId());
     }

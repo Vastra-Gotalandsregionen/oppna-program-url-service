@@ -40,7 +40,7 @@ import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -56,7 +56,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Before
     @Transactional
     public void setup() {
-        User owner = new User("roblu");
+        Owner owner = new Owner("roblu");
         LongUrl longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);
         Keyword kw1 = new Keyword("kw1");
         List<Keyword> keywords = Arrays.asList(kw1);
@@ -125,7 +125,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     @Rollback
     public void findNonExistingByLongUrl() {
-        User owner = new User("roblu");
+        Owner owner = new Owner("roblu");
         Assert.assertNull(dao.findByLongUrl(URI.create("http://dummy"), owner));
     }
     
@@ -143,7 +143,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        User owner = new User("roblu");
+        Owner owner = new Owner("roblu");
         LongUrl otherLongUrl = new LongUrl(URI.create("http://dummy"), GLOBAL_HASH);
         List<Keyword> keywords = Arrays.asList(new Keyword("kw1"));
         

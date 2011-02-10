@@ -130,6 +130,11 @@
 		    <artifactId>spring-security-web</artifactId>
 		    <version>3.0.4.RELEASE</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-ldap</artifactId>
+		    <version>3.0.4.RELEASE</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.tuckey</groupId>
@@ -153,9 +158,15 @@
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<!-- TODO Set to test before production -->
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+		    <groupId>postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>9.0-801.jdbc4</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

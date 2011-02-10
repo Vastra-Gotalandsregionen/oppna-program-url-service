@@ -30,7 +30,7 @@ public class BookmarkTest {
 
     private static final String GLOBAL_HASH = "abcdef";
     private static final String HASH = "12345";
-    private static final User OWNER = new User("roblu");
+    private static final Owner OWNER = new Owner("roblu");
     private static final List<Keyword> KEYWORDS = Arrays.asList(new Keyword("kw1"));
     
     private final LongUrl longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);

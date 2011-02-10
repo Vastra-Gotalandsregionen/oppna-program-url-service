@@ -31,7 +31,7 @@ import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 /**
  * Service for handling short link, modelled after the bit.ly version 3 API
@@ -47,7 +47,7 @@ public interface UrlServiceService {
      * @return The {@link Bookmark} representing the long URL
      * @throws URISyntaxException
      */
-    Bookmark shorten(URI url, User owner);
+    Bookmark shorten(URI url, Owner owner);
 
     /**
      * Shorten a long URL to a short link. If the long URL already exists, 
@@ -58,9 +58,9 @@ public interface UrlServiceService {
      * @return The {@link Bookmark} representing the long URL
      * @throws URISyntaxException
      */
-    Bookmark shorten(URI url, String hash, User owner);
+    Bookmark shorten(URI url, String hash, Owner owner);
 
-    Bookmark shorten(URI url, String hash, Collection<String> keywordIds, User owner);
+    Bookmark shorten(URI url, String hash, Collection<String> keywordIds, Owner owner);
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 
@@ -91,7 +91,7 @@ public interface UrlServiceService {
      *   the long URL is unknown
      * @throws URISyntaxException
      */
-    Bookmark lookup(URI url, User owner);
+    Bookmark lookup(URI url, Owner owner);
 
     /**
      * Given a path, will return the URI to where the user should be redirected. 
@@ -101,7 +101,7 @@ public interface UrlServiceService {
      */
     URI redirect(String domain, String path);
     
-    User getUser(String vgrId);
+    Owner getUser(String vgrId);
     
     List<Keyword> getAllKeywords();
 
@@ -109,7 +109,7 @@ public interface UrlServiceService {
 
     void createStaticRedirect(StaticRedirect redirect);
 
-    Collection<User> findAllUsers();
+    Collection<Owner> findAllUsers();
 
     Collection<StaticRedirect> findAllStaticRedirects();
 

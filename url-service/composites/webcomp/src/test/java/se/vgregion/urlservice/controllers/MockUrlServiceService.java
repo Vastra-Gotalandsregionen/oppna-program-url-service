@@ -37,7 +37,7 @@ import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.StaticRedirect;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 public class MockUrlServiceService implements UrlServiceService {
 
@@ -70,7 +70,7 @@ public class MockUrlServiceService implements UrlServiceService {
     @Override
     public Bookmark expand(String hash) {
         if(hash.equals("foo")) {
-            return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new User(USERNAME));
+            return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new Owner(USERNAME));
         } else {
             return null;
         }
@@ -78,7 +78,7 @@ public class MockUrlServiceService implements UrlServiceService {
     
     @Override
     public Bookmark expand(URI shortUrl) throws URISyntaxException {
-        return new Bookmark(HASH, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new User(USERNAME));
+        return new Bookmark(HASH, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new Owner(USERNAME));
     }
 
     @Override
@@ -94,8 +94,8 @@ public class MockUrlServiceService implements UrlServiceService {
 
 
     @Override
-    public User getUser(String vgrId) {
-        return new User(vgrId);
+    public Owner getUser(String vgrId) {
+        return new Owner(vgrId);
     }
 
     @Override
@@ -134,17 +134,17 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public Bookmark shorten(URI url, User owner) {
+    public Bookmark shorten(URI url, Owner owner) {
         return shorten(url, null, owner);
     }
 
     @Override
-    public Bookmark shorten(URI url, String hash, User owner) {
+    public Bookmark shorten(URI url, String hash, Owner owner) {
         return shorten(url, hash, Collections.<String>emptyList(), owner);
     }
 
     @Override
-    public Bookmark shorten(URI url, String hash, Collection<String> keywordNames, User owner) {
+    public Bookmark shorten(URI url, String hash, Collection<String> keywordNames, Owner owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             hash = (hash != null) ? hash : HASH; 
             
@@ -155,13 +155,13 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public Bookmark lookup(URI url, User owner) {
+    public Bookmark lookup(URI url, Owner owner) {
         return new Bookmark(HASH, new LongUrl(url, GLOBAL_HASH), Collections.<Keyword>emptyList(), owner);
     }
 
     @Override
     public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
-        return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), new User(USERNAME));
+        return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), new Owner(USERNAME));
     }
 
     @Override
@@ -199,7 +199,7 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public Collection<User> findAllUsers() {
+    public Collection<Owner> findAllUsers() {
         return null;
     }
 }

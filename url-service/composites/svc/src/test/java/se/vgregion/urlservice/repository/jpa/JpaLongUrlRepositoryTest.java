@@ -38,7 +38,7 @@ import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
 public class JpaLongUrlRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {

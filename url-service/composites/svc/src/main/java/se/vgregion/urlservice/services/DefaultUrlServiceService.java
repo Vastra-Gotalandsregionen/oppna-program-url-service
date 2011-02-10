@@ -53,7 +53,7 @@ import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 @Service
 public class DefaultUrlServiceService implements UrlServiceService {
@@ -87,7 +87,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @SuppressWarnings("unchecked")
     @Transactional
     @Override
-    public Bookmark shorten(URI url, User owner) {
+    public Bookmark shorten(URI url, Owner owner) {
         return shorten(url, null, Collections.EMPTY_LIST, owner);
     }
     
@@ -97,7 +97,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     @SuppressWarnings("unchecked")
     @Transactional
     @Override
-    public Bookmark shorten(URI url, String hash, User owner) {
+    public Bookmark shorten(URI url, String hash, Owner owner) {
         return shorten(url, hash, Collections.EMPTY_LIST, owner);
     }
     
@@ -105,7 +105,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
      * {@inheritDoc}
      */
     @Transactional
-    public Bookmark shorten(URI url, String slug, Collection<String> keywordNames, User owner) {
+    public Bookmark shorten(URI url, String slug, Collection<String> keywordNames, Owner owner) {
         if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
             // does the LongUrl exist?
             LongUrl longUrl = longUrlRepository.findByUrl(url);
@@ -269,7 +269,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Bookmark lookup(URI url, User owner) {
+    public Bookmark lookup(URI url, Owner owner) {
         return shortLinkRepository.findByLongUrl(url, owner);
     }
 
@@ -358,10 +358,10 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
     @Override
     @Transactional
-    public User getUser(String username) {
-        User user = userRepository.findByName(username);
+    public Owner getUser(String username) {
+        Owner user = userRepository.findByName(username);
         if(user == null) {
-            user = new User(username);
+            user = new Owner(username);
             userRepository.persist(user);
         }
         return user;
@@ -450,7 +450,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public Collection<User> findAllUsers() {
+    public Collection<Owner> findAllUsers() {
         return userRepository.findAll();
     }
 }

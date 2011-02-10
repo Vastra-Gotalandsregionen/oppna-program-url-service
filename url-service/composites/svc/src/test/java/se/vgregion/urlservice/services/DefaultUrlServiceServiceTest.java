@@ -45,7 +45,7 @@ import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 public class DefaultUrlServiceServiceTest {
 
@@ -58,7 +58,7 @@ public class DefaultUrlServiceServiceTest {
     private DefaultUrlServiceService urlService = new DefaultUrlServiceService();
 
     private LongUrl longUrl = new LongUrl(LONG_URL, GLOBAL_HASH);
-    private User owner = new User(USERNAME);
+    private Owner owner = new Owner(USERNAME);
     private List<Keyword> emptyKeywords = new ArrayList<Keyword>();
     private LongUrlRepository longUrlRepository = mock(LongUrlRepository.class); 
     private BookmarkRepository bookmarkRepository = mock(BookmarkRepository.class);
@@ -115,7 +115,7 @@ public class DefaultUrlServiceServiceTest {
         
         urlService.setKeywordRepository(keywordRepository);
 
-        User owner = new User("test");
+        Owner owner = new Owner("test");
 
         Bookmark link = new Bookmark(HASH, longUrl, Arrays.asList(kw1), owner);
 

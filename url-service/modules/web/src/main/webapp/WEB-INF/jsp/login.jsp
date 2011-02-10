@@ -28,7 +28,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Spara favorit</title>
+		<title>Logga in</title>
 		
 		<link rel="shortcut icon" href="http://www.vgregion.se/VGRimages/favicon.ico" type="image/x-icon" />
 		
@@ -36,48 +36,19 @@
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/typography.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/forms.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/urlservice.css" type="text/css" />
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/jquery-ui-1.8.7.custom.css" type="text/css" />
-
+		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-1.4.4.js"></script> 
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-ui-1.8.7.custom.min.js"></script> 
 		<script src="${pageContext.request.contextPath}/resources/js/url-service.js"></script> 
 		
 	</head>
 	<body>
-		<h2>Spara favorit</h2>
-	
-		<form action='' method="post" id="editbookmarks">
-			<p><label for="longurl">Länk</label>
-			<c:choose>
-				<c:when test="${edit}">
-					<span>${longUrl}</span> 
-				</c:when>
-				<c:otherwise>
-					<input id="longurl" name='longurl' value='${longUrl}' class="input300">
-				</c:otherwise>
-			</c:choose>
-			</p>
-			<p><label for="keywords">Nyckelord</label>
-				<input name="keywords" value="${selectedKeywords}" class="tags input300" />
-			</p>
-			
-			<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}' class="input300"></p>
-			
-			<p><input type='submit' value='Spara favorit'></p>
-		</form>
-		
 
-		<c:if test="${not empty shortUrl}">
-			<p>Din privata kortlänk: <a href="${shortUrl}">${shortUrl}</a></p>
-			<p>Delad kortlänk: <a href="${globalShortUrl}">${globalShortUrl}</a></p>
-		</c:if>
-		<c:if test="${not empty error}">
-			<p>${error}</p>
-		</c:if>
-
-		<div><a href="${pageContext.request.contextPath}/u/${user.name}/b"><img src="${pageContext.request.contextPath}/resources/img/link.png" /> Se alla dina favoriter</a></div>
-
-		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
-
+<form name='f' action='${pageContext.request.contextPath}/j_spring_security_check' method='POST'> 
+ <table> 
+    <tr><td>User:</td><td><input type='text' name='j_username' value=''></td></tr> 
+    <tr><td>Password:</td><td><input type='password' name='j_password'/></td></tr> 
+    <tr><td colspan='2'><input name="submit" type="submit" value="Logga in"/></td></tr> 
+  </table> 
+</form>
 	</body>
 </html>

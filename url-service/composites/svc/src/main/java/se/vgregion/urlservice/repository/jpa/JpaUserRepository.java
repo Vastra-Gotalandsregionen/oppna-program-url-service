@@ -30,20 +30,20 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Application;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
     
 @Repository
-public class JpaUserRepository extends AbstractJpaRepository<User, UUID, UUID> implements UserRepository {
+public class JpaUserRepository extends AbstractJpaRepository<Owner, UUID, UUID> implements UserRepository {
     
     public JpaUserRepository() {
-        super(User.class);
+        super(Owner.class);
     }
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public User find(UUID id) {
+    public Owner find(UUID id) {
         try {
-            return (User) entityManager.createQuery("select l from User l where l.id = :id")
+            return (Owner) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.id = :id")
             .setParameter("id", id)
             .getSingleResult();
             
@@ -54,9 +54,9 @@ public class JpaUserRepository extends AbstractJpaRepository<User, UUID, UUID> i
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public User findByName(String name) {
+    public Owner findByName(String name) {
         try {
-            return (User) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.name = :name")
+            return (Owner) entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.name = :name")
             .setParameter("name", name)
             .getSingleResult();
         } catch(NoResultException e) {

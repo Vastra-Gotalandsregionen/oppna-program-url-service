@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
     
 @Repository
 public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID, UUID> implements BookmarkRepository {
@@ -75,7 +75,7 @@ public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID,
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public Bookmark findByLongUrl(URI longUrl, User owner) {
+    public Bookmark findByLongUrl(URI longUrl, Owner owner) {
         try {
             return (Bookmark)entityManager.createQuery("select l from " + type.getSimpleName() + " l where l.owner.name = :name " +
             		"and l.longUrl.url = :longurl")

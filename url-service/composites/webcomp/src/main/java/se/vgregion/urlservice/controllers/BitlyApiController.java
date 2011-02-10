@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 /**
  * Controller implementing the bit.ly version 3 API (http://code.google.com/p/bitly-api/wiki/ApiDocumentation)

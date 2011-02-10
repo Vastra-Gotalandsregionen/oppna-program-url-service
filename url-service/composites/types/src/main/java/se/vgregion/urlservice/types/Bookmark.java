@@ -52,7 +52,7 @@ public class Bookmark extends AbstractEntity<UUID> {
     private LongUrl longUrl;
     
     @ManyToOne(optional=false)
-    private User owner;
+    private Owner owner;
     
     @ManyToMany
     private List<Keyword> keywords = Collections.emptyList();
@@ -60,15 +60,15 @@ public class Bookmark extends AbstractEntity<UUID> {
     protected Bookmark() {
     }
 
-    public Bookmark(String hash, LongUrl longUrl, User owner) {
+    public Bookmark(String hash, LongUrl longUrl, Owner owner) {
         this(hash, longUrl, Collections.<Keyword>emptyList(), owner);
     }
     
-    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, User owner) {
+    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, Owner owner) {
         this(hash, longUrl, keywords, null, owner);
     }
     
-    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, String slug, User owner) {
+    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, String slug, Owner owner) {
         this.id = UUID.randomUUID();
         
         Validate.notEmpty(hash, "hash can not be empty");
@@ -91,7 +91,7 @@ public class Bookmark extends AbstractEntity<UUID> {
         return id;
     }
 
-    public User getOwner() {
+    public Owner getOwner() {
         return owner;
     }
 

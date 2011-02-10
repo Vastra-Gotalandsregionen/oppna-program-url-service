@@ -42,17 +42,25 @@
 		
 	</head>
 	<body>
-		<h2>Dina favoriter</h2>
+		<h2>
+			<c:if test="${owner}">
+				Dina
+			</c:if>
+			<c:if test="${not owner}">
+				${username}s
+			</c:if>
+			 favoriter
+	    </h2>
 	
 		<table class="bookmarks">
 				<c:forEach var="bookmark" items="${bookmarks}">
 					<tr>
 						<td><a href="${bookmark.longUrl.url}" class="longurl">${bookmark.longUrl.url}</a>
 							<c:forEach var="keyword" items="${bookmark.keywords}">
-								<span class="keyword">${keyword.name}</span>
+								<span class="tag">${keyword.name}</span>
 							</c:forEach>			
 						</td>
-						<td><a href="b/${not empty bookmark.slug ? bookmark.slug : bookmark.hash}"><img src="${pageContext.request.contextPath}/resources/img/link.png" /></a>
+						<td><a href="b/${not empty bookmark.slug ? bookmark.slug : bookmark.hash}"><img src="${pageContext.request.contextPath}/resources/img/link.png" title="Kort länk" /></a>
 						</td>
 						<td>
 							<c:if test="${owner}">
@@ -65,6 +73,7 @@
 		
 		<div><a href="${pageContext.request.contextPath}/b/new"><img src="${pageContext.request.contextPath}/resources/img/page_add.png" /> Skapa ny favorit</a></div>
 		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
+		<div><a href="${pageContext.request.contextPath}/">Se andras favoriter</a></div>
 
 	</body>
 </html>

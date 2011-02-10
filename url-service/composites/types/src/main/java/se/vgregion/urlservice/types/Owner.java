@@ -36,7 +36,7 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 @javax.persistence.Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public class User extends AbstractEntity<UUID> {
+public class Owner extends AbstractEntity<UUID> {
 
     @SuppressWarnings("unused")
     @Id
@@ -48,10 +48,10 @@ public class User extends AbstractEntity<UUID> {
     @OneToMany
     private Collection<Bookmark> bookmarks = new HashSet<Bookmark>();
     
-    protected User() {
+    protected Owner() {
     }
 
-    public User(String name) {
+    public Owner(String name) {
         Assert.hasText(name);
 
         this.id = UUID.randomUUID();

@@ -47,11 +47,13 @@
 		<p>Här kan man spara sina favoritlänkar och även se de länkar som andra sparat som sina favoriter</p>
 		
 		<h4>Följande användare har sparat sina länkar</h4>
-		<ul>
+		<ul id="users">
 			<c:forEach var="user" items="${users}">
 				<li><a href="${pageContext.request.contextPath}/u/${user.name}/b">${user.name}</a></li>
 			</c:forEach>
 		</ul>
 
+
+		<div><a href="${pageContext.request.contextPath}/b/new"><img src="${pageContext.request.contextPath}/resources/img/page_add.png" /> Skapa ny favorit</a></div>
 	</body>
 </html>

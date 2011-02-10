@@ -47,7 +47,7 @@ public class LongUrlTest {
         LongUrl longUrl = new LongUrl(URL, HASH);
         
         // bookmark addded on longUrl in constructor 
-        Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new User("roblu"));
+        Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new Owner("roblu"));
         
         Assert.assertEquals(1, longUrl.getBookmarks().size());
     }
@@ -56,7 +56,7 @@ public class LongUrlTest {
     public void addBookmarkIdempotent() {
         LongUrl longUrl = new LongUrl(URL, HASH);
         
-        Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new User("roblu"));
+        Bookmark bookmark = new Bookmark("123", longUrl, Arrays.asList(new Keyword("kw1")), new Owner("roblu"));
 
         // adding this an extra time
         longUrl.addBookmark(bookmark);

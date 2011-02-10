@@ -50,7 +50,7 @@ import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.LongUrl;
-import se.vgregion.urlservice.types.User;
+import se.vgregion.urlservice.types.Owner;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
@@ -87,7 +87,7 @@ public class BookmarkController {
     
     @RequestMapping(value="/", method=RequestMethod.GET)
     public ModelAndView index() throws IOException {
-        Collection<User> users = urlServiceService.findAllUsers();
+        Collection<Owner> users = urlServiceService.findAllUsers();
 
         ModelAndView mav = new ModelAndView("index");
         
@@ -100,14 +100,15 @@ public class BookmarkController {
     public ModelAndView bookmarks(@PathVariable(value="username") String username,
             Authentication authentication) throws IOException {
         
-        User user = urlServiceService.getUser(username);
+        Owner user = urlServiceService.getUser(username);
         if(user == null) {
             throw new ResourceNotFoundException("Unknown user");
         }
 
         ModelAndView mav = new ModelAndView("bookmarks/index");
         
-        User loggedInUser = getUser(authentication);
+        Owner loggedInUser = getUser(authentication);
+        mav.addObject("username", username);
         mav.addObject("user", loggedInUser);
         mav.addObject("owner", user.equals(loggedInUser));
 
@@ -129,7 +130,7 @@ public class BookmarkController {
     public ModelAndView create(@RequestParam(value="longurl") URI longUrl, @RequestParam(value="slug", required=false) String slug, 
             @RequestParam(value="keywords", required=false) String keywordNameString, Authentication authentication) throws IOException {
         
-        User user = getUser(authentication);
+        Owner user = getUser(authentication);
         if(user == null) {
             throw new ForbiddenException();
         }
@@ -165,7 +166,7 @@ public class BookmarkController {
         ModelAndView mav = new ModelAndView("bookmarks/edit");
         mav.addObject("edit", true);
 
-        User user = getUser(authentication);
+        Owner user = getUser(authentication);
         mav.addObject("user", getUser(authentication));
         
         if(user == null || !username.equals(user.getName())) {
@@ -195,7 +196,7 @@ public class BookmarkController {
         }
     }
 
-    private String createShortLink(User user, Bookmark bookmark) {
+    private String createShortLink(Owner user, Bookmark bookmark) {
         String shortLink = shortLinkPrefix + "u/" + user.getName() + "/b/";
         if(bookmark.getSlug() != null) {
             shortLink += bookmark.getSlug();
@@ -209,7 +210,7 @@ public class BookmarkController {
     public ModelAndView update(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username,
             @RequestParam(value="keywords") String keywordNameString, @RequestParam(value="slug", required=false) String slug, 
             Authentication authentication) throws IOException {
-        User user = getUser(authentication);
+        Owner user = getUser(authentication);
         if(user == null || !username.equals(user.getName())) {
             throw new ForbiddenException();
         }
@@ -224,7 +225,7 @@ public class BookmarkController {
     }
 
     
-    private User getUser(Authentication authentication) {
+    private Owner getUser(Authentication authentication) {
         if(authentication != null) {
             Object principal = authentication.getPrincipal();
             if(principal instanceof org.springframework.security.core.userdetails.User) {
@@ -275,4 +276,11 @@ public class BookmarkController {
         }
     }
 
+    @RequestMapping(value="/login")
+    public ModelAndView login() throws IOException { 
+        ModelAndView mav = new ModelAndView("login");
+        return mav;
+    }
+
+    
 }
