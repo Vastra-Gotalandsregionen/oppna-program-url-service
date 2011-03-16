@@ -35,6 +35,11 @@
 				<artifactId>url-service-url-service-composite-metadata-int</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>se.vgregion.mobile</groupId>
+				<artifactId>mobile-mobile-composite-qr</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
 
     		<dependency>
     			<groupId>org.apache.geronimo.specs</groupId>

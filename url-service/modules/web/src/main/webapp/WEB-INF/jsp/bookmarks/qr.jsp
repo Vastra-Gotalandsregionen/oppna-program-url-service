@@ -28,7 +28,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Spara favorit</title>
+		<title>Scanna favorit</title>
 		
 		<link rel="shortcut icon" href="http://www.vgregion.se/VGRimages/favicon.ico" type="image/x-icon" />
 		
@@ -44,45 +44,6 @@
 		
 	</head>
 	<body>
-		<h2>Spara favorit</h2>
-	
-		<form action='' method="post" id="editbookmarks">
-			<p><label for="longurl">Länk</label>
-			<c:choose>
-				<c:when test="${edit}">
-					<span>${longUrl}</span> 
-				</c:when>
-				<c:otherwise>
-					<input id="longurl" name='longurl' value='${longUrl}' class="input300">
-				</c:otherwise>
-			</c:choose>
-			</p>
-			<p><label for="keywords">Nyckelord</label>
-				<input name="keywords" value="${selectedKeywords}" class="tags input300" />
-			</p>
-			
-			<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}' class="input300"></p>
-			
-			<p><input type='submit' value='Spara favorit'></p>
-		</form>
-		
-
-		<c:if test="${not empty shortUrl}">
-			<p>Din privata kortlänk: <a href="${shortUrl}">${shortUrl}</a></p>
-			<p>Delad kortlänk: <a href="${globalShortUrl}">${globalShortUrl}</a></p>
-			
-			<div>
-				<p>QR kod för kortlänk:</p>
-			<img style="border: 1px solid black" src="${pageContext.request.contextPath}/qr?url=${globalShortUrl}&width=150&height=150" alt="QR kod för favoriten" />
-			</p>
-		</c:if>
-		<c:if test="${not empty error}">
-			<p>${error}</p>
-		</c:if>
-
-		<div><a href="${pageContext.request.contextPath}/u/${user.name}/b"><img src="${pageContext.request.contextPath}/resources/img/link.png" /> Se alla dina favoriter</a></div>
-
-		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
-
+		<img src="${pageContext.request.contextPath}/qr?url=${shortUrl}" alt="QR kod för favoriten" />
 	</body>
 </html>

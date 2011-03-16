@@ -160,6 +160,33 @@ public class BookmarkController {
         return keywordNames;
     }
 
+    @RequestMapping(value="/u/{username}/b/{hash}/qr", method=RequestMethod.GET)
+    public ModelAndView qr(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username) {
+        ModelAndView mav = new ModelAndView("bookmarks/qr");
+        
+        Bookmark bookmark = urlServiceService.expand(hash);
+        if(bookmark != null) {
+            mav.addObject("shortUrl", shortLinkPrefix + "u/" + username + "/b/" + hash);
+            return mav;
+        } else {
+            throw new ResourceNotFoundException("Unknown bookmark");
+        }
+    }
+    
+    @RequestMapping(value="/b/{hash}/qr", method=RequestMethod.GET)
+    public ModelAndView qrGlobal(@PathVariable(value="hash") String hash) {
+        ModelAndView mav = new ModelAndView("bookmarks/qr");
+        
+        LongUrl longUrl = urlServiceService.expandGlobal(hash);
+        if(longUrl != null) {
+            mav.addObject("shortUrl", shortLinkPrefix + "b/" + hash);
+            return mav;
+        } else {
+            throw new ResourceNotFoundException("Unknown bookmark");
+        }
+    }
+    
+    
     @RequestMapping(value="/u/{username}/b/{hash}/edit", method=RequestMethod.GET)
     public ModelAndView edit(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username, 
             Authentication authentication) throws IOException {
@@ -178,6 +205,7 @@ public class BookmarkController {
         Bookmark bookmark = urlServiceService.expand(hash);
         if(bookmark != null) {
             mav.addObject("longUrl", bookmark.getLongUrl().getUrl());
+            
             mav.addObject("shortUrl",  createShortLink(user, bookmark));
             mav.addObject("globalShortUrl", shortLinkPrefix + "b/" + bookmark.getLongUrl().getHash());
 
@@ -198,7 +226,7 @@ public class BookmarkController {
 
     private String createShortLink(Owner user, Bookmark bookmark) {
         String shortLink = shortLinkPrefix + "u/" + user.getName() + "/b/";
-        if(bookmark.getSlug() != null) {
+        if(bookmark.getSlug() != null && bookmark.getSlug().length() > 0) {
             shortLink += bookmark.getSlug();
         } else {
             shortLink += bookmark.getHash();
@@ -259,8 +287,8 @@ public class BookmarkController {
     }
 
     @RequestMapping(value="/u/{username}/b/{hash}")
-    public ModelAndView redirect(@PathVariable(value="hash") String globalHash, HttpServletResponse response) throws IOException { 
-        Bookmark bookmark = urlServiceService.expand(globalHash);
+    public ModelAndView redirect(@PathVariable(value="hash") String hash, HttpServletResponse response) throws IOException { 
+        Bookmark bookmark = urlServiceService.expand(hash);
         
         if(bookmark != null) {
             ModelAndView mav = new ModelAndView("redirect");
