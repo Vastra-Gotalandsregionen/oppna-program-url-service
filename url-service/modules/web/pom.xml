@@ -57,10 +57,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>url-service-url-service-composite-webcomp</artifactId>
 		</dependency>
+<!-- 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>url-service-url-service-composite-metadata-int</artifactId>
 		</dependency>
+ -->
 		<dependency>
 			<groupId>se.vgregion.mobile</groupId>
 			<artifactId>mobile-mobile-composite-qr</artifactId>
@@ -170,7 +172,7 @@
 		<dependency>
 		    <groupId>postgresql</groupId>
 		    <artifactId>postgresql</artifactId>
-		    <version>9.0-801.jdbc4</version>
+		    <version>8.4-702.jdbc4</version>
 		</dependency>
 
 

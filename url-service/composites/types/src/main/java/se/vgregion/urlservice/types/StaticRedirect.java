@@ -27,6 +27,10 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Redirect which statically matches a domain and path.  
+ *
+ */
 @Entity
 @Table(uniqueConstraints=
     @UniqueConstraint(columnNames={"domain", "pattern"})

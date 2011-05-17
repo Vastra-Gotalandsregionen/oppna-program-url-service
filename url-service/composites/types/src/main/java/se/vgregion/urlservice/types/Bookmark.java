@@ -31,6 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.Validate;
+import org.hibernate.annotations.Index;
 
 import com.sun.org.apache.bcel.internal.generic.LUSHR;
 
@@ -43,6 +44,7 @@ public class Bookmark extends AbstractEntity<UUID> {
     private UUID id;
     
     @Column(nullable=false, unique=true)
+    @Index(name="hash")
     private String hash;
 
     @Column

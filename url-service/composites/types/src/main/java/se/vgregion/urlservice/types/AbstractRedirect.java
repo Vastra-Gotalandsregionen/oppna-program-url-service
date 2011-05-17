@@ -32,6 +32,10 @@ import org.apache.commons.lang.Validate;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
+/**
+ * Abstract class for all types of redirects. 
+ *
+ */
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns.entity.Entity<UUID>> extends AbstractEntity<UUID> {

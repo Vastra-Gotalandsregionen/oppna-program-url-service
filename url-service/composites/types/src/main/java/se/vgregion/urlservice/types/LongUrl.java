@@ -31,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.Validate;
+import org.hibernate.annotations.Index;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
@@ -41,9 +42,11 @@ public class LongUrl extends AbstractEntity<UUID> {
     private UUID id;
     
     @Column(nullable=false, unique=true)
+    @Index(name="url")
     private String url;
     
     @Column(nullable=false, unique=true)
+    @Index(name="hash")
     private String hash;
     
     @OneToMany

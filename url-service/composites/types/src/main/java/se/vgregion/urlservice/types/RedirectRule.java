@@ -26,6 +26,11 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * Redirect which matches a domain statically and uses a regular expression
+ * to match the path  
+ *
+ */
 @Entity
 @Table(uniqueConstraints=
     @UniqueConstraint(columnNames={"domain", "pattern"})

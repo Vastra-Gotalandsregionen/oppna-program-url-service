@@ -254,6 +254,7 @@ public class DefaultUrlServiceService implements UrlServiceService {
                 
                 for(RedirectRule rule : rules) {
                     if(rule.matches(domain, path)) {
+                        // TODO implement regex group replacement in the resulting URL
                         return rule.getUrl();
                     }
                 }
