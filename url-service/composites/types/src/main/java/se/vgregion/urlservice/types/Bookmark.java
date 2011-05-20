@@ -44,7 +44,7 @@ public class Bookmark extends AbstractEntity<UUID> {
     private UUID id;
     
     @Column(nullable=false, unique=true)
-    @Index(name="hash")
+    @Index(name="bookmark_hash")
     private String hash;
 
     @Column

@@ -42,11 +42,11 @@ public class LongUrl extends AbstractEntity<UUID> {
     private UUID id;
     
     @Column(nullable=false, unique=true)
-    @Index(name="url")
+    @Index(name="longurl_url")
     private String url;
     
     @Column(nullable=false, unique=true)
-    @Index(name="hash")
+    @Index(name="longurl_hash")
     private String hash;
     
     @OneToMany
