@@ -22,7 +22,6 @@ package se.vgregion.urlservice.repository;
 import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
-import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Owner;
     
 public interface UserRepository extends JpaRepository<Owner, UUID, UUID> {

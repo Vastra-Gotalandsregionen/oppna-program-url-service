@@ -32,12 +32,12 @@ import org.slf4j.LoggerFactory;
 
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Application;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
-import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.Owner;
+import se.vgregion.urlservice.types.RedirectRule;
+import se.vgregion.urlservice.types.StaticRedirect;
 
 public class MockUrlServiceService implements UrlServiceService {
 

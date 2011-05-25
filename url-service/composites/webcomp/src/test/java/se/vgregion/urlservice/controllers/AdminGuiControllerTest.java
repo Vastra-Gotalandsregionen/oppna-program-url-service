@@ -37,8 +37,6 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.RedirectRule;

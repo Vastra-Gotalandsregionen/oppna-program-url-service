@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.UserRepository;
-import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Owner;
     
 @Repository

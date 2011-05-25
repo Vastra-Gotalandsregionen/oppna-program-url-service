@@ -28,12 +28,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.Validate;
 import org.hibernate.annotations.Index;
-
-import com.sun.org.apache.bcel.internal.generic.LUSHR;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 

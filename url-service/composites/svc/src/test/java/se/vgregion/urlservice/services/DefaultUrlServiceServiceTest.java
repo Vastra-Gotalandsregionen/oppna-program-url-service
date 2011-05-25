@@ -43,9 +43,9 @@ import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
+import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
-import se.vgregion.urlservice.types.Owner;
 
 public class DefaultUrlServiceServiceTest {
 

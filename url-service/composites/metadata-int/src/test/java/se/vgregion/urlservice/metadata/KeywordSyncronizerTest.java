@@ -3,7 +3,6 @@ package se.vgregion.urlservice.metadata;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
-import org.mockito.internal.progress.ArgumentMatcherStorage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 

@@ -19,10 +19,6 @@
 
 package se.vgregion.urlservice.repository.jpa;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.NoResultException;
@@ -33,9 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
 import se.vgregion.urlservice.repository.ApplicationRepository;
-import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.types.Application;
-import se.vgregion.urlservice.types.Keyword;
     
 @Repository("applicationRepository")
 public class JpaApplicationRepository extends AbstractJpaRepository<Application, UUID, UUID> implements ApplicationRepository {

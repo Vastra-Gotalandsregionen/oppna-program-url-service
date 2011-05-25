@@ -21,7 +21,6 @@ package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;

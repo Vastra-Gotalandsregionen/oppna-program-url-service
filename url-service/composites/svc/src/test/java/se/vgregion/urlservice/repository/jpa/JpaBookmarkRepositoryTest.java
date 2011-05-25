@@ -33,13 +33,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
-import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.UserRepository;
+import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
-import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Owner;
 
 @ContextConfiguration({"classpath:spring/services-common.xml", "classpath:test.xml"})
