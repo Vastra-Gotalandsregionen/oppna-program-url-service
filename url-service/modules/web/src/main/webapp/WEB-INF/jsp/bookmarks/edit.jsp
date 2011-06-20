@@ -57,11 +57,11 @@
 				</c:otherwise>
 			</c:choose>
 			</p>
-			<p><label for="keywords">Nyckelord</label>
+			<p><label for="keywords">Nyckelord (valfri)</label>
 				<input name="keywords" value="${selectedKeywords}" class="tags input300" />
 			</p>
 			
-			<p><label for="slug">Privat nyckel (valfri)</label><input id="slug" name='slug' value='${slug}' class="input300"></p>
+			<p><label for="slug">Kortord (valfri)</label><input id="slug" name='slug' value='${slug}' class="input300"></p>
 			
 			<p><input type='submit' value='Spara favorit'></p>
 		</form>

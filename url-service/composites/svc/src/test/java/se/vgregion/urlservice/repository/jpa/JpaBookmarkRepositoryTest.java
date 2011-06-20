@@ -21,6 +21,7 @@ package se.vgregion.urlservice.repository.jpa;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -47,17 +48,19 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
 
     private static final String GLOBAL_HASH = "abcdef";
     private static final String HASH = "12345";
-    private static final String SLUG = "slug";
 
     private BookmarkRepository dao;
     
     private Bookmark bookmark1;
+	private Owner owner;
+	private LongUrl longUrl;
+	private LongUrlRepository longUrlRepository;
     
     @Before
     @Transactional
     public void setup() {
-        Owner owner = new Owner("roblu");
-        LongUrl longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);
+        owner = new Owner("roblu");
+        longUrl = new LongUrl(URI.create("http://example.com"), GLOBAL_HASH);
         Keyword kw1 = new Keyword("kw1");
         List<Keyword> keywords = Arrays.asList(kw1);
         
@@ -66,7 +69,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
         userRepository.persist(owner);
         userRepository.flush();
         
-        LongUrlRepository longUrlRepository = applicationContext.getBean(LongUrlRepository.class);
+        longUrlRepository = applicationContext.getBean(LongUrlRepository.class);
         longUrlRepository.persist(longUrl);
         longUrlRepository.flush();
         
@@ -75,7 +78,7 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
         keywordRepository.flush();
 
         
-        Bookmark shortLink = new Bookmark(HASH, longUrl, keywords, SLUG, owner);
+        Bookmark shortLink = new Bookmark(HASH, longUrl, keywords, owner);
 
         dao = applicationContext.getBean(BookmarkRepository.class);
         
@@ -97,28 +100,17 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     @Rollback
     public void findByHash() {
-        Bookmark loaded = dao.findByHash(HASH, false);
+        Bookmark loaded = dao.findByHash(HASH, owner);
         
         Assert.assertEquals(bookmark1.getHash(), loaded.getHash());
         Assert.assertEquals(bookmark1.getOwner(), loaded.getOwner());
     }
 
-    @Test
-    @Transactional
-    @Rollback
-    public void findBySlug() {
-        Bookmark loaded = dao.findByHash(SLUG, true);
-        
-        Assert.assertEquals(bookmark1.getHash(), loaded.getHash());
-        Assert.assertEquals(bookmark1.getOwner(), loaded.getOwner());
-    }
-
-    
     @Test
     @Transactional
     @Rollback
     public void findNonExistingByHashOrSlug() {
-        Assert.assertNull(dao.findByHash("dummy", true));
+        Assert.assertNull(dao.findByHash("dummy", owner));
     }
 
     @Test
@@ -143,12 +135,13 @@ public class JpaBookmarkRepositoryTest extends AbstractTransactionalJUnit4Spring
     @Transactional
     @Rollback
     public void duplicateHashNotAllowed() {
-        Owner owner = new Owner("roblu");
-        LongUrl otherLongUrl = new LongUrl(URI.create("http://dummy"), GLOBAL_HASH);
-        List<Keyword> keywords = Arrays.asList(new Keyword("kw1"));
-        
-        dao.persist(new Bookmark(bookmark1.getHash(), otherLongUrl, keywords, owner));
+    	try {
+        dao.persist(new Bookmark(bookmark1.getHash(), longUrl, Collections.EMPTY_LIST, owner));
         dao.flush();
+    	} catch(PersistenceException e) {
+    		e.printStackTrace();
+    		throw e;
+    	}
     }
 
 }

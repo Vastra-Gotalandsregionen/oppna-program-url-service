@@ -19,6 +19,7 @@
 
 package se.vgregion.urlservice.types;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.Validate;
 import org.hibernate.annotations.Index;
@@ -35,17 +38,17 @@ import org.hibernate.annotations.Index;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class Bookmark extends AbstractEntity<UUID> {
+@Table(uniqueConstraints=
+    @UniqueConstraint(columnNames={"owner_id", "hash"})
+    )
+public class Bookmark extends AbstractEntity<UUID> implements UrlWithHash {
 
     @Id
     private UUID id;
     
-    @Column(nullable=false, unique=true)
+    @Column(nullable=false)
     @Index(name="bookmark_hash")
     private String hash;
-
-    @Column
-    private String slug;
 
     @ManyToOne(optional=false)
     private LongUrl longUrl;
@@ -64,10 +67,6 @@ public class Bookmark extends AbstractEntity<UUID> {
     }
     
     public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, Owner owner) {
-        this(hash, longUrl, keywords, null, owner);
-    }
-    
-    public Bookmark(String hash, LongUrl longUrl, List<Keyword> keywords, String slug, Owner owner) {
         this.id = UUID.randomUUID();
         
         Validate.notEmpty(hash, "hash can not be empty");
@@ -78,13 +77,12 @@ public class Bookmark extends AbstractEntity<UUID> {
         this.hash = hash;
         this.longUrl = longUrl;
         this.keywords = keywords;
-        this.slug = slug;
         this.owner = owner;
         
         longUrl.addBookmark(this);
         owner.addShortLink(this);
     }
-
+    
     @Override
     public UUID getId() {
         return id;
@@ -98,17 +96,18 @@ public class Bookmark extends AbstractEntity<UUID> {
         return hash;
     }
 
-    public String getSlug() {
-        return slug;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
+    public void setHash(String hash) {
+        this.hash = hash;
     }
     
     public LongUrl getLongUrl() {
         return longUrl;
     }
+    
+	@Override
+	public URI getUrl() {
+		return longUrl.getUrl();
+	}
 
     public List<Keyword> getKeywords() {
         if(keywords != null) {

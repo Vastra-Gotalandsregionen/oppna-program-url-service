@@ -100,7 +100,7 @@ public class BookmarkControllerTest {
     public void redirectWithExistingHash() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        ModelAndView mav = controller.redirect("foo", response);
+        ModelAndView mav = controller.redirect("foo", user.getUsername(), response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
@@ -110,7 +110,7 @@ public class BookmarkControllerTest {
     @Test
     public void redirectWithNonExistingHash() throws IOException {
         MockHttpServletResponse response = new MockHttpServletResponse();
-        ModelAndView mav = controller.redirect("dummy", response);
+        ModelAndView mav = controller.redirect("dummy", user.getUsername(), response);
         
         Assert.assertEquals(404, response.getStatus());
         Assert.assertNull(mav);

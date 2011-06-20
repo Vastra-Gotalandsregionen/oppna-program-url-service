@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
+import se.vgregion.urlservice.types.UrlWithHash;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
@@ -64,13 +65,15 @@ public interface UrlServiceService {
     
     /**
      * Expand a short link (e.g. http://s.vgregion.se/abc) 
-     * to the matching long URL. 
+     * to the matching long URL or bookmark. 
      * @param shortUrlOrHash The short URL, required
-     * @return The {@link Bookmark} containing the long URL. Null if the
+     * @return The {@link LongUrl} or {@link Bookmark} for the short URL. Null if the
      *   short URL/hash is unknown.
      * @throws URISyntaxException
      */
-    Bookmark expand(URI shortUrl) throws URISyntaxException;
+    UrlWithHash expandPath(URI shortUrl);
+
+    UrlWithHash expandPath(String path);
 
     /**
      * Expand a hash (e.g. "abc") 
@@ -82,7 +85,7 @@ public interface UrlServiceService {
      */
     LongUrl expandGlobal(String hash);
     
-    Bookmark expand(String hash);
+    Bookmark expand(String hash, Owner owner);
 
     /**
      * Find the matching hash for a long URL.  
@@ -119,7 +122,7 @@ public interface UrlServiceService {
 
     void removeStaticRedirect(UUID id);
 
-    Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames);
+    Bookmark updateBookmark(String hash, String newHash, Collection<String> keywordNames, Owner owner);
     
     void addHit(Bookmark bookmark);
     void addHit(LongUrl longUrl);

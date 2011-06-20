@@ -17,24 +17,13 @@
  *
  */
 
-package se.vgregion.urlservice.repository;
+package se.vgregion.urlservice.types;
 
 import java.net.URI;
-import java.util.UUID;
 
-import se.vgregion.dao.domain.patterns.repository.db.jpa.JpaRepository;
-import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.Owner;
+public interface UrlWithHash {
+
+    URI getUrl();
     
-public interface BookmarkRepository extends JpaRepository<Bookmark, UUID, UUID> {
-
-    /**
-     * Find link by hash or slug.
-     */
-    Bookmark findByHash(String hash, Owner owner);
-
-    /**
-     * Find link by URL.
-     */
-    Bookmark findByLongUrl(URI longUrl, Owner owner);
+    String getHash();
 }

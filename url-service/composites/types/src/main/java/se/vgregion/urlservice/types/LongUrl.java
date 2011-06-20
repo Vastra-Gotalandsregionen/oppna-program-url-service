@@ -36,7 +36,7 @@ import org.hibernate.annotations.Index;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class LongUrl extends AbstractEntity<UUID> {
+public class LongUrl extends AbstractEntity<UUID> implements UrlWithHash {
 
     @Id
     private UUID id;

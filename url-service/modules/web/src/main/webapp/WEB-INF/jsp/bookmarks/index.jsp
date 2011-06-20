@@ -60,7 +60,7 @@
 								<span class="tag">${keyword.name}</span>
 							</c:forEach>			
 						</td>
-						<td><a href="b/${not empty bookmark.slug ? bookmark.slug : bookmark.hash}"><img src="${pageContext.request.contextPath}/resources/img/link.png" title="Kort länk" /></a>
+						<td><a href="b/${bookmark.hash}"><img src="${pageContext.request.contextPath}/resources/img/link.png" title="Kort länk" /></a>
 						</td>
 						<td>
 							<c:if test="${owner}">

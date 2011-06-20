@@ -41,25 +41,11 @@ public class BookmarkTest {
         
         Assert.assertNotNull(bookmark.getId());
         Assert.assertEquals(HASH, bookmark.getHash());
-        Assert.assertNull(bookmark.getSlug());
         Assert.assertEquals(longUrl, bookmark.getLongUrl());
         Assert.assertEquals(KEYWORDS, bookmark.getKeywords());
         Assert.assertEquals(OWNER, bookmark.getOwner());
     }
 
-    @Test
-    public void cstrWithSlug() {
-        Bookmark bookmark = new Bookmark(HASH, longUrl, KEYWORDS, "slug", OWNER);
-        
-        Assert.assertNotNull(bookmark.getId());
-        Assert.assertEquals(HASH, bookmark.getHash());
-        Assert.assertEquals("slug", bookmark.getSlug());
-        Assert.assertEquals(longUrl, bookmark.getLongUrl());
-        Assert.assertEquals(KEYWORDS, bookmark.getKeywords());
-        Assert.assertEquals(OWNER, bookmark.getOwner());
-    }
-    
-    
     @Test(expected=IllegalArgumentException.class)
     public void nullHashNotAllowed() {
         new Bookmark(null, longUrl, KEYWORDS, OWNER);

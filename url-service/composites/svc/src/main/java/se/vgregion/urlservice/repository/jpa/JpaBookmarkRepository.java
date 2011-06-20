@@ -55,16 +55,14 @@ public class JpaBookmarkRepository extends AbstractJpaRepository<Bookmark, UUID,
     
     @Override
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
-    public Bookmark findByHash(String hash, boolean includeSlugs) {
+    public Bookmark findByHash(String hash, Owner owner) {
         try {
             // TODO could have multiple matches, handle
-            String query = "select l from " + type.getSimpleName() + " l where l.hash = :hash";
+            String query = "select l from " + type.getSimpleName() + " l where l.hash = :hash and l.owner.id = :owner";
             
-            if(includeSlugs) {
-                query += " or l.slug = :hash";
-            }
             return (Bookmark) entityManager.createQuery(query)
             .setParameter("hash", hash)
+            .setParameter("owner", owner.getId())
             .getSingleResult();
             
         } catch(NoResultException e) {

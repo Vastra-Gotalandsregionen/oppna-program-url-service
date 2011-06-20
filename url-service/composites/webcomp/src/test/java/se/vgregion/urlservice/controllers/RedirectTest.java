@@ -19,30 +19,72 @@
 
 package se.vgregion.urlservice.controllers;
 
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
+import java.net.URI;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
+import se.vgregion.urlservice.services.UrlServiceService;
+import se.vgregion.urlservice.types.Owner;
+
 
 public class RedirectTest {
-
-    private RedirectController controller = new RedirectController(new MockUrlServiceService());
+	
+	@Mock private UrlServiceService urlServiceService;
+    
+	private RedirectController controller;
     private MockHttpServletResponse response = new MockHttpServletResponse();
     
+    private static final URI SHORT_LINK_PREFIX = URI.create("http://s.vgregion.se");
+    private static final String HASH = "987654";
+    private static final String GLOBAL_HASH = "abcdef";
+    private static final URI LONG_URI = URI.create("http://example.com");
+    private static final Owner OWNER = new Owner("roblu");
+    
+    @Before
+    public void before() {
+    	MockitoAnnotations.initMocks(this);
+
+    	controller = new RedirectController(urlServiceService);
+
+    	when(urlServiceService.redirect(SHORT_LINK_PREFIX.toString(), "/b/" + GLOBAL_HASH)).thenReturn(LONG_URI);
+    	when(urlServiceService.redirect(SHORT_LINK_PREFIX.toString(), "/u/" + OWNER.getName() + "/b/" + HASH)).thenReturn(LONG_URI);
+
+    	when(urlServiceService.redirect(SHORT_LINK_PREFIX.toString(), "/bar")).thenReturn(LONG_URI);
+    }
+    
     @Test
-    public void redirectWithExistingHash() throws IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/foo");
+    public void redirectWithExistingGlobalHash() throws IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", SHORT_LINK_PREFIX + "/b/" + GLOBAL_HASH);
         request.setServerName("s.vgregion.se");
-        request.setPathInfo("/foo");
-        ModelAndView mav = controller.redirect("foo", request, response);
+        request.setPathInfo("/b/" + GLOBAL_HASH);
+        ModelAndView mav = controller.redirect("/b/" + GLOBAL_HASH, request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
         Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
+    }
+
+    @Test
+    public void redirectWithExistingUserHash() throws IOException {
+    	String path = "/u/" + OWNER.getName() + "/b/" + HASH;
+    	MockHttpServletRequest request = new MockHttpServletRequest("GET", SHORT_LINK_PREFIX + path);
+    	request.setServerName("s.vgregion.se");
+    	request.setPathInfo(path);
+    	ModelAndView mav = controller.redirect(path, request, response);
+    	
+    	Assert.assertEquals(301, response.getStatus());
+    	Assert.assertEquals("http://example.com", response.getHeader("Location"));
+    	Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
     }
 
     @Test
@@ -59,12 +101,13 @@ public class RedirectTest {
     @Test
     public void redirectWithRedirectRule() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://s.vgregion.se/bar");
+        request.setServerName("s.vgregion.se");
         request.setPathInfo("/bar");
-        ModelAndView mav = controller.redirect("bar", request, response);
+        ModelAndView mav = controller.redirect("/bar", request, response);
         
         Assert.assertEquals(301, response.getStatus());
-        Assert.assertEquals("http://google.com", response.getHeader("Location"));
-        Assert.assertEquals("http://google.com", mav.getModel().get("longUrl"));
+        Assert.assertEquals("http://example.com", response.getHeader("Location"));
+        Assert.assertEquals("http://example.com", mav.getModel().get("longUrl"));
     }
 
 }

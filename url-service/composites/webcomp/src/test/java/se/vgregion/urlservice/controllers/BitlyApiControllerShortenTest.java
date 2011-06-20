@@ -45,7 +45,7 @@ public class BitlyApiControllerShortenTest {
                         "{\"status_code\":200," +
                         "\"status_txt\":\"OK\"," +
         		"\"data\":{" +
-        		"\"url\":\"http://s.vgregion.se/foo\"," +
+        		"\"url\":\"http://s.vgregion.se/u/test/b/foo\"," +
         		"\"hash\":\"foo\"," +
         		"\"global_hash\":\"" + GLOBAL_HASH + "\"," +
         		"\"long_url\":\"http://example.com\"," +
@@ -63,7 +63,7 @@ public class BitlyApiControllerShortenTest {
                         "<status_code>200</status_code>" +
                         "<status_txt>OK</status_txt>" +
                         "<data>" +
-                        "<url>http://s.vgregion.se/foo</url>" +
+                        "<url>http://s.vgregion.se/u/test/b/foo</url>" +
                         "<hash>foo</hash>" +
                         "<global_hash>" + GLOBAL_HASH + "</global_hash>" +
                         "<long_url>http://example.com</long_url>" +

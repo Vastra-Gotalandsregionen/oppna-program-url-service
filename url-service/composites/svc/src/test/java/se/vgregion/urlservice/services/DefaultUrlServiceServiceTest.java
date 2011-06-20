@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -40,19 +41,20 @@ import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
 import se.vgregion.urlservice.repository.StaticRedirectRepository;
+import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.UrlWithHash;
 
 public class DefaultUrlServiceServiceTest {
 
     private static final String DOMAIN = "foo.vgregion.se";
     private static final String GLOBAL_HASH = "a9b9f0";
     private static final String HASH = "74a88b";
-    private static final String SLUG = "slug";
     private static final String USERNAME = "roblu";
     private static final URI LONG_URL = URI.create("http://example.com");
     private DefaultUrlServiceService urlService = new DefaultUrlServiceService();
@@ -65,6 +67,7 @@ public class DefaultUrlServiceServiceTest {
     private RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
     private StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
     private KeywordRepository keywordRepository = mock(KeywordRepository.class);
+    private UserRepository userRepository = mock(UserRepository.class);
     
     private Keyword kw1 = new Keyword("kw1");
     private Keyword kw2 = new Keyword("kw2");
@@ -80,6 +83,9 @@ public class DefaultUrlServiceServiceTest {
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         urlService.setStaticRedirectRepository(staticRedirectRepository);
         urlService.setKeywordRepository(keywordRepository);
+        urlService.setUserRepository(userRepository);
+        
+        when(userRepository.findByName(owner.getName())).thenReturn(owner);
     }
     
     @Test
@@ -87,7 +93,6 @@ public class DefaultUrlServiceServiceTest {
         Bookmark link = urlService.shorten(LONG_URL, owner);
         
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertNull(link.getSlug());
         Assert.assertEquals(LONG_URL, link.getLongUrl().getUrl());
         Assert.assertEquals(GLOBAL_HASH, link.getLongUrl().getHash());
         Assert.assertEquals(owner, link.getOwner());
@@ -96,10 +101,9 @@ public class DefaultUrlServiceServiceTest {
 
     @Test
     public void shortenWithSlug() {
-        Bookmark link = urlService.shorten(LONG_URL, SLUG, owner);
+        Bookmark link = urlService.shorten(LONG_URL, owner);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(SLUG, link.getSlug());
         Assert.assertEquals(LONG_URL, link.getLongUrl().getUrl());
         Assert.assertEquals(GLOBAL_HASH, link.getLongUrl().getHash());
         Assert.assertEquals(owner, link.getOwner());
@@ -125,7 +129,7 @@ public class DefaultUrlServiceServiceTest {
 
         Assert.assertEquals(owner, link.getOwner());
         
-        link = urlService.shorten(LONG_URL, SLUG, keywordNames, owner);
+        link = urlService.shorten(LONG_URL, null, keywordNames, owner);
 
         Assert.assertEquals(2, link.getKeywords().size());
         Assert.assertEquals(kw1.getName(), link.getKeywords().get(0).getName());
@@ -139,10 +143,9 @@ public class DefaultUrlServiceServiceTest {
         when(keywordRepository.findOrCreateKeywords(keywordNames)).thenReturn(keywords);
         urlService.setKeywordRepository(keywordRepository);
 
-        Bookmark link = urlService.shorten(LONG_URL, SLUG, keywordNames, owner);
+        Bookmark link = urlService.shorten(LONG_URL, null, keywordNames, owner);
 
         Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(SLUG, link.getSlug());
         Assert.assertEquals(LONG_URL, link.getLongUrl().getUrl());
         Assert.assertEquals(GLOBAL_HASH, link.getLongUrl().getHash());
         Assert.assertEquals(owner, link.getOwner());
@@ -225,12 +228,10 @@ public class DefaultUrlServiceServiceTest {
         Assert.assertEquals(owner, link.getOwner());
     }
 
-
-    
     @Test
     public void shortenWithBookmarkHashCollision() {
         BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByHash(HASH, false)).thenReturn(new Bookmark(HASH, longUrl, owner));
+        when(shortLinkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
         urlService.setShortLinkRepository(shortLinkRepository);
         
         Bookmark link = urlService.shorten(LONG_URL, owner);
@@ -267,10 +268,10 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void expandExistingHash() {
         BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByHash(HASH, true)).thenReturn(new Bookmark(HASH, longUrl, owner));
+        when(shortLinkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
         urlService.setShortLinkRepository(shortLinkRepository);
         
-        Bookmark link = urlService.expand(HASH);
+        Bookmark link = urlService.expand(HASH, owner);
 
         Assert.assertEquals(HASH, link.getHash());
         Assert.assertEquals(LONG_URL, link.getLongUrl().getUrl());
@@ -279,29 +280,33 @@ public class DefaultUrlServiceServiceTest {
     }
 
     @Test
-    public void expandExistingShortUrl() throws URISyntaxException {
-        BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByHash(HASH, true)).thenReturn(new Bookmark(HASH, longUrl, owner));
-        urlService.setShortLinkRepository(shortLinkRepository);
+    public void expandExistingGlobalShortUrl() throws URISyntaxException {
+        when(longUrlRepository.findByHash(GLOBAL_HASH)).thenReturn(new LongUrl(LONG_URL, GLOBAL_HASH));
 
-        Bookmark link = urlService.expand(URI.create("http://" + DOMAIN + "/" + HASH));
+        UrlWithHash link = urlService.expandPath(URI.create("http://" + DOMAIN + "/b/" + GLOBAL_HASH));
 
-        Assert.assertEquals(HASH, link.getHash());
-        Assert.assertEquals(LONG_URL, link.getLongUrl().getUrl());
-        Assert.assertEquals(GLOBAL_HASH, link.getLongUrl().getHash());
-        Assert.assertEquals(owner, link.getOwner());
+        Assert.assertEquals(GLOBAL_HASH, link.getHash());
+        Assert.assertEquals(LONG_URL, link.getUrl());
     }
 
+    @Test
+    public void expandExistingUserShortUrl() throws URISyntaxException {
+    	when(bookmarkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
+    	
+    	UrlWithHash link = urlService.expandPath(URI.create("http://" + DOMAIN + "/u/" + owner.getName() + "/b/" + HASH));
+    	
+    	Assert.assertEquals(HASH, link.getHash());
+    	Assert.assertEquals(LONG_URL, link.getUrl());
+    }
+    
     @Test
     public void expandNonExistingHash() {
-        Assert.assertNull(urlService.expand(HASH));
+        Assert.assertNull(urlService.expand(HASH, owner));
     }
     
     @Test
     public void lookupExistingUrl() {
-        BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByLongUrl(LONG_URL, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
-        urlService.setShortLinkRepository(shortLinkRepository);
+        when(bookmarkRepository.findByLongUrl(LONG_URL, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
 
         Bookmark link = urlService.lookup(LONG_URL, owner);
 
@@ -364,14 +369,10 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnShortLink() {
         urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
-        
-        BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByHash(HASH, true)).thenReturn(new Bookmark(HASH, longUrl, owner));
-        urlService.setShortLinkRepository(shortLinkRepository);
-
+        when(bookmarkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
         urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
-        URI uri = urlService.redirect(DOMAIN, HASH);
+        URI uri = urlService.redirect(DOMAIN, "/u/" + owner.getName() + "/b/" + HASH);
 
         Assert.assertEquals(LONG_URL, uri);
     }
@@ -379,7 +380,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnShortLinkDomainNoMatching() {
         BookmarkRepository shortLinkRepository = mock(BookmarkRepository.class);
-        when(shortLinkRepository.findByHash(HASH, true)).thenReturn(new Bookmark(HASH, longUrl, owner));
+        when(shortLinkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
         urlService.setShortLinkRepository(shortLinkRepository);
 
         Assert.assertNull(urlService.redirect("dummy", "dummy"));

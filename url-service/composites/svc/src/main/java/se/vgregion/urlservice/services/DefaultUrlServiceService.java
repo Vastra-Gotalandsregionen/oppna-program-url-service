@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -54,404 +55,434 @@ import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.UrlWithHash;
 
 @Service
 public class DefaultUrlServiceService implements UrlServiceService {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultUrlServiceService.class);
-    
-    private static final List<String> WHITELISTED_SCHEMES = Arrays.asList(new String[] {"http", "https"});
+	private final Logger log = LoggerFactory
+			.getLogger(DefaultUrlServiceService.class);
 
-    private static final int INITIAL_HASH_LENGTH = 6;
-    
-    private static final Pattern HASH_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
-    
-    private String domain;
-    
-    private BookmarkRepository shortLinkRepository;
-    private RedirectRuleRepository redirectRuleRepository;
-    private StaticRedirectRepository staticRedirectRepository;
-    private UserRepository userRepository;
-    private KeywordRepository keywordRepository;
-    private LongUrlRepository longUrlRepository;
-    private HitRepository hitRepository;
-    private ApplicationRepository applicationRepository;
-    
-    public DefaultUrlServiceService() {
-        log.info("Created {}", DefaultUrlServiceService.class.getName());
-    }
+	private static final List<String> WHITELISTED_SCHEMES = Arrays
+			.asList(new String[] { "http", "https" });
 
-    /** 
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Transactional
-    @Override
-    public Bookmark shorten(URI url, Owner owner) {
-        return shorten(url, null, Collections.EMPTY_LIST, owner);
-    }
-    
-    /** 
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Transactional
-    @Override
-    public Bookmark shorten(URI url, String hash, Owner owner) {
-        return shorten(url, hash, Collections.EMPTY_LIST, owner);
-    }
-    
-    /** 
-     * {@inheritDoc}
-     */
-    @Transactional
-    public Bookmark shorten(URI url, String slug, Collection<String> keywordNames, Owner owner) {
-        if(WHITELISTED_SCHEMES.contains(url.getScheme())) {
-            // does the LongUrl exist?
-            LongUrl longUrl = longUrlRepository.findByUrl(url);
-            
-            if(longUrl == null) {
-                // new LongUrl, create and persist
-                String md5 = DigestUtils.md5Hex(url.toString());
-                
-                int length = INITIAL_HASH_LENGTH;
-                
-                String globalHash = md5.substring(0, length);
-                // check that the hash does not already exist
-                while(longUrlRepository.findByHash(globalHash) != null) {
-                    length++;
-                    
-                    if(length > md5.length()) {
-                        // should never happen...
-                        throw new RuntimeException("Failed to generate hash");
-                    }
-                    
-                    globalHash += md5.substring(length-1, length);
-                }
+	private static final int INITIAL_HASH_LENGTH = 6;
 
-                
-                longUrl = new LongUrl(url, globalHash);
-                longUrlRepository.persist(longUrl);
-            }
-            
-            Bookmark link = shortLinkRepository.findByLongUrl(url, owner);
-            if(link != null) {
-                return link;
-            } else {
-                String md5 = DigestUtils.md5Hex("{" + owner.getName() + "}" + url.toString());
-                
-                int length = INITIAL_HASH_LENGTH;
-                
-                if(!StringUtils.isEmpty(slug) && !HASH_PATTERN.matcher(slug).matches()) {
-                    throw new IllegalArgumentException("Hash contains invalid characters");
-                }
-                
-                
-                String hash = md5.substring(0, length);
+	private static final Pattern HASH_PATTERN = Pattern
+			.compile("[a-zA-Z0-9_-]+");
 
-                // check that the hash does not already exist
-                while(shortLinkRepository.findByHash(hash, false) != null) {
-                    length++;
-                    
-                    if(length > md5.length()) {
-                        // should never happen...
-                        throw new RuntimeException("Failed to generate hash");
-                    }
-                    
-                    hash += md5.substring(length-1, length);
-                }
-                
-                List<Keyword> keywords = findOrCreateKeywords(keywordNames);
-                Bookmark newLink = new Bookmark(hash, longUrl, keywords, slug, owner);
-                
-                shortLinkRepository.persist(newLink);
-                return newLink;
-            }
-        } else {
-            throw new IllegalArgumentException("Scheme not allowed: " + url.getScheme());
-        }
-    }
+	private String domain;
 
-    /** 
-     * {@inheritDoc}
-     */
-    @Transactional
-    public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
-        Bookmark bookmark = shortLinkRepository.findByHash(hash, true);
-        
-        if(bookmark != null) {
-            if(StringUtils.isEmpty(slug)) slug = null;
-            
-            bookmark.setSlug(slug);
-            bookmark.setKeywords(findOrCreateKeywords(keywordNames));
-            return bookmark;
-        } else {
-            return null;
-        }
+	private BookmarkRepository shortLinkRepository;
+	private RedirectRuleRepository redirectRuleRepository;
+	private StaticRedirectRepository staticRedirectRepository;
+	private UserRepository userRepository;
+	private KeywordRepository keywordRepository;
+	private LongUrlRepository longUrlRepository;
+	private HitRepository hitRepository;
+	private ApplicationRepository applicationRepository;
 
-    }
-    
-    @Transactional
-    private List<Keyword> findOrCreateKeywords(Collection<String> keywordNames) {
-        return keywordRepository.findOrCreateKeywords(keywordNames);
-    }
+	public DefaultUrlServiceService() {
+		log.info("Created {}", DefaultUrlServiceService.class.getName());
+	}
 
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public LongUrl expandGlobal(String hash) {
-        return longUrlRepository.findByHash(hash);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Transactional
+	@Override
+	public Bookmark shorten(URI url, Owner owner) {
+		return shorten(url, null, Collections.EMPTY_LIST, owner);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Transactional
+	@Override
+	public Bookmark shorten(URI url, String hash, Owner owner) {
+		return shorten(url, hash, Collections.EMPTY_LIST, owner);
+	}
 
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Bookmark expand(String hash) {
-        return shortLinkRepository.findByHash(hash, true);
-    }
-    
-    @Override
-    public Bookmark expand(URI url) throws URISyntaxException {
-        String domain = url.getHost();
-        if(url.getPort() > 0) {
-            domain += ":" + url.getPort();
-        }
-        
-        int lastSlash = url.getPath().lastIndexOf('/');
-        String hash;
-        if(lastSlash == -1) {
-            hash = url.getPath();
-        } else {
-            hash = url.getPath().substring(lastSlash + 1);
-        }
-        return expand(hash);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Transactional
+	public Bookmark shorten(URI url, String hash,
+			Collection<String> keywordNames, Owner owner) {
+		if (WHITELISTED_SCHEMES.contains(url.getScheme())) {
+			// does the LongUrl exist?
+			LongUrl longUrl = longUrlRepository.findByUrl(url);
 
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public URI redirect(String domain, String path) {
-        Bookmark shortLink = expand(path);
-        // first try short links
-        if(shortLink != null) {
-            return shortLink.getLongUrl().getUrl();
-        } else {
-            // next, try static redirects
-            StaticRedirect redirect = staticRedirectRepository.findByPath(domain, path);
+			if (longUrl == null) {
+				// new LongUrl, create and persist
+				String md5 = DigestUtils.md5Hex(url.toString());
 
-            if(redirect != null) {
-                return redirect.getUrl();
-            } else {
-                // finally, check redirect rules
-                Collection<RedirectRule> rules = redirectRuleRepository.findAll();
-                
-                for(RedirectRule rule : rules) {
-                    if(rule.matches(domain, path)) {
-                        // TODO implement regex group replacement in the resulting URL
-                        return rule.getUrl();
-                    }
-                }
-                
-                return null;
-            }
-        }
-    }
+				int length = INITIAL_HASH_LENGTH;
 
-    
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Bookmark lookup(URI url, Owner owner) {
-        return shortLinkRepository.findByLongUrl(url, owner);
-    }
+				String globalHash = md5.substring(0, length);
+				// check that the hash does not already exist
+				while (longUrlRepository.findByHash(globalHash) != null) {
+					length++;
 
-    public BookmarkRepository getShortLinkRepository() {
-        return shortLinkRepository;
-    }
+					if (length > md5.length()) {
+						// should never happen...
+						throw new RuntimeException("Failed to generate hash");
+					}
 
-    @Resource
-    public void setShortLinkRepository(BookmarkRepository shortLinkRepository) {
-        this.shortLinkRepository = shortLinkRepository;
-    }
-    
-    public RedirectRuleRepository getRedirectRuleRepository() {
-        return redirectRuleRepository;
-    }
+					globalHash += md5.substring(length - 1, length);
+				}
 
-    @Resource
-    public void setRedirectRuleRepository(RedirectRuleRepository redirectRuleRepository) {
-        this.redirectRuleRepository = redirectRuleRepository;
-    }
+				longUrl = new LongUrl(url, globalHash);
+				longUrlRepository.persist(longUrl);
+			}
 
-    public StaticRedirectRepository getStaticRedirectRepository() {
-        return staticRedirectRepository;
-    }
+			Bookmark link = shortLinkRepository.findByLongUrl(url, owner);
+			if (link != null) {
+				return link;
+			} else {
+				String md5 = DigestUtils.md5Hex("{" + owner.getName() + "}"
+						+ url.toString());
 
-    @Resource
-    public void setStaticRedirectRepository(StaticRedirectRepository staticRedirectRepository) {
-        this.staticRedirectRepository = staticRedirectRepository;
-    }
+				int length = INITIAL_HASH_LENGTH;
 
-    public UserRepository getUserRepository() {
-        return userRepository;
-    }
+				if (!StringUtils.isEmpty(hash)
+						&& !HASH_PATTERN.matcher(hash).matches()) {
+					throw new IllegalArgumentException(
+							"Hash contains invalid characters");
+				}
 
-    @Resource
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+				if (StringUtils.isEmpty(hash)) {
+					hash = md5.substring(0, length);
+				}
 
-    public KeywordRepository getKeywordRepository() {
-        return keywordRepository;
-    }
+				// check that the hash does not already exist
+				while (shortLinkRepository.findByHash(hash, owner) != null) {
+					length++;
 
-    @Resource
-    public void setKeywordRepository(KeywordRepository keywordRepository) {
-        this.keywordRepository = keywordRepository;
-    }
+					if (length > md5.length()) {
+						// should never happen...
+						throw new RuntimeException("Failed to generate hash");
+					}
 
+					hash += md5.substring(length - 1, length);
+				}
 
-    public LongUrlRepository getLongUrlRepository() {
-        return longUrlRepository;
-    }
+				List<Keyword> keywords = findOrCreateKeywords(keywordNames);
+				Bookmark newLink = new Bookmark(hash, longUrl, keywords, owner);
 
-    @Resource
-    public void setLongUrlRepository(LongUrlRepository longUrlRepository) {
-        this.longUrlRepository = longUrlRepository;
-    }
+				shortLinkRepository.persist(newLink);
+				return newLink;
+			}
+		} else {
+			throw new IllegalArgumentException("Scheme not allowed: "
+					+ url.getScheme());
+		}
+	}
 
-    public HitRepository getHitRepository() {
-        return hitRepository;
-    }
-    
-    @Resource
-    public void setHitRepository(HitRepository hitRepository) {
-        this.hitRepository = hitRepository;
-    }
-    
-    public ApplicationRepository getApplicationRepository() {
-        return applicationRepository;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Transactional
+	public Bookmark updateBookmark(String hash, String newHash,
+			Collection<String> keywordNames, Owner owner) {
+		Bookmark bookmark = shortLinkRepository.findByHash(hash, owner);
 
-    @Resource
-    public void setApplicationRepository(ApplicationRepository applicationRepository) {
-        this.applicationRepository = applicationRepository;
-    }
+		if (bookmark != null) {
+			if (!StringUtils.isEmpty(newHash)) {
+				bookmark.setHash(newHash);
+			}
 
-    public String getDomain() {
-        return domain;
-    }
+			bookmark.setKeywords(findOrCreateKeywords(keywordNames));
+			return bookmark;
+		} else {
+			return null;
+		}
 
-    @Resource(name="domain")
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
+	}
 
+	@Transactional
+	private List<Keyword> findOrCreateKeywords(Collection<String> keywordNames) {
+		return keywordRepository.findOrCreateKeywords(keywordNames);
+	}
 
-    @Override
-    @Transactional
-    public Owner getUser(String username) {
-        Owner user = userRepository.findByName(username);
-        if(user == null) {
-            user = new Owner(username);
-            userRepository.persist(user);
-        }
-        return user;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public LongUrl expandGlobal(String hash) {
+		return longUrlRepository.findByHash(hash);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Bookmark expand(String hash, Owner owner) {
+		return shortLinkRepository.findByHash(hash, owner);
+	}
 
-    @Override
-    @Transactional(readOnly=true)
-    public List<Keyword> getAllKeywords() {
-        return keywordRepository.findAllInOrder();
-    }
+	private final Pattern USER_SHORTLINK_PATTERN = Pattern
+			.compile("/u/([a-zA-Z0-9]+)/b/([a-zA-Z0-9]+)$");
+	private final Pattern GLOBAL_SHORTLINK_PATTERN = Pattern
+			.compile("/b/([a-zA-Z0-9]+)$");
 
-    @Override
-    @Transactional    
-    public void createRedirectRule(RedirectRule rule) {
-        redirectRuleRepository.persist(rule);
-    }
+	@Override
+	public UrlWithHash expandPath(URI url) {
+		String domain = url.getHost();
+		if (url.getPort() > 0) {
+			domain += ":" + url.getPort();
+		}
+		
+		return expandPath(url.getPath());
+	}
+	
+	@Override
+	public UrlWithHash expandPath(String path) {
+		Matcher userShortLinkMatcher = USER_SHORTLINK_PATTERN.matcher(path);
+		Matcher globalShortLinkMatcher = GLOBAL_SHORTLINK_PATTERN.matcher(path);
+		if (userShortLinkMatcher.find()) {
+			Owner owner = userRepository.findByName(userShortLinkMatcher.group(1));
+			String hash = userShortLinkMatcher.group(2);
 
-    @Override
-    @Transactional    
-    public void createStaticRedirect(StaticRedirect redirect) {
-        staticRedirectRepository.persist(redirect);
-    }
+			if (owner != null) {
+				return expand(hash, owner);
+			}
+		} else if (globalShortLinkMatcher.find()) {
+			String hash = globalShortLinkMatcher.group(1);
+			return expandGlobal(hash);
+		} else {
+			// not found
+		}
 
-    @Override
-    @Transactional    
-    public Collection<RedirectRule> findAllRedirectRules() {
-        return redirectRuleRepository.findAll();
-    }
+		return null;
+	}
 
-    @Override
-    @Transactional    
-    public Collection<StaticRedirect> findAllStaticRedirects() {
-        return staticRedirectRepository.findAll();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public URI redirect(String domain, String path) {
+		// first try short links
+		UrlWithHash urlWithHash = expandPath(path);
+		if (urlWithHash != null) {
+			return urlWithHash.getUrl();
+		} else {
+			// next, try static redirects
+			StaticRedirect redirect = staticRedirectRepository.findByPath(
+					domain, path);
 
-    @Override
-    @Transactional    
-    public void removeRedirectRule(UUID id) {
-        redirectRuleRepository.remove(id);
-    }
+			if (redirect != null) {
+				return redirect.getUrl();
+			} else {
+				// finally, check redirect rules
+				Collection<RedirectRule> rules = redirectRuleRepository
+						.findAll();
 
-    
-    @Override
-    @Transactional    
-    public void removeStaticRedirect(UUID id) {
-        staticRedirectRepository.remove(id);
-    }
+				for (RedirectRule rule : rules) {
+					if (rule.matches(domain, path)) {
+						// TODO implement regex group replacement in the
+						// resulting URL
+						return rule.getUrl();
+					}
+				}
 
-    @Override
-    @Transactional    
-    public void addHit(Bookmark bookmark) {
-        Hit hit = new Hit(bookmark.getId(), null, new Date().getTime());
-        hitRepository.persist(hit);
-    }
+				return null;
+			}
+		}
+	}
 
-    @Override
-    @Transactional    
-    public void addHit(LongUrl longUrl) {
-        Hit hit = new Hit(null, longUrl.getId(), new Date().getTime());
-        hitRepository.persist(hit);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Bookmark lookup(URI url, Owner owner) {
+		return shortLinkRepository.findByLongUrl(url, owner);
+	}
 
-    @Override
-    @Transactional
-    public Application getApplication(String apiKey) {
-        return applicationRepository.findByApiKey(apiKey);
-    }
+	public BookmarkRepository getShortLinkRepository() {
+		return shortLinkRepository;
+	}
 
-    @Override
-    @Transactional
-    public void createApplication(Application application) {
-        applicationRepository.persist(application);
-    }
+	@Resource
+	public void setShortLinkRepository(BookmarkRepository shortLinkRepository) {
+		this.shortLinkRepository = shortLinkRepository;
+	}
 
-    @Override
-    @Transactional
-    public Collection<Application> findAllApplications() {
-        return applicationRepository.findAll();
-    }
+	public RedirectRuleRepository getRedirectRuleRepository() {
+		return redirectRuleRepository;
+	}
 
-    @Override
-    @Transactional
-    public void removeApplication(UUID id) {
-        applicationRepository.remove(id);
-    }
+	@Resource
+	public void setRedirectRuleRepository(
+			RedirectRuleRepository redirectRuleRepository) {
+		this.redirectRuleRepository = redirectRuleRepository;
+	}
 
-    @Override
-    public Collection<Owner> findAllUsers() {
-        return userRepository.findAll();
-    }
+	public StaticRedirectRepository getStaticRedirectRepository() {
+		return staticRedirectRepository;
+	}
+
+	@Resource
+	public void setStaticRedirectRepository(
+			StaticRedirectRepository staticRedirectRepository) {
+		this.staticRedirectRepository = staticRedirectRepository;
+	}
+
+	public UserRepository getUserRepository() {
+		return userRepository;
+	}
+
+	@Resource
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	public KeywordRepository getKeywordRepository() {
+		return keywordRepository;
+	}
+
+	@Resource
+	public void setKeywordRepository(KeywordRepository keywordRepository) {
+		this.keywordRepository = keywordRepository;
+	}
+
+	public LongUrlRepository getLongUrlRepository() {
+		return longUrlRepository;
+	}
+
+	@Resource
+	public void setLongUrlRepository(LongUrlRepository longUrlRepository) {
+		this.longUrlRepository = longUrlRepository;
+	}
+
+	public HitRepository getHitRepository() {
+		return hitRepository;
+	}
+
+	@Resource
+	public void setHitRepository(HitRepository hitRepository) {
+		this.hitRepository = hitRepository;
+	}
+
+	public ApplicationRepository getApplicationRepository() {
+		return applicationRepository;
+	}
+
+	@Resource
+	public void setApplicationRepository(
+			ApplicationRepository applicationRepository) {
+		this.applicationRepository = applicationRepository;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	@Resource(name = "domain")
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	@Override
+	@Transactional
+	public Owner getUser(String username) {
+		Owner user = userRepository.findByName(username);
+		if (user == null) {
+			user = new Owner(username);
+			userRepository.persist(user);
+		}
+		return user;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Keyword> getAllKeywords() {
+		return keywordRepository.findAllInOrder();
+	}
+
+	@Override
+	@Transactional
+	public void createRedirectRule(RedirectRule rule) {
+		redirectRuleRepository.persist(rule);
+	}
+
+	@Override
+	@Transactional
+	public void createStaticRedirect(StaticRedirect redirect) {
+		staticRedirectRepository.persist(redirect);
+	}
+
+	@Override
+	@Transactional
+	public Collection<RedirectRule> findAllRedirectRules() {
+		return redirectRuleRepository.findAll();
+	}
+
+	@Override
+	@Transactional
+	public Collection<StaticRedirect> findAllStaticRedirects() {
+		return staticRedirectRepository.findAll();
+	}
+
+	@Override
+	@Transactional
+	public void removeRedirectRule(UUID id) {
+		redirectRuleRepository.remove(id);
+	}
+
+	@Override
+	@Transactional
+	public void removeStaticRedirect(UUID id) {
+		staticRedirectRepository.remove(id);
+	}
+
+	@Override
+	@Transactional
+	public void addHit(Bookmark bookmark) {
+		Hit hit = new Hit(bookmark.getId(), null, new Date().getTime());
+		hitRepository.persist(hit);
+	}
+
+	@Override
+	@Transactional
+	public void addHit(LongUrl longUrl) {
+		Hit hit = new Hit(null, longUrl.getId(), new Date().getTime());
+		hitRepository.persist(hit);
+	}
+
+	@Override
+	@Transactional
+	public Application getApplication(String apiKey) {
+		return applicationRepository.findByApiKey(apiKey);
+	}
+
+	@Override
+	@Transactional
+	public void createApplication(Application application) {
+		applicationRepository.persist(application);
+	}
+
+	@Override
+	@Transactional
+	public Collection<Application> findAllApplications() {
+		return applicationRepository.findAll();
+	}
+
+	@Override
+	@Transactional
+	public void removeApplication(UUID id) {
+		applicationRepository.remove(id);
+	}
+
+	@Override
+	public Collection<Owner> findAllUsers() {
+		return userRepository.findAll();
+	}
 }

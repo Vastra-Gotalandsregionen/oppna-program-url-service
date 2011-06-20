@@ -38,6 +38,7 @@ import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
 import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.UrlWithHash;
 
 public class MockUrlServiceService implements UrlServiceService {
 
@@ -68,23 +69,28 @@ public class MockUrlServiceService implements UrlServiceService {
 
     
     @Override
-    public Bookmark expand(String hash) {
+    public Bookmark expand(String hash, Owner owner) {
         if(hash.equals("foo")) {
-            return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new Owner(USERNAME));
+            return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, owner);
         } else {
             return null;
         }
     }
     
     @Override
-    public Bookmark expand(URI shortUrl) throws URISyntaxException {
-        return new Bookmark(HASH, new LongUrl(LONG_URL, GLOBAL_HASH), keywords, new Owner(USERNAME));
+    public UrlWithHash expandPath(URI shortUrl) {
+        return new LongUrl(LONG_URL, GLOBAL_HASH);
     }
 
     @Override
+    public UrlWithHash expandPath(String path) {
+    	return new LongUrl(LONG_URL, GLOBAL_HASH);
+    }
+    
+    @Override
     public URI redirect(String domain, String path) {
-        if(expand(path) != null) {
-            return expand(path).getLongUrl().getUrl(); 
+        if(expandPath(path) != null) {
+            return expandPath(path).getUrl(); 
         } else if(path.equals("bar")) {
             return URI.create("http://google.com");
         } else {
@@ -160,8 +166,8 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames) {
-        return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), new Owner(USERNAME));
+    public Bookmark updateBookmark(String hash, String slug, Collection<String> keywordNames, Owner owner) {
+        return new Bookmark(hash, new LongUrl(LONG_URL, GLOBAL_HASH), Collections.<Keyword>emptyList(), owner);
     }
 
     @Override

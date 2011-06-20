@@ -42,7 +42,7 @@ public class LoadTestingScript extends AbstractTransactionalJUnit4SpringContextT
 	        LongUrlRepository longUrlRepository = applicationContext.getBean(LongUrlRepository.class);
 	        longUrlRepository.persist(longUrl);
 	        longUrlRepository.flush();
-	        Bookmark shortLink = new Bookmark(hash, longUrl, Collections.EMPTY_LIST, null, owner);
+	        Bookmark shortLink = new Bookmark(hash, longUrl, Collections.EMPTY_LIST, owner);
 	
 	        BookmarkRepository bookmarkRepository = applicationContext.getBean(BookmarkRepository.class);
 	        
