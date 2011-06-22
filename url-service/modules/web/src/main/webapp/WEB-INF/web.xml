@@ -111,4 +111,21 @@
 		<servlet-name>url</servlet-name>
 		<url-pattern>/app/*</url-pattern>
 	</servlet-mapping>
+
+	<!-- Used for load balancing -->
+	<servlet>
+		<servlet-name>probe</servlet-name>
+		<servlet-class>se.vgregion.urlservice.servlets.ProbeServlet</servlet-class>
+		<init-param >
+			<param-name>configuration-file</param-name>
+			<param-value>~/.urlapp/urlapp.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>probe</servlet-name>
+		<url-pattern>/probe</url-pattern>
+	</servlet-mapping>
+
 </web-app>

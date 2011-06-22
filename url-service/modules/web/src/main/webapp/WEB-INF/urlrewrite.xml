@@ -27,6 +27,11 @@
 	</rule>
 
 	<rule match-type="wildcard">
+		<from>/probe</from>
+		<to last="true">/probe</to>
+	</rule>
+
+	<rule match-type="wildcard">
 		<from>/WEB-INF/**</from>
 		<to last="true">/WEB-INF/$1</to>
 	</rule>
