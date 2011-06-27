@@ -21,6 +21,8 @@
 		<intercept-url pattern="/favicon.ico" filters="none" />
 		<intercept-url pattern="/b/new" access="ROLE_USER"  />
 		<intercept-url pattern="/u/*/b/*/edit" access="ROLE_USER"  />
+		<intercept-url pattern="/app/admin/**" access="ROLE_ADMIN"  />
+		<intercept-url pattern="/admin/**" access="ROLE_ADMIN"  />
 		<form-login default-target-url="/" login-page="/login"  />
 		<logout logout-success-url="/" logout-url="/logout"/>
 	</http>

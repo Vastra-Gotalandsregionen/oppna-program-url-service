@@ -58,4 +58,15 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
         Assert.assertEquals(HASH, loaded.getPattern());
         Assert.assertEquals(LONG_URL.toString(), loaded.getUrl());
     }
+    
+    @Test
+    @Transactional
+    @Rollback
+    public void findByDomainAndPattern() {
+    	RedirectRule loaded = dao.findByDomainAndPattern(DOMAIN, HASH);
+        
+        Assert.assertEquals(rule1.getPattern(), loaded.getPattern());
+        Assert.assertEquals(rule1.getUrl(), loaded.getUrl());
+    }
+
 }

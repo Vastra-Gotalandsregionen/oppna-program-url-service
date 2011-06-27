@@ -26,4 +26,9 @@ import se.vgregion.urlservice.types.RedirectRule;
     
 public interface RedirectRuleRepository extends JpaRepository<RedirectRule, UUID, UUID> {
 
+    /**
+     * Find rule by domain and pattern.
+     */
+    RedirectRule findByDomainAndPattern(String domain, String pattern);
+
 }

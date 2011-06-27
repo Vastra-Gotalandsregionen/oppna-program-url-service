@@ -19,8 +19,6 @@
 
 package se.vgregion.urlservice.services;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -40,14 +37,12 @@ import se.vgregion.urlservice.repository.BookmarkRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Bookmark;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.UrlWithHash;
 
 public class DefaultUrlServiceServiceTest {
@@ -65,7 +60,6 @@ public class DefaultUrlServiceServiceTest {
     private LongUrlRepository longUrlRepository = mock(LongUrlRepository.class); 
     private BookmarkRepository bookmarkRepository = mock(BookmarkRepository.class);
     private RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-    private StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
     private KeywordRepository keywordRepository = mock(KeywordRepository.class);
     private UserRepository userRepository = mock(UserRepository.class);
     
@@ -81,7 +75,6 @@ public class DefaultUrlServiceServiceTest {
         urlService.setLongUrlRepository(longUrlRepository);
         urlService.setShortLinkRepository(bookmarkRepository);
         urlService.setRedirectRuleRepository(redirectRuleRepository);
-        urlService.setStaticRedirectRepository(staticRedirectRepository);
         urlService.setKeywordRepository(keywordRepository);
         urlService.setUserRepository(userRepository);
         
@@ -329,7 +322,6 @@ public class DefaultUrlServiceServiceTest {
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
-        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
         
         URI uri = urlService.redirect(DOMAIN, "foo");
@@ -338,13 +330,26 @@ public class DefaultUrlServiceServiceTest {
     }
 
     @Test
+    public void redirectOnRedirectRuleWithPlaceHolder() {
+    	RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
+    	when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "/foo(.+)", "http://example.com/{1}")));
+    	urlService.setRedirectRuleRepository(redirectRuleRepository);
+    	
+    	urlService.setShortLinkRepository(mock(BookmarkRepository.class));
+    	
+    	
+    	URI uri = urlService.redirect(DOMAIN, "foobar");
+    	
+    	Assert.assertEquals(URI.create("http://example.com/bar"), uri);
+    }
+    
+    @Test
     public void redirectOnRedirectRuleNullDomain() {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
         when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(null, "/foo", LONG_URL.toString())));
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
-        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
         
         URI uri = urlService.redirect(null, "foo");
@@ -359,7 +364,6 @@ public class DefaultUrlServiceServiceTest {
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
-        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
         
         Assert.assertNull(urlService.redirect("dummy", "foo"));
@@ -370,7 +374,6 @@ public class DefaultUrlServiceServiceTest {
     public void redirectOnShortLink() {
         urlService.setRedirectRuleRepository(mock(RedirectRuleRepository.class));
         when(bookmarkRepository.findByHash(HASH, owner)).thenReturn(new Bookmark(HASH, longUrl, owner));
-        urlService.setStaticRedirectRepository(mock(StaticRedirectRepository.class));
         
         URI uri = urlService.redirect(DOMAIN, "/u/" + owner.getName() + "/b/" + HASH);
 
@@ -384,27 +387,6 @@ public class DefaultUrlServiceServiceTest {
         urlService.setShortLinkRepository(shortLinkRepository);
 
         Assert.assertNull(urlService.redirect("dummy", "dummy"));
-    }
-
-    
-    @Test
-    public void redirectOnStaticRedirect() {
-        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        when(staticRedirectRepository.findByPath(eq(DOMAIN), anyString())).thenReturn(new StaticRedirect(DOMAIN, HASH, LONG_URL));
-        urlService.setStaticRedirectRepository(staticRedirectRepository);
-        
-        URI uri = urlService.redirect(DOMAIN, HASH);
-
-        Assert.assertEquals(LONG_URL, uri);
-    }
-
-    @Test
-    public void redirectOnStaticRedirectDomainNotMatching() {
-        StaticRedirectRepository staticRedirectRepository = mock(StaticRedirectRepository.class);
-        when(staticRedirectRepository.findByPath(eq(DOMAIN), anyString())).thenReturn(new StaticRedirect(DOMAIN, "foo", LONG_URL));
-        urlService.setStaticRedirectRepository(staticRedirectRepository);
-        
-        Assert.assertNull(urlService.redirect("dummy", "foo"));
     }
 
     

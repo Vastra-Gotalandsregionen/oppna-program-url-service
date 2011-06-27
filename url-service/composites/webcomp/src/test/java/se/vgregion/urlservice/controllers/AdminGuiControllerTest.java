@@ -40,7 +40,6 @@ import org.springframework.web.servlet.ModelAndView;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
 
 
 public class AdminGuiControllerTest {
@@ -57,16 +56,12 @@ public class AdminGuiControllerTest {
         List<RedirectRule> rules = Arrays.asList(new RedirectRule(DOMAIN, PATTERN, URL.toString()));
         when(urlServiceService.findAllRedirectRules()).thenReturn(rules);
 
-        List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(DOMAIN, PATTERN, URL));
-        when(urlServiceService.findAllStaticRedirects()).thenReturn(statics);
-        
         controller.setUrlServiceService(urlServiceService);
 
         
         ModelAndView mav = controller.index();
         
         Assert.assertEquals(rules, mav.getModel().get("redirectRules"));
-        Assert.assertEquals(statics, mav.getModel().get("staticRedirects"));
     }
     
     @Test
@@ -105,45 +100,6 @@ public class AdminGuiControllerTest {
         controller.updateRedirectRules(request);
 
         verify(urlServiceService).removeRedirectRule(id);
-    }
-
-    @Test
-    public void addStaticRedirect() throws IOException {
-        UrlServiceService urlServiceService = mock(UrlServiceService.class);
-        controller.setUrlServiceService(urlServiceService);
-        
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("add", "any value");
-        request.addParameter("domain", DOMAIN);
-        request.addParameter("pattern", PATTERN);
-        request.addParameter("url", URL.toString());
-        
-        controller.updateStaticRedirects(request);
-
-        verify(urlServiceService).createStaticRedirect(Mockito.argThat(new TypeSafeMatcher<StaticRedirect>() {
-            @Override
-            public boolean matchesSafely(StaticRedirect rule) {
-                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL.toString());
-            }
-
-            @Override
-            public void describeTo(Description arg0) {
-            }}));
-    }
-
-    @Test
-    public void deleteStaticRedirect() throws IOException {
-        UrlServiceService urlServiceService = mock(UrlServiceService.class);
-        controller.setUrlServiceService(urlServiceService);
-        
-        UUID id = UUID.randomUUID();
-        
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("delete-" + id.toString(), "any value");
-        
-        controller.updateStaticRedirects(request);
-
-        verify(urlServiceService).removeStaticRedirect(id);
     }
 
     @Test

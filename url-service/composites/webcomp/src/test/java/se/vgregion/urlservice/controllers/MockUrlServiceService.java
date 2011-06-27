@@ -20,7 +20,6 @@
 package se.vgregion.urlservice.controllers;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +36,6 @@ import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.UrlWithHash;
 
 public class MockUrlServiceService implements UrlServiceService {
@@ -115,27 +113,12 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public void createStaticRedirect(StaticRedirect redirect) {
-        
-    }
-
-    @Override
-    public Collection<StaticRedirect> findAllStaticRedirects() {
-        return null;
-    }
-
-    @Override
     public Collection<RedirectRule> findAllRedirectRules() {
         return null;
     }
 
     @Override
     public void removeRedirectRule(UUID id) {
-        
-    }
-
-    @Override
-    public void removeStaticRedirect(UUID id) {
         
     }
 

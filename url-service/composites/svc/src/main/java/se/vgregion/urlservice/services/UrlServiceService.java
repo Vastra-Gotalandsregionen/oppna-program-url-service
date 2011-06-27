@@ -27,12 +27,11 @@ import java.util.UUID;
 
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
-import se.vgregion.urlservice.types.UrlWithHash;
 import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
+import se.vgregion.urlservice.types.UrlWithHash;
 
 /**
  * Service for handling short link, modelled after the bit.ly version 3 API
@@ -110,17 +109,11 @@ public interface UrlServiceService {
 
     void createRedirectRule(RedirectRule rule);
 
-    void createStaticRedirect(StaticRedirect redirect);
-
     Collection<Owner> findAllUsers();
-
-    Collection<StaticRedirect> findAllStaticRedirects();
 
     Collection<RedirectRule> findAllRedirectRules();
 
     void removeRedirectRule(UUID id);
-
-    void removeStaticRedirect(UUID id);
 
     Bookmark updateBookmark(String hash, String newHash, Collection<String> keywordNames, Owner owner);
     

@@ -47,4 +47,23 @@ public class JpaRedirectRuleRepository extends AbstractJpaRepository<RedirectRul
         }
     }
     
+    
+    /**
+     * Find link by domain and pattern.
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
+    public RedirectRule findByDomainAndPattern(String domain, String pattern) {
+        try {
+            return (RedirectRule) entityManager.createQuery("select l from " + type.getName() + " l where l.domain = :domain and l.pattern = :pattern")
+                .setParameter("domain", domain)
+                .setParameter("pattern", pattern)
+                .getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
+
+    }
+
+    
 }

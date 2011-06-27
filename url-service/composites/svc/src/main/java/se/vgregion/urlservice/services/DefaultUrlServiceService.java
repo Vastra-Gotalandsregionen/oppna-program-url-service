@@ -20,7 +20,6 @@
 package se.vgregion.urlservice.services;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +44,6 @@ import se.vgregion.urlservice.repository.HitRepository;
 import se.vgregion.urlservice.repository.KeywordRepository;
 import se.vgregion.urlservice.repository.LongUrlRepository;
 import se.vgregion.urlservice.repository.RedirectRuleRepository;
-import se.vgregion.urlservice.repository.StaticRedirectRepository;
 import se.vgregion.urlservice.repository.UserRepository;
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.Bookmark;
@@ -54,7 +52,6 @@ import se.vgregion.urlservice.types.Keyword;
 import se.vgregion.urlservice.types.LongUrl;
 import se.vgregion.urlservice.types.Owner;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
 import se.vgregion.urlservice.types.UrlWithHash;
 
 @Service
@@ -75,7 +72,6 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
 	private BookmarkRepository shortLinkRepository;
 	private RedirectRuleRepository redirectRuleRepository;
-	private StaticRedirectRepository staticRedirectRepository;
 	private UserRepository userRepository;
 	private KeywordRepository keywordRepository;
 	private LongUrlRepository longUrlRepository;
@@ -273,21 +269,19 @@ public class DefaultUrlServiceService implements UrlServiceService {
 		if (urlWithHash != null) {
 			return urlWithHash.getUrl();
 		} else {
-			// next, try static redirects
-			StaticRedirect redirect = staticRedirectRepository.findByPath(
-					domain, path);
+			String pathWithLeadingSlash = (path.startsWith("/")) ? path : "/" + path;
+			// next, try a perfect matching rule. This is a performance optimization for when
+			// large number of static redirects are used
+			RedirectRule directRedirect= redirectRuleRepository.findByDomainAndPattern(domain, pathWithLeadingSlash);
 
-			if (redirect != null) {
-				return URI.create(redirect.getUrl());
+			if (directRedirect != null) {
+				return URI.create(directRedirect.getUrl());
 			} else {
 				// finally, check redirect rules
 				Collection<RedirectRule> rules = redirectRuleRepository
 						.findAll();
 
 				for (RedirectRule rule : rules) {
-					String pathWithLeadingSlash = (path.startsWith("/")) ? path : "/" + path;
-					
-					
 					if (rule.matches(domain, pathWithLeadingSlash)) {
 						return rule.resolve(pathWithLeadingSlash);
 					}
@@ -324,16 +318,6 @@ public class DefaultUrlServiceService implements UrlServiceService {
 	public void setRedirectRuleRepository(
 			RedirectRuleRepository redirectRuleRepository) {
 		this.redirectRuleRepository = redirectRuleRepository;
-	}
-
-	public StaticRedirectRepository getStaticRedirectRepository() {
-		return staticRedirectRepository;
-	}
-
-	@Resource
-	public void setStaticRedirectRepository(
-			StaticRedirectRepository staticRedirectRepository) {
-		this.staticRedirectRepository = staticRedirectRepository;
 	}
 
 	public UserRepository getUserRepository() {
@@ -416,32 +400,14 @@ public class DefaultUrlServiceService implements UrlServiceService {
 
 	@Override
 	@Transactional
-	public void createStaticRedirect(StaticRedirect redirect) {
-		staticRedirectRepository.persist(redirect);
-	}
-
-	@Override
-	@Transactional
 	public Collection<RedirectRule> findAllRedirectRules() {
 		return redirectRuleRepository.findAll();
 	}
 
 	@Override
 	@Transactional
-	public Collection<StaticRedirect> findAllStaticRedirects() {
-		return staticRedirectRepository.findAll();
-	}
-
-	@Override
-	@Transactional
 	public void removeRedirectRule(UUID id) {
 		redirectRuleRepository.remove(id);
-	}
-
-	@Override
-	@Transactional
-	public void removeStaticRedirect(UUID id) {
-		staticRedirectRepository.remove(id);
 	}
 
 	@Override

@@ -26,7 +26,6 @@
     <persistence-unit name="URLService">
         <class>se.vgregion.urlservice.types.Bookmark</class>
         <class>se.vgregion.urlservice.types.RedirectRule</class>
-        <class>se.vgregion.urlservice.types.StaticRedirect</class>
         <class>se.vgregion.urlservice.types.Owner</class>
         <class>se.vgregion.urlservice.types.Keyword</class>
         <class>se.vgregion.urlservice.types.LongUrl</class>

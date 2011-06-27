@@ -20,7 +20,6 @@
 package se.vgregion.urlservice.controllers;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -38,7 +37,6 @@ import org.springframework.web.servlet.ModelAndView;
 import se.vgregion.urlservice.services.UrlServiceService;
 import se.vgregion.urlservice.types.Application;
 import se.vgregion.urlservice.types.RedirectRule;
-import se.vgregion.urlservice.types.StaticRedirect;
 
 /**
  * Controller for showing a basic web GUI for shorting link.
@@ -62,7 +60,6 @@ public class AdminGuiController {
         ModelAndView mav = new ModelAndView("admin/index");
         
         mav.addObject("redirectRules", urlServiceService.findAllRedirectRules());
-        mav.addObject("staticRedirects", urlServiceService.findAllStaticRedirects());
         mav.addObject("applications", urlServiceService.findAllApplications());
         
         return mav;
@@ -97,35 +94,6 @@ public class AdminGuiController {
             if(deletedId != null) {
                 log.debug("Deleting redirect rule {}", deletedId);
                 urlServiceService.removeRedirectRule(deletedId);
-            }
-        }
-        
-        return mav;
-    }
-
-    @RequestMapping(value="/admin/staticredirects", method=RequestMethod.POST)
-    public ModelAndView updateStaticRedirects(HttpServletRequest request) throws IOException {
-        ModelAndView mav = new ModelAndView("redirect:../admin");
-        
-        if(request.getParameter("add") != null) {
-            // adding a new rule
-            String domain = request.getParameter("domain");
-            String path = request.getParameter("pattern");
-            URI url = URI.create(request.getParameter("url"));
-            
-            if(StringUtils.isNotEmpty(domain) && StringUtils.isNotEmpty(path)) {
-                log.debug("Adding static redirect with path \"{}\" and URL \"{}\"", path, url);
-                try { 
-                    urlServiceService.createStaticRedirect(new StaticRedirect(domain, path, url));
-                } catch(RuntimeException e) {
-                    // TODO do not ignore
-                }
-            }
-        } else {
-            UUID deletedId = findDeletedId(request);
-            if(deletedId != null) {
-                log.debug("Deleting static redirect {}", deletedId);
-                urlServiceService.removeStaticRedirect(deletedId);
             }
         }
         
