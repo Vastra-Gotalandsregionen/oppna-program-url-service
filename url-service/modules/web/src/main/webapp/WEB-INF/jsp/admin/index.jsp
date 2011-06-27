@@ -28,9 +28,9 @@
 		
 			<table>
 				<tr>
-					<th>Domän</th>
-					<th>Mönster</th>
-					<th>URL</th>
+					<th>Domän <span title="En full domän, inklusive protokoll. T.ex. http://foo.vgregion.se">(?)</span></th>
+					<th>Mönster <span title="En regular expression. Måste starta med /">(?)</span></th>
+					<th>URL <span title="En komplett URL, kan innehålla platshållare som ersätts med gruppträffar från mönstret. T.ex. http://bar.vgregion.se/{1}">(?)</span></th>
 					<th></th>
 				</tr>
 				<c:forEach var="rule" items="${redirectRules}">

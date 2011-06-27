@@ -41,7 +41,7 @@ public class StaticRedirect extends AbstractRedirect<StaticRedirect> {
     }
 
     public StaticRedirect(String domain, String path, URI url) {
-        super(domain, path, url);
+        super(domain, path, url.toString());
         
         if(StringUtils.isEmpty(domain)) {
             throw new IllegalArgumentException("Domain can not be empty");

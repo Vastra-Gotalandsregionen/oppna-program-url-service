@@ -278,17 +278,18 @@ public class DefaultUrlServiceService implements UrlServiceService {
 					domain, path);
 
 			if (redirect != null) {
-				return redirect.getUrl();
+				return URI.create(redirect.getUrl());
 			} else {
 				// finally, check redirect rules
 				Collection<RedirectRule> rules = redirectRuleRepository
 						.findAll();
 
 				for (RedirectRule rule : rules) {
-					if (rule.matches(domain, path)) {
-						// TODO implement regex group replacement in the
-						// resulting URL
-						return rule.getUrl();
+					String pathWithLeadingSlash = (path.startsWith("/")) ? path : "/" + path;
+					
+					
+					if (rule.matches(domain, pathWithLeadingSlash)) {
+						return rule.resolve(pathWithLeadingSlash);
 					}
 				}
 

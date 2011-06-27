@@ -20,10 +20,12 @@
 package se.vgregion.urlservice.types;
 
 import java.net.URI;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -38,19 +40,48 @@ import javax.persistence.UniqueConstraint;
 
 public class RedirectRule extends AbstractRedirect<RedirectRule> {
 
+	@Transient
+	private Pattern regex;
+	
     /* Make JPA happy */
     protected RedirectRule() {
     }
 
-    public RedirectRule(String domain, String pattern, URI url) {
+    public RedirectRule(String domain, String pattern, String url) {
         super(domain, pattern, url);
+    }
+
+    private void compileRegex() {
+        if(regex == null) {
+        	regex = Pattern.compile(getPattern());
+        }
     }
     
     public boolean matches(String domain, String path) {
         if(!domainMatches(domain)) return false;
         
-        Pattern regex = Pattern.compile(getPattern());
+        compileRegex();
         
         return regex.matcher(path).matches();
+    }
+    
+    public URI resolve(String path) {
+    	compileRegex();
+    	
+    	String url = getUrl();
+    	
+    	Matcher matcher = regex.matcher(path);
+    	if(matcher.matches()) {
+    		for(int i = 0; i<matcher.groupCount() + 1; i++) {
+    			url = url.replace("{" + i + "}", matcher.group(i));
+    		}
+    		
+    		// remove the extra placeholders
+    		url = url.replaceAll("\\{\\d+\\}", "");
+    		
+    		return URI.create(url);
+    	} else {
+    		throw new IllegalArgumentException("path does not match pattern, verify with matches() first");
+    	}
     }
 }

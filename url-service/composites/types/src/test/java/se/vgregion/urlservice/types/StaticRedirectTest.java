@@ -40,7 +40,7 @@ public class StaticRedirectTest {
         new StaticRedirect(DOMAIN, null, URL);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=NullPointerException.class)
     public void nullUrlNotAllowed() {
         new StaticRedirect(DOMAIN, "foo", null);
     }

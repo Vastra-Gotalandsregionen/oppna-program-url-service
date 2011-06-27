@@ -79,7 +79,7 @@ public class AdminGuiController {
                 domain = null;
             }
             String pattern = request.getParameter("pattern");
-            URI url = URI.create(request.getParameter("url"));
+            String url = request.getParameter("url");
 
             if(StringUtils.isNotEmpty(pattern)) {
                 log.debug("Adding redirect rule with pattern \"{}\" and URL \"{}\"", pattern, url);

@@ -54,7 +54,7 @@ public class AdminGuiControllerTest {
     public void index() throws IOException {
         UrlServiceService urlServiceService = mock(UrlServiceService.class);
         
-        List<RedirectRule> rules = Arrays.asList(new RedirectRule(DOMAIN, PATTERN, URL));
+        List<RedirectRule> rules = Arrays.asList(new RedirectRule(DOMAIN, PATTERN, URL.toString()));
         when(urlServiceService.findAllRedirectRules()).thenReturn(rules);
 
         List<StaticRedirect> statics = Arrays.asList(new StaticRedirect(DOMAIN, PATTERN, URL));
@@ -84,7 +84,7 @@ public class AdminGuiControllerTest {
         verify(urlServiceService).createRedirectRule(Mockito.argThat(new TypeSafeMatcher<RedirectRule>() {
             @Override
             public boolean matchesSafely(RedirectRule rule) {
-                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
+                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL.toString());
             }
             @Override
             public void describeTo(Description arg0) {
@@ -123,7 +123,7 @@ public class AdminGuiControllerTest {
         verify(urlServiceService).createStaticRedirect(Mockito.argThat(new TypeSafeMatcher<StaticRedirect>() {
             @Override
             public boolean matchesSafely(StaticRedirect rule) {
-                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL);
+                return rule.getPattern().equals(PATTERN) && rule.getUrl().equals(URL.toString());
             }
 
             @Override

@@ -55,7 +55,7 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     public AbstractRedirect() {
     }
 
-    public AbstractRedirect(String domain, String pattern, URI url) {
+    public AbstractRedirect(String domain, String pattern, String url) {
         this.id = UUID.randomUUID();
         
         Validate.notEmpty(pattern, "pattern can not be empty");
@@ -63,7 +63,7 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
         
         this.domain = domain;
         this.pattern = pattern;
-        this.url = url.toString();
+        this.url = url;
     }
     
     public UUID getId() {
@@ -76,8 +76,8 @@ public abstract class AbstractRedirect<T extends se.vgregion.dao.domain.patterns
     public String getPattern() {
         return pattern;
     }
-    public URI getUrl() {
-        return URI.create(url);
+    public String getUrl() {
+        return url;
     }
     
     protected boolean domainMatches(String otherDomain) {

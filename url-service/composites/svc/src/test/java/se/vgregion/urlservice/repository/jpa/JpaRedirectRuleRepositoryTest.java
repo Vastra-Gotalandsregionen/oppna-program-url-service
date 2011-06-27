@@ -46,7 +46,7 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
     @Before
     public void setup() {
         dao = applicationContext.getBean(RedirectRuleRepository.class);
-        rule1 = dao.persist(new RedirectRule(DOMAIN, HASH, LONG_URL));
+        rule1 = dao.persist(new RedirectRule(DOMAIN, HASH, LONG_URL.toString()));
     }
     
     @Test
@@ -56,6 +56,6 @@ public class JpaRedirectRuleRepositoryTest extends AbstractTransactionalJUnit4Sp
         RedirectRule loaded = dao.find(rule1.getId());
         
         Assert.assertEquals(HASH, loaded.getPattern());
-        Assert.assertEquals(LONG_URL, loaded.getUrl());
+        Assert.assertEquals(LONG_URL.toString(), loaded.getUrl());
     }
 }

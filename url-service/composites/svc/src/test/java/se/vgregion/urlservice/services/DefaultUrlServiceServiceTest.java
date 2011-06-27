@@ -325,7 +325,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnRedirectRule() {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "foo", LONG_URL)));
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "/foo", LONG_URL.toString())));
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
@@ -340,7 +340,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnRedirectRuleNullDomain() {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(null, "foo", LONG_URL)));
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(null, "/foo", LONG_URL.toString())));
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
@@ -355,7 +355,7 @@ public class DefaultUrlServiceServiceTest {
     @Test
     public void redirectOnRedirectRuleDomainNotMatching() {
         RedirectRuleRepository redirectRuleRepository = mock(RedirectRuleRepository.class);
-        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "foo", LONG_URL)));
+        when(redirectRuleRepository.findAll()).thenReturn(Arrays.asList(new RedirectRule(DOMAIN, "/foo", LONG_URL.toString())));
         urlService.setRedirectRuleRepository(redirectRuleRepository);
         
         urlService.setShortLinkRepository(mock(BookmarkRepository.class));
