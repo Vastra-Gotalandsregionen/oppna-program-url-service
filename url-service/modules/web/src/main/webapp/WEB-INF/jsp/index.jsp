@@ -53,7 +53,6 @@
 			</c:forEach>
 		</ul>
 
-
 		<div><a href="${pageContext.request.contextPath}/b/new"><img src="${pageContext.request.contextPath}/resources/img/page_add.png" /> Skapa ny favorit</a></div>
 	</body>
 </html>

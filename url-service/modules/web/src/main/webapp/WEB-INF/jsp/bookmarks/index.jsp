@@ -75,5 +75,8 @@
 		<div id="bookmarklet"><a href="javascript:location.href='${domain}/b/new?longurl='+encodeURIComponent(location.href)">Förkorta länk</a>, drag denna länk till dina bokmärken för att enkelt skapa korta länkar</div>
 		<div><a href="${pageContext.request.contextPath}/">Se andras favoriter</a></div>
 
+		<c:if test="${not empty user}">
+			<div><a href="${pageContext.request.contextPath}/j_spring_security_logout">Logga ut</a></div>
+		</c:if>
 	</body>
 </html>

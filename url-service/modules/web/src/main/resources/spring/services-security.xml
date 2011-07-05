@@ -24,7 +24,7 @@
 		<intercept-url pattern="/app/admin/**" access="ROLE_ADMIN"  />
 		<intercept-url pattern="/admin/**" access="ROLE_ADMIN"  />
 		<form-login default-target-url="/" login-page="/login"  />
-		<logout logout-success-url="/" logout-url="/logout"/>
+		<logout logout-success-url="/"/>
 	</http>
 
 	<ldap-server url="${ldap.url}" />

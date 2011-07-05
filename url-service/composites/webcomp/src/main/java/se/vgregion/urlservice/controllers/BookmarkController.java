@@ -81,11 +81,11 @@ public class BookmarkController {
     }
     
     @RequestMapping(value="/", method=RequestMethod.GET)
-    public ModelAndView index() throws IOException {
+    public ModelAndView index(Authentication authentication) throws IOException {
         Collection<Owner> users = urlServiceService.findAllUsers();
 
         ModelAndView mav = new ModelAndView("index");
-        
+        mav.addObject("user", getUser(authentication));
         mav.addObject("users", users);
         return mav;
     }
@@ -156,13 +156,14 @@ public class BookmarkController {
     }
 
     @RequestMapping(value="/u/{username}/b/{hash}/qr", method=RequestMethod.GET)
-    public ModelAndView qr(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username) {
+    public ModelAndView qr(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username, Authentication authentication) {
         ModelAndView mav = new ModelAndView("bookmarks/qr");
 
         Owner user = urlServiceService.getUser(username);
         if(user == null) {
             throw new ResourceNotFoundException("Unknown user");
         }
+        mav.addObject("user", getUser(authentication));
 
         Bookmark bookmark = urlServiceService.expand(hash, user);
         if(bookmark != null) {
