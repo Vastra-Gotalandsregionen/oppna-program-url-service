@@ -154,16 +154,6 @@ public class MockUrlServiceService implements UrlServiceService {
     }
 
     @Override
-    public void addHit(Bookmark bookmark) {
-        
-    }
-
-    @Override
-    public void addHit(LongUrl longUrl) {
-        
-    }
-
-    @Override
     public Application getApplication(String apiKey) {
         if("123456".equals(apiKey)) {
             return new Application("test");

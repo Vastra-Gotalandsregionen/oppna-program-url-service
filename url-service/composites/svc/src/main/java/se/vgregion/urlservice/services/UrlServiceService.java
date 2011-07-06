@@ -117,9 +117,6 @@ public interface UrlServiceService {
 
     Bookmark updateBookmark(String hash, String newHash, Collection<String> keywordNames, Owner owner);
     
-    void addHit(Bookmark bookmark);
-    void addHit(LongUrl longUrl);
-    
     Application getApplication(String apikey);
     
     void createApplication(Application application);
