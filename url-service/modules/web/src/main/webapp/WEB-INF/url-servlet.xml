@@ -26,7 +26,26 @@
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
         ">
 
+	<context:property-placeholder
+		location="classpath:default.properties,file:${user.home}/.urlapp/urlapp.properties,${testproperties}"
+		ignore-resource-not-found="true"
+		ignore-unresolvable="true"
+	/>
+
 	<mvc:annotation-driven/>
+
+	<!-- 
+	 Optional resource, if piwik.baseurl and pwiki.siteid are configured,
+	 it will track visits to the provided Piwik instance.
+	 If these are not set, it will automatically disable tracking
+	  -->
+	<bean class="se.vgregion.urlservice.controllers.PiwikClientFactoryBean">
+		<!-- Piwik base URL -->
+		<constructor-arg value="${piwik.baseurl}" />
+		
+		<!-- Site ID -->
+		<constructor-arg value="${piwik.siteid}" />
+	</bean>
 
 	<context:component-scan base-package="se.vgregion.urlservice.controllers" />
 	<context:component-scan base-package="se.vgregion.mobile.qr" />

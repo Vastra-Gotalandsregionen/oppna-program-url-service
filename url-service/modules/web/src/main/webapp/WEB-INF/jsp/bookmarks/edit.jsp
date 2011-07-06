@@ -46,7 +46,7 @@
 	<body>
 		<h2>Spara favorit</h2>
 	
-		<form action='' method="post" id="editbookmarks">
+		<form action='${action}' method="post" id="editbookmarks">
 			<p><label for="longurl">Länk</label>
 			<c:choose>
 				<c:when test="${edit}">

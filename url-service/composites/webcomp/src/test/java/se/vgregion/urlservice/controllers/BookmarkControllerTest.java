@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -98,9 +99,10 @@ public class BookmarkControllerTest {
 
     @Test
     public void redirectWithExistingHash() throws IOException {
+    	MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        ModelAndView mav = controller.redirect("foo", user.getUsername(), response);
+        ModelAndView mav = controller.redirect("foo", user.getUsername(), request, response);
         
         Assert.assertEquals(301, response.getStatus());
         Assert.assertEquals("http://example.com", response.getHeader("Location"));
@@ -109,8 +111,9 @@ public class BookmarkControllerTest {
 
     @Test
     public void redirectWithNonExistingHash() throws IOException {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        ModelAndView mav = controller.redirect("dummy", user.getUsername(), response);
+    	MockHttpServletRequest request = new MockHttpServletRequest();
+    	MockHttpServletResponse response = new MockHttpServletResponse();
+        ModelAndView mav = controller.redirect("dummy", user.getUsername(), request, response);
         
         Assert.assertEquals(404, response.getStatus());
         Assert.assertNull(mav);

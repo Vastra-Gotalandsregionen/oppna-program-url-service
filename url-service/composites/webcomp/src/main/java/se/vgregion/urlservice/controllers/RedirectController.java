@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,9 @@ public class RedirectController {
 
     @Resource
     private UrlServiceService urlServiceService;
+    
+    @Autowired(required=false)
+    private StatsTracker statsTracker;
 
     public RedirectController() {
         log.info("Created {}", RedirectController.class.getName());
@@ -70,7 +74,6 @@ public class RedirectController {
             domain += ":" + request.getServerPort();
         }
         domain += request.getContextPath();
-        //String path = request.getPathInfo().substring(1);
         URI uri = urlServiceService.redirect(domain, path);
 
         if(uri != null) {
@@ -80,6 +83,14 @@ public class RedirectController {
             
             mav.addObject("longUrl", uri.toString());
 
+            if(statsTracker != null) {
+	            try {
+	            	statsTracker.track(uri.toString(), domain + path, path, request.getHeader("User-agent"));
+	            } catch(Exception e) {
+	            	log.warn("Error on tracking to Piwik", e);
+	            }
+            }
+            
             return mav;
         } else {
             response.sendError(404);

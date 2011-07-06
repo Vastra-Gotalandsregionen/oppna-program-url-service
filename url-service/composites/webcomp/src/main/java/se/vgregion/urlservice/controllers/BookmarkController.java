@@ -28,11 +28,13 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +63,9 @@ public class BookmarkController {
     
     @Resource
     private UrlServiceService urlServiceService;
+    
+    @Autowired(required=false)
+    private StatsTracker statsTracker;
 
     public BookmarkController() {
         log.info("Created {}", BookmarkController.class.getName());
@@ -113,9 +118,11 @@ public class BookmarkController {
 
     
     @RequestMapping(value="/b/new", method=RequestMethod.GET)
-    public ModelAndView newBookmark(Authentication authentication) {
+    public ModelAndView newBookmark(@RequestParam(value="longurl", required=false) String longUrl, Authentication authentication) {
         ModelAndView mav = new ModelAndView("bookmarks/edit");
         
+        mav.addObject("action", "new");
+        mav.addObject("longUrl", longUrl);
         mav.addObject("user", getUser(authentication));
         
         return mav;
@@ -193,7 +200,8 @@ public class BookmarkController {
             Authentication authentication) throws IOException {
         ModelAndView mav = new ModelAndView("bookmarks/edit");
         mav.addObject("edit", true);
-
+        mav.addObject("action", "edit");
+        
         Owner user = getUser(authentication);
         mav.addObject("user", getUser(authentication));
         
@@ -265,16 +273,23 @@ public class BookmarkController {
     }
     
     @RequestMapping(value="/b/{globalHash}")
-    public ModelAndView redirectGlobal(@PathVariable(value="globalHash") String globalHash, HttpServletResponse response) throws IOException { 
+    public ModelAndView redirectGlobal(@PathVariable(value="globalHash") String globalHash, HttpServletRequest request, HttpServletResponse response) throws IOException { 
         LongUrl longUrl = urlServiceService.expandGlobal(globalHash);
         
         if(longUrl != null) {
             ModelAndView mav = new ModelAndView("redirect");
             response.setStatus(301);
-            response.setHeader("Location", longUrl.getUrl().toString());
             
-            mav.addObject("longUrl", longUrl.getUrl().toString());
+            String longUrlStr = longUrl.getUrl().toString();
+            response.setHeader("Location", longUrlStr);
+            
+            mav.addObject("longUrl", longUrlStr);
 
+            if(statsTracker != null) {
+            	String referrer = shortLinkPrefix + "b/" + globalHash;
+            	track(longUrlStr, referrer, globalHash, request);
+            }
+            
             return mav;
         } else {
             response.sendError(404);
@@ -283,7 +298,7 @@ public class BookmarkController {
     }
 
     @RequestMapping(value="/u/{username}/b/{hash}")
-    public ModelAndView redirect(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username, HttpServletResponse response) throws IOException { 
+    public ModelAndView redirect(@PathVariable(value="hash") String hash, @PathVariable(value="username") String username, HttpServletRequest request, HttpServletResponse response) throws IOException { 
         Owner user = urlServiceService.getUser(username);
         if(user == null) {
             throw new ResourceNotFoundException("Unknown user");
@@ -294,14 +309,32 @@ public class BookmarkController {
         if(bookmark != null) {
             ModelAndView mav = new ModelAndView("redirect");
             response.setStatus(301);
-            response.setHeader("Location", bookmark.getLongUrl().getUrl().toString());
+            String longUrl = bookmark.getLongUrl().getUrl().toString();
             
-            mav.addObject("longUrl", bookmark.getLongUrl().getUrl().toString());
+            response.setHeader("Location", longUrl);
+            
+            mav.addObject("longUrl", longUrl);
 
+            if(statsTracker != null) {
+            	String referrer = createShortLink(user, bookmark);
+            	track(longUrl, referrer, hash, request);
+            }
+            
             return mav;
         } else {
             response.sendError(404);
             return null;
+        }
+    }
+    
+    private void track(String url, String referrer, String title, HttpServletRequest request) {
+        if(statsTracker != null) {
+        	String userAgent = request.getHeader("User-agent");
+        	try {
+        		statsTracker.track(url, referrer, title, userAgent);
+        	} catch(Exception e) {
+        		log.warn("Error on tracking to Piwik", e);
+        	}
         }
     }
 
