@@ -17,10 +17,13 @@
  *
  */
 
-package se.vgregion.urlservice.controllers;
+package se.vgregion.urlservice.stats.piwik;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
+
+import se.vgregion.urlservice.stats.StatsTracker;
+
 
 
 /**

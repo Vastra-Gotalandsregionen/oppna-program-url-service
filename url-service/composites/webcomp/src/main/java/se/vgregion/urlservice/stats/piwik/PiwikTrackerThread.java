@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.controllers;
+package se.vgregion.urlservice.stats.piwik;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -26,60 +26,63 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
+import se.vgregion.urlservice.stats.piwik.DefaultPiwikClient.Hit;
 
-/**
- * Client to report clicks in Piwik
- *
- */
-public class DefaultPiwikClient implements StatsTracker {
+class PiwikTrackerThread extends Thread {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultPiwikClient.class);
+    private final Logger log = LoggerFactory.getLogger(PiwikTrackerThread.class);
 	
 	private static final int API_VERSION = 1;
 	
 	private String piwikBase;
 	private String siteId;
+	private LinkedBlockingQueue<Hit> hits;
 	
 	private Random rnd = new Random();
 	
-	public DefaultPiwikClient(String piwikBase, String siteId) {
-		Assert.hasText(piwikBase, "piwikBase must be provided");
-		Assert.hasText(siteId, "siteId must be provided");
+	public PiwikTrackerThread(String piwikBase, String siteId, LinkedBlockingQueue<Hit> hits) {
+		super("Piwik tracker");
+		
 		this.piwikBase = piwikBase;
 		this.siteId = siteId;
+		this.hits = hits;
 	}
 	
-	public void track(String url, String referrer, String title, String userAgent) {
-		Assert.hasText(url, "url must be provided");
-		Assert.hasText(referrer, "referrer must be provided");
-		Assert.hasText(title, "title must be provided");
-		
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("idsite", siteId);
-		parameters.put("rec", 1);
-		parameters.put("apiv", API_VERSION);
-		parameters.put("url", encode(url));
-		parameters.put("urlref", encode(referrer));
-		parameters.put("action_name", encode(title));
-		parameters.put("rand", rnd.nextInt(9999999));
-		
-		String query = buildQuery(parameters);
-		
-		URL piwikUrl;
+	@Override
+	public void run() {
+		while(trackOneHit());
+	}
+
+	protected boolean trackOneHit() {
 		try {
+			Hit hit = hits.take();
+			
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			parameters.put("idsite", siteId);
+			parameters.put("rec", 1);
+			parameters.put("apiv", API_VERSION);
+			parameters.put("url", encode(hit.getUrl()));
+			parameters.put("urlref", encode(hit.getReferrer()));
+			parameters.put("action_name", encode(hit.getTitle()));
+			parameters.put("rand", rnd.nextInt(9999999));
+			
+			String query = buildQuery(parameters);
+			
+			URL piwikUrl;
 			piwikUrl = new URL(piwikBase + "?" + query);
 
 			// best effort, if it doesn't work we'll just ignore the error
-			URLConnection conn = piwikUrl.openConnection();
-			if(userAgent != null) {
-				conn.setRequestProperty("User-agent", userAgent);
+			URLConnection conn = openConnection(piwikUrl);
+
+			if(hit.getUserAgent() != null) {
+				conn.setRequestProperty("User-agent", hit.getUserAgent());
 			}
 			conn.setConnectTimeout(10000);
 			conn.setReadTimeout(10000);
@@ -88,11 +91,20 @@ public class DefaultPiwikClient implements StatsTracker {
 			log.debug("Tracking to Piwik with URL: {}", piwikUrl);
 			conn.connect();
 			conn.getInputStream().close();
-		} catch (IOException e) {
+		} catch (InterruptedException e) {
+			log.debug("Stopping Piwik tracker", e);
+			return false;
+		} catch (Exception e) {
 			log.warn("Failed to track request in Piwik", e);
 		}
+		
+		return true;
 	}
-
+	
+	protected URLConnection openConnection(URL url) throws IOException {
+		return url.openConnection();
+	}
+	
 	private String buildQuery(Map<String, Object> parameters) {
 		StringBuilder sb = new StringBuilder();
 		for(Entry<String, Object> parameter : parameters.entrySet()) {

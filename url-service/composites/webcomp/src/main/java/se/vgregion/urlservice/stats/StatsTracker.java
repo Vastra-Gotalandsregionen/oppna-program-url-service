@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.controllers;
+package se.vgregion.urlservice.stats;
 
 
 

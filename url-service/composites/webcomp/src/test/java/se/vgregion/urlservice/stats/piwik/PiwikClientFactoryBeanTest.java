@@ -17,12 +17,14 @@
  *
  */
 
-package se.vgregion.urlservice.controllers;
+package se.vgregion.urlservice.stats.piwik;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.urlservice.controllers.PiwikClientFactoryBean.NoopStatsTracker;
+import se.vgregion.urlservice.stats.piwik.DefaultPiwikClient;
+import se.vgregion.urlservice.stats.piwik.PiwikClientFactoryBean;
+import se.vgregion.urlservice.stats.piwik.PiwikClientFactoryBean.NoopStatsTracker;
 
 
 public class PiwikClientFactoryBeanTest {

@@ -39,7 +39,7 @@
 	 it will track visits to the provided Piwik instance.
 	 If these are not set, it will automatically disable tracking
 	  -->
-	<bean class="se.vgregion.urlservice.controllers.PiwikClientFactoryBean">
+	<bean class="se.vgregion.urlservice.stats.piwik.PiwikClientFactoryBean">
 		<!-- Piwik base URL -->
 		<constructor-arg value="${piwik.baseurl}" />
 		
